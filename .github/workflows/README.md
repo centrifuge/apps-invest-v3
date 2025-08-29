@@ -23,7 +23,7 @@
 #### Repository Secrets (for dev/demo)
 ```bash
 gh secret set CLOUDFLARE_API_TOKEN --body "your-api-token"
-gh secret set CLOUDFLARE_ACCOUNT_ID --body "your-account-id"
+gh variable set CLOUDFLARE_ACCOUNT_ID --body "your-account-id"
 ```
 
 #### Production Environment Secrets
@@ -38,6 +38,6 @@ gh secret set CLOUDFLARE_ACCOUNT_ID --body "your-account-id"
 
 # 2. Upload secrets to production environment
 gh secret set CLOUDFLARE_API_TOKEN --env production --body "your-api-token"
-gh secret set CLOUDFLARE_ACCOUNT_ID --env production --body "your-account-id"
+gh variable set CLOUDFLARE_ACCOUNT_ID --env production --body "your-account-id"
 ```
 
