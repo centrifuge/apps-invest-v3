@@ -53,10 +53,10 @@ runs:
             ? `\n\n> Test functions quickly: GET ${helloUrl}\n> Example: curl -s ${helloUrl}\n> This endpoint is read-only and does not pin to IPFS.`
             : '';
           let body = `${marker}\n` +
-            `### ${app} deploy to CF Workers\n\n` +
-            '| Status | Name | Commit | Preview URL | Updated (UTC) |\n' +
-            '|---|---|---|---|---|\n' +
-            `| ${icon} | ${app} | ${shortSha ? `[${shortSha}](${commitUrl})` : 'NotFound'} | ${url ? `[Preview URL](${url})` : '—'} | ${new Date().toUTCString()} |` +
+            `### 🚀 Deploy to CF Workers\n\n` +
+            '| Status | Commit | Preview URL | Updated (UTC) |\n' +
+            '|---|---|---|---|\n' +
+            `| ${icon} | ${shortSha ? `[${shortSha}](${commitUrl})` : 'NotFound'} | ${url ? `[Preview URL](${url})` : '—'} | ${new Date().toUTCString()} |` +
             `${extra}`;
           if (lighthouseUrl && app !== 'functions') {
             body += `\n\n**Lighthouse report**: ${lighthouseUrl}`;
