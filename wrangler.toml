@@ -1,0 +1,22 @@
+main = "index.js"
+compatibility_date = "2025-06-30"
+
+[observability]
+enabled = true
+
+[assets]
+directory          = "./dist"
+binding            = "ASSETS"
+not_found_handling = "single-page-application"
+
+[env.demo]
+name   = "derwa-demo"
+routes = [
+  { pattern = "derwa-demo.k-f.dev/*", zone_name = "k-f.dev" }
+]
+
+[env.production]
+name   = "derwa-production"        
+routes = [
+  { pattern = "beta.app.centrifuge.io/*", zone_name = "centrifuge.io" }
+]

@@ -1,0 +1,15 @@
+node_modules
+.next
+.idea/
+.vscode
+.DS_Store
+out
+services/tinlake/addresses_tinlake.json
+nft_data_definition.json
+dist
+
+.react-router/
+.cursor/
+.wrangler/
+
+.env.local
