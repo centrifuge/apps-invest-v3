@@ -21,7 +21,7 @@ runs:
         
         # Run Lighthouse CI on the deployed URL and capture report URL
         set -o pipefail
-        lhci autorun --config=lighthouserc.js --collect.url=${{ inputs.deployment-url }} --collect.numberOfRuns=2 2>&1 | tee lhci.out
+        lhci autorun --config=lighthouserc.json --collect.url=${{ inputs.deployment-url }} --collect.numberOfRuns=2 2>&1 | tee lhci.out
         REPORT_URL=$(grep -Eo 'https://storage.googleapis.com/[^ ]+\.html' lhci.out | tail -n1)
         if [ -n "$REPORT_URL" ]; then
           echo "report_url=$REPORT_URL" >> $GITHUB_OUTPUT
