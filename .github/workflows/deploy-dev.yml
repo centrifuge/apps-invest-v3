@@ -24,6 +24,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      gh_env: ${{ steps.set-env.outputs.environment }}
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
@@ -34,9 +36,19 @@ jobs:
         with:
           build-args: --mode testnet
 
+      - name: '⚙️ Set Environment'
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "environment=demo" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment: 
+      name: ${{ needs.build.outputs.gh_env }}
+      url: ${{ github.event_name == 'pull_request' && '' || steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
@@ -56,7 +68,16 @@ jobs:
         uses: ./.github/actions/lighthouse-test
         with:
           deployment-url: ${{ steps.deploy.outputs.deployment-url }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: '🔍 Debug Lighthouse Output'
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Lighthouse output report_url: '${{ steps.lighthouse.outputs.report_url }}'"
+          echo "Lighthouse output length: ${#LIGHTHOUSE_URL}"
+          echo "Lighthouse step outcome: ${{ steps.lighthouse.outcome }}"
+        env:
+          LIGHTHOUSE_URL: ${{ steps.lighthouse.outputs.report_url }}
 
       - name: '💬 Upsert PR Preview Comment'
         if: github.event_name == 'pull_request'
@@ -65,4 +86,4 @@ jobs:
           app: ${{ env.APP_NAME }}
           url: ${{ steps.deploy.outputs.deployment-url }}
           status: ${{ steps.deploy.outcome }}
-          lighthouse-url: ${{ steps.lighthouse.outputs.report-url }}
+          lighthouse-url: ${{ steps.lighthouse.outputs.report_url }}
