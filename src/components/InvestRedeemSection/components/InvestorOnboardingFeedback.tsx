@@ -51,16 +51,18 @@ export function InvestorOnboardingFeedback({
         <Button disabled colorPalette="yellow" mt={8}>
           Invest
         </Button>
-        <Box mt={6} mb={8}>
-          <a href={marketLink} target="_blank" rel="noopener noreferrer">
-            <Flex alignItems="center" justifyContent="center">
-              <Text fontSize="sm" mr={8} fontWeight={500}>
-                Secondary Market
-              </Text>
-              <CiShare1 />
-            </Flex>
-          </a>
-        </Box>
+        {isBaseDeJAAA && (
+          <Box mt={6} mb={8}>
+            <a href={marketLink} target="_blank" rel="noopener noreferrer">
+              <Flex alignItems="center" justifyContent="center">
+                <Text fontSize="sm" mr={8} fontWeight={500}>
+                  Secondary Market
+                </Text>
+                <CiShare1 />
+              </Flex>
+            </a>
+          </Box>
+        )}
       </Flex>
     </Box>
   )
