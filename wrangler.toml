@@ -10,13 +10,13 @@ binding            = "ASSETS"
 not_found_handling = "single-page-application"
 
 [env.dev]
-name   = "derwa-demo"
+name   = "invest-v3-dev"
 routes = [
   { pattern = "derwa-demo.k-f.dev", custom_domain = true }
 ]
 
 [env.prod]
-name   = "derwa-production"        
+name   = "invest-v3-prod"        
 routes = [
   { pattern = "beta.app.centrifuge.io", custom_domain = true }
 ]
