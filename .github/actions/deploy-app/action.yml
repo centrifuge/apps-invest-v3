@@ -49,22 +49,20 @@ runs:
         if [ "${{ inputs.environment }}" = "staging" ]; then
           # Staging: Upload with tag and preview-alias
           CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message 'Staging deployment for ${{ github.ref_name }}' --preview-alias staging"
-        
         elif [ "${{ inputs.environment }}" = "prod" ]; then
           # Prod: Deploy existing version by tag
           # First, get the version ID for the tag using JSON output
           VERSION_ID=$(wrangler versions list --name invest-v3-$WRANGLER_ENV --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
           if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
-            CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV" -y
+            CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
           else
             echo "Error: No version found for tag ${{ github.ref_name }}"
             exit 1
           fi
-        
         elif [ "${{ inputs.environment }}" = "dev" ]; then
           # PR: Upload with PR info
           CMD="versions upload --env $WRANGLER_ENV --tag pr-${{ github.event.pull_request.number }} --message 'PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}'"
-        elif [ "${{ inputs.environment }}" = "demo" ]
+        elif [ "${{ inputs.environment }}" = "demo" ]; then
           # Default: Regular deploy
           CMD="deploy --env $WRANGLER_ENV"
         else
