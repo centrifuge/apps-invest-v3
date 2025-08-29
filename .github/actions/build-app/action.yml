@@ -1,0 +1,70 @@
+name: 'Build App GH action'
+description: 'Build app with common setup'
+
+inputs:
+  build-args:
+    description: 'pnpm $build-args'
+    required: false
+
+  github-token:
+    description: 'GitHub token (required for mainnet builds)'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '📦 Setup pnpm'
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+
+    - name: '🟢 Setup Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+
+    - name: '🔍 Check if Build Artifact Already Exists'
+      if: github.event_name == 'release'
+      id: check-artifact
+      shell: sh
+      run: |
+        ARTIFACT_NAME="invest-v3-${{ github.ref_name }}.zip"
+        echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+        if gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq ".assets[] | select(.name == \"$ARTIFACT_NAME\")" > /dev/null 2>&1; then
+          echo "::info::✅ Build artifact already exists: $ARTIFACT_NAME"
+          echo "skip_build=true" >> $GITHUB_OUTPUT
+        else
+          echo "::info::🔄 Build artifact not found, building $ARTIFACT_NAME"
+          echo "skip_build=false" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: '📥 Install Dependencies'
+      shell: sh
+      run: pnpm install --frozen-lockfile
+
+    - name: '🔨 Build App'
+      if: github.event_name != 'release' || steps.check-artifact.outputs.skip_build != 'true'
+      shell:  sh
+      run: |
+        pnpm build ${{ inputs.build-args }}
+
+    - name: '📦 Upload Build Artifact'
+      uses: actions/upload-artifact@v4
+      with:
+        name: invest-v3-build-${{ github.sha }}
+        path: ./dist
+
+    - name: '📦 Upload Build Artifact to Release'
+      if: github.event_name == 'release' && steps.check-artifact.outputs.skip_build != 'true'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./dist
+        asset_name: ${{ env.artifact-name }}
+        asset_content_type: application/zip
+

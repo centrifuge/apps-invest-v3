@@ -1,0 +1,68 @@
+name: 🚀 Build & Deploy to Dev/Demo
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: preview-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_NAME: invest-v3
+
+permissions:
+  contents: read
+  deployments: write
+  issues: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: '📥 Checkout Code'
+        uses: actions/checkout@v4
+
+      - name: '🔨 Build App'
+        id: build
+        uses: ./.github/actions/build-app
+        with:
+          build-args: --mode testnet
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: '📥 Checkout Code'
+        uses: actions/checkout@v4
+
+      - name: '🚀 Deploy App'
+        id: deploy
+        uses: ./.github/actions/deploy-app
+        with:
+          environment: ${{ github.event_name == 'pull_request' && 'dev' || 'demo' }}
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: '📊 Performance Test with Lighthouse'
+        id: lighthouse
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/lighthouse-test
+        with:
+          deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: '💬 Upsert PR Preview Comment'
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/upsert-preview-comment
+        with:
+          app: ${{ env.APP_NAME }}
+          url: ${{ steps.deploy.outputs.deployment-url }}
+          status: ${{ steps.deploy.outcome }}
+          lighthouse-url: ${{ steps.lighthouse.outputs.report-url }}

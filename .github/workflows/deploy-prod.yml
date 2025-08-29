@@ -1,0 +1,48 @@
+name: 🚀 Build & Deploy to Staging/Production
+
+on:
+  release:
+    types: [released, prereleased]
+
+env:
+  ARTIFACT_NAME: invest-v3-${{ github.ref_name }}.zip
+
+permissions:
+  contents: write
+  deployments: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.action != 'prereleased'
+    steps:
+      - name: '📥 Checkout Code from Release Tag'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: '🔨 Build App'
+        id: build
+        uses: ./.github/actions/build-app
+        with:
+          build-args: --mode mainnet
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: '📥 Checkout Code'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: '🚀 Deploy App'
+        id: deploy
+        uses: ./.github/actions/deploy-app
+        with:
+          environment: ${{ github.event.action == 'prereleased' && 'staging' || 'prod' }}
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
