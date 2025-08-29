@@ -24,6 +24,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      gh_env: ${{ steps.set-env.outputs.environment }}
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
@@ -34,11 +36,18 @@ jobs:
         with:
           build-args: --mode testnet
 
+      - name: '⚙️ Set Environment'
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "environment=demo" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
     environment: 
-      name: ${{ github.event_name == 'pull_request' && '' || 'demo' }}
+      name: ${{ needs.build.outputs.gh_env }}
       url: ${{ github.event_name == 'pull_request' && '' || steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code'
