@@ -73,6 +73,32 @@ runs:
         wranglerVersion: "4.33.1"
       id: deploy
 
+    - name: '🐛 Debug: Check wrangler command'
+      shell: sh
+      run: |
+        echo "Wrangler command used: ${{ steps.wrangler-command.outputs.cmd }}"
+        echo "Environment: ${{ inputs.environment }}"
+        echo "Event name: ${{ github.event_name }}"
+
+    - name: '🐛 Debug: Check deployment URL output'
+      shell: sh
+      run: |
+        echo "Deployment URL from wrangler action: '${{ steps.deploy.outputs.deployment-url }}'"
+        echo "Deployment URL length: ${#DEPLOYMENT_URL}"
+        if [ -n "${{ steps.deploy.outputs.deployment-url }}" ]; then
+          echo "✅ Deployment URL is NOT empty"
+        else
+          echo "❌ Deployment URL is empty"
+        fi
+
+    - name: '🐛 Debug: Check all deploy step outputs'
+      shell: sh
+      run: |
+        echo "All outputs from deploy step:"
+        echo "deployment-url: '${{ steps.deploy.outputs.deployment-url }}'"
+        echo "command-output: '${{ steps.deploy.outputs.command-output }}'"
+        echo "command-stderr: '${{ steps.deploy.outputs.command-stderr }}'"
+
     - name: '⚙️ Create Deployment Status'
       if: always()
       shell: sh
