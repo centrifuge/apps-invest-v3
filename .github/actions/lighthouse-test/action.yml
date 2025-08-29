@@ -14,7 +14,7 @@ runs:
   steps:
     - name: '📊 Performance Test with Lighthouse'
       id: lighthouse
-      shell: sh
+      shell: bash
       run: |
         # Install Lighthouse CI
         npm install -g @lhci/cli
