@@ -64,7 +64,6 @@ runs:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
         command: ${{ steps.wrangler-command.outputs.cmd }}
-        workingDirectory: invest-v3
       id: deploy
 
     - name: '⚙️ Create Deployment Status'
