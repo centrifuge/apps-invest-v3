@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/environment-deployment-tracking
   pull_request:
     types: [opened, synchronize, reopened]
 
