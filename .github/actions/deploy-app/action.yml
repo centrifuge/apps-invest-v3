@@ -69,6 +69,7 @@ runs:
       with:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
+        gitHubToken: ${{ inputs.github-token }}
         command: ${{ steps.wrangler-command.outputs.cmd }}
         wranglerVersion: "4.33.1"
       id: deploy
