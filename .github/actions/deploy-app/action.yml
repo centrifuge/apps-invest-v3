@@ -1,0 +1,121 @@
+name: 'Deploy App GH action'
+description: 'Deploy app with environment-based configuration'
+
+inputs:
+  environment:
+    description: 'Environment (dev, demo, staging, prod)'
+    required: true
+  cloudflare-api-token:
+    description: 'Cloudflare API token'
+    required: true
+  cloudflare-account-id:
+    description: 'Cloudflare account ID'
+    required: true
+  github-token:
+    description: 'GitHub token'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '🟢 Setup Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: '📦 Download Build Artifact'
+      if: inputs.environment != 'prod'
+      uses: actions/download-artifact@v4
+      with:
+        name: invest-v3-build-${{ github.sha }}
+        path: ./dist
+
+    - name: '📥 Download Build Artifact from Release'
+      if: inputs.environment == 'prod'
+      shell: sh
+      run: |
+        ARTIFACT_NAME="invest-v3-${{ github.ref_name }}.zip"
+        gh release download ${{ github.ref_name }} \
+          --repo ${{ github.repository }} \
+          --pattern "$ARTIFACT_NAME" \
+          --dir ./dist/
+        
+        # Extract the zip file
+        unzip "$ARTIFACT_NAME" -d dist
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: '⚙️ Determine wrangler command'
+      id: wrangler-command
+      shell: sh
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          CMD="versions upload --env ${{ inputs.environment }}"
+        elif [ "${{ github.event.action }}" = "prereleased" ]; then
+          CMD="versions upload --env ${{ inputs.environment }} --preview-alias staging"
+        else
+          CMD="deploy --env ${{ inputs.environment }}"
+        fi
+        echo "Wrangler command: $CMD"
+        echo "cmd=$CMD" >> $GITHUB_OUTPUT
+
+    - name: '📦 Setup pnpm (for Wrangler)'
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+
+    - name: '🚀 Deploy to Cloudflare'
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.cloudflare-api-token }}
+        accountId: ${{ inputs.cloudflare-account-id }}
+        gitHubToken: ${{ inputs.github-token }}
+        command: ${{ steps.wrangler-command.outputs.cmd }}
+        wranglerVersion: "4.33.1"
+      id: deploy
+
+    - name: '🐛 Debug: Check wrangler command'
+      shell: sh
+      run: |
+        echo "Wrangler command used: ${{ steps.wrangler-command.outputs.cmd }}"
+        echo "Environment: ${{ inputs.environment }}"
+        echo "Event name: ${{ github.event_name }}"
+
+    - name: '🐛 Debug: Check deployment URL output'
+      shell: sh
+      run: |
+        echo "Deployment URL from wrangler action: '${{ steps.deploy.outputs.deployment-url }}'"
+        echo "Deployment URL length: ${#DEPLOYMENT_URL}"
+        if [ -n "${{ steps.deploy.outputs.deployment-url }}" ]; then
+          echo "✅ Deployment URL is NOT empty"
+        else
+          echo "❌ Deployment URL is empty"
+        fi
+
+    - name: '🐛 Debug: Check all deploy step outputs'
+      shell: sh
+      run: |
+        echo "All outputs from deploy step:"
+        echo "deployment-url: '${{ steps.deploy.outputs.deployment-url }}'"
+        echo "command-output: '${{ steps.deploy.outputs.command-output }}'"
+        echo "command-stderr: '${{ steps.deploy.outputs.command-stderr }}'"
+
+    - name: '⚙️ Create Deployment Status'
+      if: always()
+      shell: sh
+      run: |
+        if [ "${{ steps.deploy.outcome }}" = "success" ]; then
+          gh api repos/:owner/:repo/deployments \
+            --method POST \
+            --field ref=${{ github.ref }} \
+            --field environment=${{ inputs.environment }} \
+            --field description="Deployed to ${{ inputs.environment }}" \
+            --field auto_inactive=false
+        fi
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+outputs:
+  deployment-url:
+    description: 'URL of the deployed application'
+    value: ${{ steps.deploy.outputs.deployment-url }}

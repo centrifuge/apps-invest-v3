@@ -9,14 +9,14 @@ directory          = "./dist"
 binding            = "ASSETS"
 not_found_handling = "single-page-application"
 
-[env.demo]
-name   = "derwa-demo"
+[env.dev]
+name   = "invest-v3-dev"
 routes = [
-  { pattern = "derwa-demo.k-f.dev/*", zone_name = "k-f.dev" }
+  { pattern = "derwa-demo.k-f.dev", custom_domain = true }
 ]
 
-[env.production]
-name   = "derwa-production"        
+[env.prod]
+name   = "invest-v3-prod"        
 routes = [
-  { pattern = "beta.app.centrifuge.io/*", zone_name = "centrifuge.io" }
+  { pattern = "beta.app.centrifuge.io", custom_domain = true }
 ]
