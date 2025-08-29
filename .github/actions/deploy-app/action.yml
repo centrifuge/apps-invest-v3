@@ -28,6 +28,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: invest-v3-build-${{ github.sha }}
+        path: ./dist
 
     - name: '📥 Download Build Artifact from Release'
       if: inputs.environment == 'prod'
@@ -37,7 +38,7 @@ runs:
         gh release download ${{ github.ref_name }} \
           --repo ${{ github.repository }} \
           --pattern "$ARTIFACT_NAME" \
-          --dir ./
+          --dir ./dist/
         
         # Extract the zip file
         unzip "$ARTIFACT_NAME" -d dist
@@ -69,6 +70,7 @@ runs:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
         command: ${{ steps.wrangler-command.outputs.cmd }}
+        wranglerVersion: "4.33.1"
       id: deploy
 
     - name: '⚙️ Create Deployment Status'
