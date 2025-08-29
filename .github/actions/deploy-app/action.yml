@@ -30,24 +30,12 @@ runs:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
 
-    - name: '📥 Download Build Artifact from Release'
-      if: inputs.environment == 'prod'
-      shell: sh
-      run: |
-        ARTIFACT_NAME="invest-v3-${{ github.ref_name }}.zip"
-        gh release download ${{ github.ref_name }} \
-          --repo ${{ github.repository }} \
-          --pattern "$ARTIFACT_NAME" \
-          --dir ./dist/
-        
-        # Extract the zip file
-        unzip "$ARTIFACT_NAME" -d dist
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
-
     - name: '⚙️ Determine wrangler command'
       id: wrangler-command
       shell: sh
+      env:
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
       run: |
         # Map workflow environment names to wrangler environment names
         if [ "${{ inputs.environment }}" = "demo" ]; then
@@ -58,12 +46,30 @@ runs:
           WRANGLER_ENV="${{ inputs.environment }}"
         fi
         
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          CMD="versions upload --env $WRANGLER_ENV"
-        elif [ "${{ github.event.action }}" = "prereleased" ]; then
-          CMD="versions upload --env $WRANGLER_ENV --preview-alias staging"
-        else
+        if [ "${{ inputs.environment }}" = "staging" ]; then
+          # Staging: Upload with tag and preview-alias
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message \"Deployed commit: $SHORT_SHA\" --preview-alias staging"
+        elif [ "${{ inputs.environment }}" = "prod" ]; then
+          # Prod: Deploy existing version by tag
+          # First, get the version ID for the tag using JSON output
+          VERSION_ID=$(wrangler versions list --name invest-v3-$WRANGLER_ENV --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
+          if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
+            CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
+          else
+            echo "Error: No version found for tag ${{ github.ref_name }}"
+            exit 1
+          fi
+        elif [ "${{ inputs.environment }}" = "dev" ]; then
+          # PR: Upload with PR info
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          CMD="versions upload --env $WRANGLER_ENV --tag $SHORT_SHA --message \"PR #${{ github.event.pull_request.number }} - $SHORT_SHA\""
+        elif [ "${{ inputs.environment }}" = "demo" ]; then
+          # Demo: Direct deploy
           CMD="deploy --env $WRANGLER_ENV"
+        else
+          echo "Error: Environment '${{ inputs.environment }}' is not defined or supported."
+          exit 1
         fi
         echo "Wrangler command: $CMD"
         echo "cmd=$CMD" >> $GITHUB_OUTPUT
@@ -99,17 +105,43 @@ runs:
         echo ""
         echo "::notice::Note: This is a one-time setup. Once enabled, all future deployments will work automatically."
 
-    - name: '⚙️ Create Deployment Status'
-      if: always()
+    - name: '✅ Create and Update Deployment Status (Non-Dev)'
+      if: always() && inputs.environment != 'dev'
       shell: sh
       run: |
-        if [ "${{ steps.deploy.outcome }}" = "success" ]; then
-          gh api repos/:owner/:repo/deployments \
+        # Check if deployment already exists for this commit and environment
+        EXISTING_DEPLOYMENT=$(gh api repos/:owner/:repo/deployments \
+          --field ref=${{ github.sha }} \
+          --field environment=${{ inputs.environment }} \
+          --jq '.[0]' 2>/dev/null || echo "null")
+        
+        if [ "$EXISTING_DEPLOYMENT" != "null" ] && [ -n "$EXISTING_DEPLOYMENT" ]; then
+          # Use existing deployment
+          DEPLOYMENT_ID=$(echo "$EXISTING_DEPLOYMENT" | jq -r '.id')
+          echo "Using existing deployment ID: $DEPLOYMENT_ID"
+        else
+          # Create new deployment
+          DEPLOYMENT_RESPONSE=$(gh api repos/:owner/:repo/deployments \
             --method POST \
-            --field ref=${{ github.ref }} \
+            --field ref=${{ github.sha }} \
             --field environment=${{ inputs.environment }} \
-            --field description="Deployed to ${{ inputs.environment }}" \
-            --field auto_inactive=false
+            --field description="Deployment to ${{ inputs.environment }}" \
+            --field auto_inactive=false)
+          
+          # Extract deployment ID from response
+          DEPLOYMENT_ID=$(echo "$DEPLOYMENT_RESPONSE" | jq -r '.id')
+          echo "Created new deployment ID: $DEPLOYMENT_ID"
+        fi
+        
+        if [ -n "$DEPLOYMENT_ID" ] && [ "$DEPLOYMENT_ID" != "null" ]; then
+          # Update deployment status based on outcome
+          gh api repos/:owner/:repo/deployments/$DEPLOYMENT_ID/statuses \
+            --method POST \
+            --field state=${{ steps.deploy.outcome }} \
+            --field description="Deployment to ${{ inputs.environment }} status: ${{ steps.deploy.outcome }}" \
+            --field target_url="${{ steps.deploy.outputs.deployment-url }}" || echo "Failed to update deployment status"
+        else
+          echo "Failed to create or find deployment"
         fi
       env:
         GH_TOKEN: ${{ inputs.github-token }}
