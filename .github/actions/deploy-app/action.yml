@@ -48,7 +48,8 @@ runs:
         
         if [ "${{ inputs.environment }}" = "staging" ]; then
           # Staging: Upload with tag and preview-alias
-          CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message \"Staging deployment for ${{ github.ref_name }}\" --preview-alias staging"
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message \"Deployed commit: $SHORT_SHA\" --preview-alias staging"
         elif [ "${{ inputs.environment }}" = "prod" ]; then
           # Prod: Deploy existing version by tag
           # First, get the version ID for the tag using JSON output
@@ -61,9 +62,10 @@ runs:
           fi
         elif [ "${{ inputs.environment }}" = "dev" ]; then
           # PR: Upload with PR info
-          CMD="versions upload --env $WRANGLER_ENV --tag pr-${{ github.event.pull_request.number }} --message \"PR #${{ github.event.pull_request.number }}\""
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          CMD="versions upload --env $WRANGLER_ENV --tag $SHORT_SHA --message \"PR #${{ github.event.pull_request.number }} - $SHORT_SHA\""
         elif [ "${{ inputs.environment }}" = "demo" ]; then
-          # Default: Regular deploy
+          # Demo: Direct deploy
           CMD="deploy --env $WRANGLER_ENV"
         else
           echo "Error: Environment '${{ inputs.environment }}' is not defined or supported."
