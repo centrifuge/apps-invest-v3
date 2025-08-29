@@ -16,6 +16,7 @@ import { useChainId } from 'wagmi'
 
 const PoolContext = createContext<
   | {
+      connectedChainId: number | undefined
       holdings?: Holdings
       isLoading: boolean
       isNetworksLoading: boolean
@@ -96,6 +97,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   return (
     <PoolContext.Provider
       value={{
+        connectedChainId,
         holdings,
         isHoldingsLoading,
         isLoading,

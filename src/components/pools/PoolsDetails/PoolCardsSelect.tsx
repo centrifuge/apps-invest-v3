@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { MdBrokenImage } from 'react-icons/md'
 import { Link } from 'react-router-dom'
 import { Box, Center, Flex, Grid, Heading, Icon, Image, Separator, Spinner, Text } from '@chakra-ui/react'
+import { useChainId } from 'wagmi'
 import { PoolId } from '@centrifuge/sdk'
 import {
   formatBalanceAbbreviated,
@@ -10,13 +12,11 @@ import {
   useIsMember,
   usePoolActiveNetworks,
 } from '@cfg'
-import { Card, ValueText } from '@ui'
-import { routePaths } from '@routes/routePaths'
 import { PoolCardsSelectSkeleton } from '@components/Skeletons/PoolCardsSelectSkeleton'
-import { getPoolTVL } from '@utils/getPoolTVL'
-import { MdBrokenImage } from 'react-icons/md'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
-import { useChainId } from 'wagmi'
+import { routePaths } from '@routes/routePaths'
+import { Card, ValueText } from '@ui'
+import { getPoolTVL } from '@utils/getPoolTVL'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
@@ -34,7 +34,7 @@ interface PoolSelectorProps {
 
 export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) => {
   const { data: pools, isLoading } = useAllPoolDetails(poolIds)
-  const { productionPoolIds, restrictedPoolIds, getIsRwaPool } = useGetPoolsByIds()
+  const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool } = useGetPoolsByIds()
 
   const allPools: DisplayPool[] | undefined = useMemo(
     () =>
@@ -47,7 +47,10 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
     [pools]
   )
 
-  const productionPools = useMemo(() => allPools?.filter((pool) => productionPoolIds.includes(pool.id)), [allPools])
+  const productionPools = useMemo(
+    () => allPools?.filter((pool) => getIsProductionPool(pool.id)),
+    [allPools, getIsProductionPool]
+  )
   const displayPools = import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet' ? allPools : productionPools
   const rwaPools = displayPools?.filter((pool) => pool.isRwaPool) ?? []
   const deRwaPools = displayPools?.filter((pool) => !pool.isRwaPool) ?? []
@@ -65,7 +68,7 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
         <Text fontSize="sm" mb={4}>
           Tokenized real-world assets issued under various legal structures. KYB onboarding required.
         </Text>
-        <RenderPoolCards pools={rwaPools} restrictedPoolIds={restrictedPoolIds} isRwaPool />
+        <RenderPoolCards pools={rwaPools} getIsRestrictedPool={getIsRestrictedPool} isRwaPool />
       </Box>
 
       <Heading as="h2" size="lg" mb={2}>
@@ -74,18 +77,18 @@ export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProp
       <Text fontSize="sm" mb={4}>
         Decentralized real-world asset tokens. Freely transferable tokens with on-chain transparency and liquidity.
       </Text>
-      <RenderPoolCards pools={deRwaPools} restrictedPoolIds={restrictedPoolIds} isRwaPool={false} />
+      <RenderPoolCards pools={deRwaPools} getIsRestrictedPool={getIsRestrictedPool} isRwaPool={false} />
     </>
   )
 }
 
 function RenderPoolCards({
   pools,
-  restrictedPoolIds,
+  getIsRestrictedPool,
   isRwaPool,
 }: {
   pools: DisplayPool[]
-  restrictedPoolIds: string[]
+  getIsRestrictedPool: (poolId?: string | undefined) => boolean
   isRwaPool: boolean
 }) {
   return (
@@ -97,7 +100,7 @@ function RenderPoolCards({
         >
           {pools.map((pool) => (
             <Link to={`${routePaths.poolPage}/${pool.id}`} onClick={pool.setId} key={pool.id}>
-              <PoolCard poolDetails={pool.pool} isRwaPool={pool.isRwaPool} restrictedPoolIds={restrictedPoolIds} />
+              <PoolCard poolDetails={pool.pool} isRwaPool={pool.isRwaPool} getIsRestrictedPool={getIsRestrictedPool} />
             </Link>
           ))}
         </Grid>
@@ -112,11 +115,11 @@ function RenderPoolCards({
 
 function PoolCard({
   poolDetails,
-  restrictedPoolIds,
+  getIsRestrictedPool,
   isRwaPool,
 }: {
   poolDetails: PoolDetails
-  restrictedPoolIds: string[]
+  getIsRestrictedPool: (poolId?: string | undefined) => boolean
   isRwaPool: boolean
 }) {
   const connectedChainId = useChainId()
@@ -126,18 +129,17 @@ function PoolCard({
 
   // We need to find the pool network and check if the current wallet is whitelisted
   const currentNetwork = networks?.find((n) => n.chainId === connectedChainId)
-  const queriedNetwork = currentNetwork ?? networks?.[0]
+  const currentNetworkChainId = currentNetwork ? currentNetwork.chainId : undefined
   const { data: isMember, isLoading: isMemberLoading } = useIsMember(
     poolDetails?.shareClasses[0]?.shareClass.id,
-    queriedNetwork?.chainId,
+    currentNetworkChainId,
     {
-      enabled: !!poolDetails?.shareClasses[0]?.shareClass.id && !!queriedNetwork?.chainId,
+      enabled: !!poolDetails?.shareClasses[0]?.shareClass.id && !!currentNetworkChainId,
     }
   )
   const isWhitelisted = isMember ?? false
-  const isRestrictedPoolId = restrictedPoolIds.includes(poolDetails.id.toString())
+  const isRestrictedPoolId = getIsRestrictedPool(poolDetails.id.toString())
   const isRestrictedPool = isRestrictedPoolId && !isWhitelisted
-
   const poolTVL = useMemo(() => getPoolTVL(poolDetails), [poolDetails.shareClasses])
   const poolMetadata = poolDetails.metadata?.pool
   const iconUri = poolMetadata?.icon?.uri ?? ''
@@ -233,20 +235,6 @@ function PoolCard({
               : ''}
           </Text>
         </Flex>
-        {/* <Flex alignItems="center" justifyContent="space-between">
-          <Text fontSize="xs" fontWeight={500}>
-            Rating
-          </Text>
-          <Flex alignItems="center" justifyContent="flex-end" flexWrap="wrap">
-            {poolMetadata?.poolRatings?.length
-              ? poolMetadata?.poolRatings?.map((rating) => (
-                  <span style={{ marginLeft: '2px' }} key={rating?.agency}>
-                    <RatingPill rating={rating} />
-                  </span>
-                ))
-              : '-'}
-          </Flex>
-        </Flex> */}
       </Flex>
     </Card>
   )
