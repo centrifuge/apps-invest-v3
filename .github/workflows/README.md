@@ -28,10 +28,15 @@ gh secret set CLOUDFLARE_ACCOUNT_ID --body "your-account-id"
 
 #### Production Environment Secrets
 ```bash
-# Create production environment
-gh api repos/:owner/:repo/environments --method POST --field name=production
+# As of now, GitHub CLI does not natively support creating environments via a simple command,
+# and the REST API for environments is only available for GitHub Enterprise Server.
+# For public GitHub.com repositories, you must create environments manually in the repository settings UI.
+# See: https://github.com/orgs/community/discussions/25220
 
-# Upload secrets to production environment
+# 1. Go to your repository → Settings → Environments → New environment, and create "production" there.
+
+
+# 2. Upload secrets to production environment
 gh secret set CLOUDFLARE_API_TOKEN --env production --body "your-api-token"
 gh secret set CLOUDFLARE_ACCOUNT_ID --env production --body "your-account-id"
 ```

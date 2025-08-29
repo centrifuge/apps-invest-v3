@@ -58,6 +58,11 @@ runs:
         echo "Wrangler command: $CMD"
         echo "cmd=$CMD" >> $GITHUB_OUTPUT
 
+    - name: '📦 Setup pnpm (for Wrangler)'
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+
     - name: '🚀 Deploy to Cloudflare'
       uses: cloudflare/wrangler-action@v3
       with:
