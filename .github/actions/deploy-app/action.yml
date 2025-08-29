@@ -111,11 +111,9 @@ runs:
       run: |
         # Check if deployment already exists for this commit and environment
         EXISTING_DEPLOYMENT=$(gh api repos/:owner/:repo/deployments \
-          --field ref=${{ github.sha }} \
-          --field environment=${{ inputs.environment }} \
-          --jq '.[0]' 2>/dev/null || echo "null")
+          --jq ".[] | select(.sha == \"${{ github.sha }}\" and .environment == \"${{ inputs.environment }}\") | ." 2>/dev/null | head -1 || echo "null")
         
-        if [ "$EXISTING_DEPLOYMENT" != "null" ] && [ -n "$EXISTING_DEPLOYMENT" ]; then
+        if [ -n "$EXISTING_DEPLOYMENT" ] && [ "$EXISTING_DEPLOYMENT" != "null" ]; then
           # Use existing deployment
           DEPLOYMENT_ID=$(echo "$EXISTING_DEPLOYMENT" | jq -r '.id')
           echo "Using existing deployment ID: $DEPLOYMENT_ID"
@@ -135,11 +133,18 @@ runs:
         
         if [ -n "$DEPLOYMENT_ID" ] && [ "$DEPLOYMENT_ID" != "null" ]; then
           # Update deployment status based on outcome
-          gh api repos/:owner/:repo/deployments/$DEPLOYMENT_ID/statuses \
-            --method POST \
-            --field state=${{ steps.deploy.outcome }} \
-            --field description="Deployment to ${{ inputs.environment }} status: ${{ steps.deploy.outcome }}" \
-            --field target_url="${{ steps.deploy.outputs.deployment-url }}" || echo "Failed to update deployment status"
+          if [ -n "${{ steps.deploy.outputs.deployment-url }}" ]; then
+            gh api repos/:owner/:repo/deployments/$DEPLOYMENT_ID/statuses \
+              --method POST \
+              --field state=${{ steps.deploy.outcome }} \
+              --field description="Deployment to ${{ inputs.environment }} status: ${{ steps.deploy.outcome }}" \
+              --field target_url="${{ steps.deploy.outputs.deployment-url }}" || echo "Failed to update deployment status"
+          else
+            gh api repos/:owner/:repo/deployments/$DEPLOYMENT_ID/statuses \
+              --method POST \
+              --field state=${{ steps.deploy.outcome }} \
+              --field description="Deployment to ${{ inputs.environment }} status: ${{ steps.deploy.outcome }}" || echo "Failed to update deployment status"
+          fi
         else
           echo "Failed to create or find deployment"
         fi
