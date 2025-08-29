@@ -61,7 +61,7 @@ runs:
           fi
         elif [ "${{ inputs.environment }}" = "dev" ]; then
           # PR: Upload with PR info
-          CMD="versions upload --env $WRANGLER_ENV --tag pr-${{ github.event.pull_request.number }} --message 'PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}'"
+          CMD="versions upload --env $WRANGLER_ENV --tag pr-${{ github.event.pull_request.number }} --message 'PR #${{ github.event.pull_request.number }}'"
         elif [ "${{ inputs.environment }}" = "demo" ]; then
           # Default: Regular deploy
           CMD="deploy --env $WRANGLER_ENV"
