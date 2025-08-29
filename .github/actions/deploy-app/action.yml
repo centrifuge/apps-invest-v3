@@ -49,15 +49,25 @@ runs:
       id: wrangler-command
       shell: sh
       run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          CMD="versions upload --env ${{ inputs.environment }}"
-        elif [ "${{ github.event.action }}" = "prereleased" ]; then
-          CMD="versions upload --env ${{ inputs.environment }} --preview-alias staging"
+        # Map workflow environment names to wrangler environment names
+        if [ "${{ inputs.environment }}" = "demo" ]; then
+          WRANGLER_ENV="dev"
+        elif [ "${{ inputs.environment }}" = "staging" ]; then
+          WRANGLER_ENV="prod"
         else
-          CMD="deploy --env ${{ inputs.environment }}"
+          WRANGLER_ENV="${{ inputs.environment }}"
+        fi
+        
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          CMD="versions upload --env $WRANGLER_ENV"
+        elif [ "${{ github.event.action }}" = "prereleased" ]; then
+          CMD="versions upload --env $WRANGLER_ENV --preview-alias staging"
+        else
+          CMD="deploy --env $WRANGLER_ENV"
         fi
         echo "Wrangler command: $CMD"
         echo "cmd=$CMD" >> $GITHUB_OUTPUT
+        echo "wrangler-env=$WRANGLER_ENV" >> $GITHUB_OUTPUT
 
     - name: '📦 Setup pnpm (for Wrangler)'
       uses: pnpm/action-setup@v3
@@ -74,31 +84,20 @@ runs:
         wranglerVersion: "4.33.1"
       id: deploy
 
-    - name: '🐛 Debug: Check wrangler command'
+    - name: '🔗 Handle Missing Preview URLs'
+      if: steps.deploy.outputs.deployment-url == ''
       shell: sh
       run: |
-        echo "Wrangler command used: ${{ steps.wrangler-command.outputs.cmd }}"
-        echo "Environment: ${{ inputs.environment }}"
-        echo "Event name: ${{ github.event_name }}"
-
-    - name: '🐛 Debug: Check deployment URL output'
-      shell: sh
-      run: |
-        echo "Deployment URL from wrangler action: '${{ steps.deploy.outputs.deployment-url }}'"
-        echo "Deployment URL length: ${#DEPLOYMENT_URL}"
-        if [ -n "${{ steps.deploy.outputs.deployment-url }}" ]; then
-          echo "✅ Deployment URL is NOT empty"
-        else
-          echo "❌ Deployment URL is empty"
-        fi
-
-    - name: '🐛 Debug: Check all deploy step outputs'
-      shell: sh
-      run: |
-        echo "All outputs from deploy step:"
-        echo "deployment-url: '${{ steps.deploy.outputs.deployment-url }}'"
-        echo "command-output: '${{ steps.deploy.outputs.command-output }}'"
-        echo "command-stderr: '${{ steps.deploy.outputs.command-stderr }}'"
+        echo "::warning::No deployment URL generated because preview URLs are disabled for this worker."
+        echo "::warning::Preview URLs need to be enabled manually in the Cloudflare dashboard."
+        echo "::notice::To enable preview URLs:"
+        echo "::notice::1. Go to Cloudflare Dashboard > Workers & Pages"
+        echo "::notice::2. Select your worker (invest-v3-${{ steps.wrangler-command.outputs.wrangler-env }})"
+        echo "::notice::3. Go to Settings > General"
+        echo "::notice::4. Enable 'Preview deployments'"
+        echo "::notice::5. Re-run this job or update the PR to get a deployment URL."
+        echo ""
+        echo "::notice::Note: This is a one-time setup. Once enabled, all future deployments will work automatically."
 
     - name: '⚙️ Create Deployment Status'
       if: always()
