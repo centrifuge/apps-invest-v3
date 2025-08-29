@@ -31,7 +31,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: production
+    environment: 
+      name: ${{ github.event.action == 'prereleased' && 'staging' || 'production' }}
+      url: ${{ github.event.action == 'prereleased' && steps.deploy.outputs.deployment-url || 'https://app.centrifuge.io/' }}
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4

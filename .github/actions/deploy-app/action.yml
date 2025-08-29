@@ -105,51 +105,7 @@ runs:
         echo ""
         echo "::notice::Note: This is a one-time setup. Once enabled, all future deployments will work automatically."
 
-    - name: '✅ Create and Update Deployment Status (Non-Dev)'
-      if: always() && inputs.environment != 'dev'
-      shell: sh
-      run: |
-        # Check if deployment already exists for this commit and environment
-        EXISTING_DEPLOYMENT=$(gh api repos/:owner/:repo/deployments \
-          --jq ".[] | select(.sha == \"${{ github.sha }}\" and .environment == \"${{ inputs.environment }}\") | ." 2>/dev/null | head -1 || echo "null")
-        
-        if [ -n "$EXISTING_DEPLOYMENT" ] && [ "$EXISTING_DEPLOYMENT" != "null" ]; then
-          # Use existing deployment
-          DEPLOYMENT_ID=$(echo "$EXISTING_DEPLOYMENT" | jq -r '.id')
-          echo "Using existing deployment ID: $DEPLOYMENT_ID"
-        else
-          # Create new deployment
-          DEPLOYMENT_RESPONSE=$(gh api repos/:owner/:repo/deployments \
-            --method POST \
-            --field ref=${{ github.sha }} \
-            --field environment=${{ inputs.environment }} \
-            --field description="Deployment to ${{ inputs.environment }}" \
-            --field auto_inactive=false)
-          
-          # Extract deployment ID from response
-          DEPLOYMENT_ID=$(echo "$DEPLOYMENT_RESPONSE" | jq -r '.id')
-          echo "Created new deployment ID: $DEPLOYMENT_ID"
-        fi
-        
-        if [ -n "$DEPLOYMENT_ID" ] && [ "$DEPLOYMENT_ID" != "null" ]; then
-          # Update deployment status based on outcome
-          if [ -n "${{ steps.deploy.outputs.deployment-url }}" ]; then
-            gh api repos/:owner/:repo/deployments/$DEPLOYMENT_ID/statuses \
-              --method POST \
-              --field state=${{ steps.deploy.outcome }} \
-              --field description="Deployment to ${{ inputs.environment }} status: ${{ steps.deploy.outcome }}" \
-              --field target_url="${{ steps.deploy.outputs.deployment-url }}" || echo "Failed to update deployment status"
-          else
-            gh api repos/:owner/:repo/deployments/$DEPLOYMENT_ID/statuses \
-              --method POST \
-              --field state=${{ steps.deploy.outcome }} \
-              --field description="Deployment to ${{ inputs.environment }} status: ${{ steps.deploy.outcome }}" || echo "Failed to update deployment status"
-          fi
-        else
-          echo "Failed to create or find deployment"
-        fi
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
+
 
 outputs:
   deployment-url:

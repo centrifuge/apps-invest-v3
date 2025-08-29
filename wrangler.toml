@@ -12,11 +12,11 @@ not_found_handling = "single-page-application"
 [env.dev]
 name   = "invest-v3-dev"
 routes = [
-  { pattern = "derwa-demo.k-f.dev", custom_domain = true }
+  { pattern = "invest-v3-demo.k-f.dev", custom_domain = true }
 ]
 
 [env.prod]
 name   = "invest-v3-prod"        
 routes = [
-  { pattern = "beta.app.centrifuge.io", custom_domain = true }
+  { pattern = "app.centrifuge.io", custom_domain = true }
 ]

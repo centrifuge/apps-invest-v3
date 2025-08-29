@@ -37,6 +37,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.event_name == 'pull_request' && '' || 'demo' }}
+      url: ${{ github.event_name == 'pull_request' && '' || steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
