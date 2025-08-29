@@ -69,6 +69,16 @@ jobs:
         with:
           deployment-url: ${{ steps.deploy.outputs.deployment-url }}
           # github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: '🔍 Debug Lighthouse Output'
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Lighthouse output report_url: '${{ steps.lighthouse.outputs.report_url }}'"
+          echo "Lighthouse output length: ${#LIGHTHOUSE_URL}"
+          echo "Lighthouse step outcome: ${{ steps.lighthouse.outcome }}"
+        env:
+          LIGHTHOUSE_URL: ${{ steps.lighthouse.outputs.report_url }}
+
       - name: '💬 Upsert PR Preview Comment'
         if: github.event_name == 'pull_request'
         uses: ./.github/actions/upsert-preview-comment
