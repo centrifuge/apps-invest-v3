@@ -7,10 +7,6 @@ on:
         description: 'Deployment URL to test'
         required: true
         type: string
-      github_token:
-        description: 'GitHub token for posting comments'
-        required: true
-        type: string
 
 jobs:
   lighthouse:
@@ -24,4 +20,4 @@ jobs:
         uses: ./.github/actions/lighthouse-check
         with:
           url: ${{ inputs.deployment_url }}
-          github-token: ${{ inputs.github_token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
