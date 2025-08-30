@@ -10,7 +10,6 @@ on:
 
 jobs:
   lighthouse:
-    name: '📊 Lighthouse Performance Check'
     runs-on: ubuntu-latest
     steps:
       - name: '📥 Checkout Code'

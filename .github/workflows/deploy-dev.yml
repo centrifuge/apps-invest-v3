@@ -1,4 +1,4 @@
-name: 🚀 PRs and main branch ci/cd
+name: 🚀 Deploy & CI Checks
 
 on:
   push:

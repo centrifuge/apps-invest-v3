@@ -1,4 +1,4 @@
-name: 🚀 Build & Deploy to Staging/Production
+name: 🚀 Staging/Production Deploy
 
 on:
   release:
