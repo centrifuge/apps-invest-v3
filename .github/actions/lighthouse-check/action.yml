@@ -12,7 +12,7 @@ inputs:
 
 runs:
   using: 'node20'
-  main: 'index.js'
+  main: 'build/index.js'
 
 branding:
   icon: 'zap'
