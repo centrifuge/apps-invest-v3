@@ -34557,6 +34557,11 @@ async function run() {
     const lighthouseDir = path.join(process.env.GITHUB_WORKSPACE || '.', '.lighthouseci');
     const linksPath = path.join(lighthouseDir, 'links.json');
     
+    console.log(`🔍 Looking for lighthouse files in: ${lighthouseDir}`);
+    console.log(`🔍 Looking for links.json at: ${linksPath}`);
+    console.log(`🔍 Directory exists: ${fs.existsSync(lighthouseDir)}`);
+    console.log(`🔍 Links file exists: ${fs.existsSync(linksPath)}`);
+    
     let reportUrl = '';
     let performance = 0, accessibility = 0, bestPractices = 0, seo = 0;
     
@@ -34590,6 +34595,9 @@ async function run() {
     if (fs.existsSync(lighthouseDir)) {
       const files = fs.readdirSync(lighthouseDir);
       const lhrFiles = files.filter(file => file.startsWith('lhr-') && file.endsWith('.json'));
+      
+      console.log(`🔍 All files in lighthouse dir: ${files.join(', ')}`);
+      console.log(`🔍 LHR JSON files found: ${lhrFiles.join(', ')}`);
       
       if (lhrFiles.length > 0) {
         // Get the most recent file
