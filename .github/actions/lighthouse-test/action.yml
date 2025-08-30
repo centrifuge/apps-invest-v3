@@ -22,15 +22,15 @@ runs:
         # Run Lighthouse CI on the deployed URL and capture report URL
         set -o pipefail
         lhci autorun --config=lighthouserc.json --collect.url=${{ inputs.deployment-url }} 2>&1 | tee lhci-test.out
-        REPORT_URL=$(grep -Eo 'https://storage.googleapis.com/[^ ]+\.html' lhci-test.out | tail -n1)
-        if [ -n "$REPORT_URL" ]; then
-          echo "report_url=$REPORT_URL" >> $GITHUB_OUTPUT
-          echo "Lighthouse report URL: $REPORT_URL"
-          echo "DEBUG: Set output report_url to: $REPORT_URL"
+        report-url=$(grep -Eo 'https://storage.googleapis.com/[^ ]+\.html' lhci-test.out | tail -n1)
+        if [ -n "$report-url" ]; then
+          echo "report-url=$report-url" >> $GITHUB_OUTPUT
+          echo "Lighthouse report URL: $report-url"
+          echo "DEBUG: Set output report-url to: $report-url"
         else
-          echo "report_url=" >> $GITHUB_OUTPUT
+          echo "report-url=" >> $GITHUB_OUTPUT
           echo "No Lighthouse report URL found"
-          echo "DEBUG: Set output report_url to empty"
+          echo "DEBUG: Set output report-url to empty"
         fi
         
         # Debug: Check what was actually set
@@ -44,12 +44,12 @@ runs:
       shell: sh
       if: github.event_name == 'pull_request'
       run: |
-        echo "Lighthouse output report_url: '${{ steps.lighthouse.outputs.report_url }}'"
+        echo "Lighthouse output report-url: '${{ steps.lighthouse.outputs.report-url }}'"
         echo "Lighthouse output length: ${#LIGHTHOUSE_URL}"
         echo "Lighthouse step outcome: ${{ steps.lighthouse.outcome }}"
       env:
-        LIGHTHOUSE_URL: ${{ steps.lighthouse.outputs.report_url }}
+        LIGHTHOUSE_URL: ${{ steps.lighthouse.outputs.report-url }}
 outputs:
   report-url:
     description: 'URL of the Lighthouse report'
-    value: ${{ steps.lighthouse.outputs.report_url }}
+    value: ${{ steps.lighthouse.outputs.report-url }}

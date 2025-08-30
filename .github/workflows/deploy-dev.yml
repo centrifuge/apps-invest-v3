@@ -73,11 +73,11 @@ jobs:
       - name: '🔍 Debug Lighthouse Output'
         if: github.event_name == 'pull_request'
         run: |
-          echo "Lighthouse output report_url: '${{ steps.lighthouse.outputs.report_url }}'"
+          echo "Lighthouse output report-url: '${{ steps.lighthouse.outputs.report-url }}'"
           echo "Lighthouse output length: ${#LIGHTHOUSE_URL}"
           echo "Lighthouse step outcome: ${{ steps.lighthouse.outcome }}"
         env:
-          LIGHTHOUSE_URL: ${{ steps.lighthouse.outputs.report_url }}
+          LIGHTHOUSE_URL: ${{ steps.lighthouse.outputs.report-url }}
 
       - name: '💬 Upsert PR Preview Comment'
         if: github.event_name == 'pull_request'
@@ -86,4 +86,4 @@ jobs:
           app: ${{ env.APP_NAME }}
           url: ${{ steps.deploy.outputs.deployment-url }}
           status: ${{ steps.deploy.outcome }}
-          lighthouse-url: ${{ steps.lighthouse.outputs.report_url }}
+          lighthouse-url: ${{ steps.lighthouse.outputs.report-url }}
