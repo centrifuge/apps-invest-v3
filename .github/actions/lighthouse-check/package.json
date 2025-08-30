@@ -1,0 +1,10 @@
+{
+  "name": "lighthouse-check-action",
+  "version": "1.0.0",
+  "description": "Custom Lighthouse Check Action",
+  "main": "index.js",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
+  }
+}

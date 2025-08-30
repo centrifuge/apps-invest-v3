@@ -1,10 +1,25 @@
 {
   "ci": {
     "collect": {
-      "numberOfRuns": 1
+     
+    },
+    "assert": {
+      "assertions": {
+      "categories:performance": "off",
+      "categories:accessibility": "off",
+      "categories:best-practices": "off",
+      "categories:seo": "off",
+      "categories:pwa": "off"
+      }
     },
     "upload": {
       "target": "temporary-public-storage"
+    },
+    "server": {
+      
+    },
+    "wizard": {
+      
     }
   }
 }
