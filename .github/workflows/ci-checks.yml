@@ -1,0 +1,23 @@
+name: '🔍 CI Checks'
+
+on:
+  workflow_call:
+    inputs:
+      deployment_url:
+        description: 'Deployment URL to test'
+        required: true
+        type: string
+
+jobs:
+  lighthouse:
+    name: '📊 Lighthouse Performance Check'
+    runs-on: ubuntu-latest
+    steps:
+      - name: '📥 Checkout Code'
+        uses: actions/checkout@v4
+
+      - name: '📊 Performance Test with Lighthouse'
+        uses: ./.github/actions/lighthouse-check
+        with:
+          url: ${{ inputs.deployment_url }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

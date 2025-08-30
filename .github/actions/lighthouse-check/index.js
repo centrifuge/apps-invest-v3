@@ -65,6 +65,11 @@ async function run() {
     const lighthouseDir = path.join(process.env.GITHUB_WORKSPACE || '.', '.lighthouseci');
     const linksPath = path.join(lighthouseDir, 'links.json');
     
+    console.log(`🔍 Looking for lighthouse files in: ${lighthouseDir}`);
+    console.log(`🔍 Looking for links.json at: ${linksPath}`);
+    console.log(`🔍 Directory exists: ${fs.existsSync(lighthouseDir)}`);
+    console.log(`🔍 Links file exists: ${fs.existsSync(linksPath)}`);
+    
     let reportUrl = '';
     let performance = 0, accessibility = 0, bestPractices = 0, seo = 0;
     
@@ -72,8 +77,23 @@ async function run() {
     if (fs.existsSync(linksPath)) {
       try {
         const linksData = JSON.parse(fs.readFileSync(linksPath, 'utf8'));
+        
+        // Try exact match first
         reportUrl = linksData[url] || '';
+        
+        // If not found, try with trailing slash
+        if (!reportUrl && !url.endsWith('/')) {
+          reportUrl = linksData[url + '/'] || '';
+        }
+        
+        // If still not found, try without trailing slash
+        if (!reportUrl && url.endsWith('/')) {
+          reportUrl = linksData[url.slice(0, -1)] || '';
+        }
+        
         console.log(`📊 Report URL: ${reportUrl}`);
+        console.log(`🔍 Looking for URL: ${url}`);
+        console.log(`🔍 Available keys: ${Object.keys(linksData).join(', ')}`);
       } catch (error) {
         console.log('⚠️ Failed to read links.json:', error.message);
       }
@@ -83,6 +103,9 @@ async function run() {
     if (fs.existsSync(lighthouseDir)) {
       const files = fs.readdirSync(lighthouseDir);
       const lhrFiles = files.filter(file => file.startsWith('lhr-') && file.endsWith('.json'));
+      
+      console.log(`🔍 All files in lighthouse dir: ${files.join(', ')}`);
+      console.log(`🔍 LHR JSON files found: ${lhrFiles.join(', ')}`);
       
       if (lhrFiles.length > 0) {
         // Get the most recent file
@@ -207,7 +230,7 @@ async function postPRComment(url, reportUrl, performance, accessibility, bestPra
     body += `**URL tested:** ${url}\n`;
     
     if (reportUrl) {
-      body += `**Full report:** ${reportUrl}`;
+      body += `**📋 [View Full Report](${reportUrl})**`;
     }
     
     // Post comment

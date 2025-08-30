@@ -1,4 +1,4 @@
-name: 🚀 Build & Deploy to Dev/Demo
+name: 🚀 PRs and main branch ci/cd
 
 on:
   push:
@@ -53,11 +53,10 @@ jobs:
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: '📊 Performance Test with Lighthouse'
-        id: lighthouse
-        if: github.event_name == 'pull_request'
-        uses: ./.github/actions/lighthouse-check
-        with:
-          url: ${{ steps.deploy.outputs.deployment-url }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+  ci-checks:
+    needs: deploy
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/ci-checks.yml
+    with:
+      deployment_url: ${{ needs.deploy.outputs.deployment-url }}
 
