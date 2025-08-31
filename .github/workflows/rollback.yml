@@ -21,8 +21,8 @@ jobs:
     environment: ${{ github.event.inputs.environment == 'production' && 'production' || null }}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: invest-v3-${{ github.event.inputs.tag }}.zip
-      app-name: "invest-v3-${{ github.event.inputs.tag }}.zip"
+      ARTIFACT_NAME: launchpad-${{ github.event.inputs.tag }}.zip
+      app-name: "launchpad"
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
@@ -33,12 +33,12 @@ jobs:
         run: |
           gh release download ${{ github.event.inputs.tag }} \
             --repo ${{ github.repository }} \
-            --pattern "$ARTIFACT_NAME".zip \
+            --pattern "$ARTIFACT_NAME" \
             --dir ./${{ env.app-name }}
           
           # Extract the zip file
           cd ./${{ env.app-name }}
-          unzip "$ARTIFACT_NAME.zip" -d dist
+          unzip "$ARTIFACT_NAME" -d dist
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
