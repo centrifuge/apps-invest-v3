@@ -55,10 +55,17 @@ jobs:
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-  ci-checks:
+  performance-score:
     needs: deploy
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/ci-checks.yml
-    with:
-      deployment_url: ${{ needs.deploy.outputs.deployment-url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: '📥 Checkout Code'
+        uses: actions/checkout@v4
 
+      - name: '📊 Performance Test with Lighthouse'
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun --config=lighthouserc.json --collect.url=${{ needs.deploy.outputs.deployment-url }}
+        env:
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
