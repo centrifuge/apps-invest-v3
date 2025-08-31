@@ -53,4 +53,6 @@ jobs:
           # Shallow clone to speed up the action
       - name: TruffleHog scan
         uses: trufflesecurity/trufflehog@v3.90.4
+        with:
+          extra_args: --exclude-globs ""**/dist/**,**/build/**""
         # continue-on-error: true
