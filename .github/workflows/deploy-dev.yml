@@ -14,15 +14,12 @@ concurrency:
 env:
   APP_NAME: invest-v3
 
-permissions:
-  contents: read
-  deployments: write
-  issues: write
-  pull-requests: write
-  statuses: write
+
 
 jobs:
   build:
+    permissions:
+      contents: read   
     runs-on: ubuntu-latest
     steps:
       - name: '📥 Checkout Code'
@@ -36,6 +33,11 @@ jobs:
 
   deploy:
     needs: build
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+
     runs-on: ubuntu-latest
     environment: 
       name: ${{ github.event_name == 'pull_request' && 'preview' || 'demo' }}
@@ -62,7 +64,8 @@ jobs:
     permissions:
       contents: read
       issues: write
-      pull-requests: write
+      statuses: write
+      checks: write
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4

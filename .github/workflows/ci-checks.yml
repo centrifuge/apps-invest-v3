@@ -3,13 +3,10 @@ name: '🔍 CI Checks'
 on:
   pull_request:
 
-permissions:
-  contents: read
-  security-events: write
-  actions: read
-
 jobs:
   basic-checks:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: '📥 Checkout Code'
@@ -47,6 +44,10 @@ jobs:
 
 
   osv-dependency-sec-check:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read    
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.2.2"
     with:
       fail-on-vuln: true
@@ -54,7 +55,9 @@ jobs:
 
   secrets-scan:
     runs-on: ubuntu-latest
-    steps:
+    permissions:
+      contents: read
+    steps:      
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
