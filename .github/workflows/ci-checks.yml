@@ -44,8 +44,8 @@ jobs:
   osv-dependency-sec-check:
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.2.2"
     with:
-      fail-on-vuln: false
-      upload-sarif: false
+      fail-on-vuln: true
+      upload-sarif: true
 
   secrets-scan:
     runs-on: ubuntu-latest
