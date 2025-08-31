@@ -30,7 +30,7 @@ runs:
       shell: sh
       run: |
         ARTIFACT_NAME="invest-v3-${{ github.ref_name }}.zip"
-        echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+        echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
         if gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq ".assets[] | select(.name == \"$ARTIFACT_NAME\")" > /dev/null 2>&1; then
           echo "::info::✅ Build artifact already exists: $ARTIFACT_NAME"
           echo "skip_build=true" >> $GITHUB_OUTPUT
@@ -59,12 +59,15 @@ runs:
 
     - name: '📦 Upload Build Artifact to Release'
       if: github.event_name == 'release' && steps.check-artifact.outputs.skip_build != 'true'
-      uses: actions/upload-release-asset@v1
+      shell: sh
+      run: |
+        # Create a zip file of the dist folder
+        cd dist && zip -r ../${{ steps.check-artifact.outputs.artifact-name }} . && cd ..
+        
+        # Upload to release using GitHub CLI
+        gh release upload ${{ github.ref_name }} ${{ steps.check-artifact.outputs.artifact-name }} \
+          --repo ${{ github.repository }} \
+          --clobber
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./dist
-        asset_name: ${{ env.artifact-name }}
-        asset_content_type: application/zip
+        GH_TOKEN: ${{ inputs.github-token }}
 
