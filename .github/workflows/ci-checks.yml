@@ -9,7 +9,20 @@ jobs:
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
-
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+  
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+  
+      - name: Install dependencies
+        shell: sh
+        run: pnpm install --frozen-lockfile
       - name: TypeScript type-check
         shell: bash
         run: |
@@ -43,7 +56,7 @@ jobs:
       - name: TruffleHog scan
         uses: trufflesecurity/trufflehog@v3.90.4
         with:
-          
           path: .
           extra_args: --results=verified,unknown
+          upload-sarif: false
         continue-on-error: true
