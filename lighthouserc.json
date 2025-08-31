@@ -1,6 +1,8 @@
 {
   "ci": {
-    "collect": {},
+    "collect": {
+      "numberOfRuns": 1
+    },
     "assert": {
       "assertions": {
         "categories:performance": "off",

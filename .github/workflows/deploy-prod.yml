@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: ${{ github.event.action == 'prereleased' && 'staging' || 'production' }}
-      url: steps.deploy.outputs.deployment-url
+      url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4

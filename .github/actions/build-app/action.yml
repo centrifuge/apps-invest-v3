@@ -29,9 +29,9 @@ runs:
       id: check-artifact
       shell: sh
       run: |
-        ARTIFACT_NAME="invest-v3-${{ github.ref_name }}.zip"
+        ARTIFACT_NAME="launchpad-${{ github.ref_name }}.zip"
         echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
-        if gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq ".assets[] | select(.name == \"$ARTIFACT_NAME\")" > /dev/null 2>&1; then
+        if [ -n "$(gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq '.assets[] | select(.name == "'"$ARTIFACT_NAME"'")')" ]; then
           echo "::info::✅ Build artifact already exists: $ARTIFACT_NAME"
           echo "skip_build=true" >> $GITHUB_OUTPUT
         else

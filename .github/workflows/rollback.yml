@@ -33,7 +33,7 @@ jobs:
         run: |
           gh release download ${{ github.event.inputs.tag }} \
             --repo ${{ github.repository }} \
-            --pattern "$ARTIFACT_NAME.zip" \
+            --pattern "$ARTIFACT_NAME" \
             --dir ./${{ env.app-name }}
           
           # Extract the zip file
