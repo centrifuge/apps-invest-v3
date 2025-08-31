@@ -59,6 +59,10 @@ jobs:
     needs: deploy
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4

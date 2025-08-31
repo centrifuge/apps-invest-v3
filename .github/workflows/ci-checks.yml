@@ -3,6 +3,10 @@ name: '🔍 CI Checks'
 on:
   pull_request:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   basic-checks:
     runs-on: ubuntu-latest
