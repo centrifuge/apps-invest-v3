@@ -28,16 +28,18 @@ jobs:
       - name: Check code formatting
         shell: sh
         run: pnpm dlx prettier --check "**/*.{ts,tsx,js,jsx,json,md}"
-        continue-on-error: true
   
       - name: Lint
+        if: always()
         shell: sh
         run: pnpm run lint
-        continue-on-error: true
 
       - name: Audit dependencies with pnpm
+        if: always()
         shell: sh
         run: pnpm audit --audit-level moderate
+
+
 
   osv-dependency-sec-check:
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.2.2"
