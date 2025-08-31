@@ -21,8 +21,8 @@ jobs:
     environment: ${{ github.event.inputs.environment == 'production' && 'production' || null }}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: invest-v3-${{ github.ref_name }}.zip
-      app-name: "invest-v3-${{ github.ref_name }}.zip"
+      ARTIFACT_NAME: invest-v3-${{ github.event.inputs.tag }}.zip
+      app-name: "invest-v3-${{ github.event.inputs.tag }}.zip"
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
