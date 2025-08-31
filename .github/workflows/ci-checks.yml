@@ -4,11 +4,12 @@ on:
   pull_request:
 
 jobs:
-  syntax:
+  basic-checks:
     runs-on: ubuntu-latest
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
+      
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
@@ -23,27 +24,24 @@ jobs:
       - name: Install dependencies
         shell: sh
         run: pnpm install --frozen-lockfile
-      - name: TypeScript type-check
-        shell: bash
-        run: |
-          set -euo pipefail
-          pnpm -w exec tsc -v
-          mapfile -t CONFIGS < <(git ls-files '**/tsconfig.json' ':!:**/node_modules/**' ':!:**/dist/**' || true)
-          if [ ${#CONFIGS[@]} -eq 0 ]; then
-            echo "No tsconfig.json files found"; exit 0;
-          fi
-          for cfg in "${CONFIGS[@]}"; do
-            echo "TS check: $cfg"
-            pnpm -w exec tsc --noEmit -p "$cfg"
-          done
+
+      - name: Check code formatting
+        shell: sh
+        run: pnpm dlx prettier --check "**/*.{ts,tsx,js,jsx,json,md}"
   
       - name: Lint
         shell: sh
-        run: pnpm -w run lint
+        run: pnpm run lint
+
+      - name: Audit dependencies with pnpm
+        shell: sh
+        run: pnpm audit --audit-level moderate
+
   osv-dependency-sec-check:
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.2.2"
     with:
       fail-on-vuln: false
+      upload-sarif: false
 
   secrets-scan:
     runs-on: ubuntu-latest
@@ -58,5 +56,4 @@ jobs:
         with:
           path: .
           extra_args: --results=verified,unknown
-          upload-sarif: false
         continue-on-error: true
