@@ -29,7 +29,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     environment: 
       name: ${{ github.event.action == 'prereleased' && 'staging' || 'production' }}

@@ -32,7 +32,7 @@ runs:
         ARTIFACT_NAME="launchpad-${{ github.ref_name }}.zip"
         echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
         if [ -n "$(gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq '.assets[] | select(.name == "'"$ARTIFACT_NAME"'")')" ]; then
-          echo "::info::✅ Build artifact already exists: $ARTIFACT_NAME"
+          echo "::info::✅ Build artifact already exists, skipping build: $ARTIFACT_NAME"
           echo "skip_build=true" >> $GITHUB_OUTPUT
         else
           echo "::info::🔄 Build artifact not found, building $ARTIFACT_NAME"
@@ -46,19 +46,21 @@ runs:
       run: pnpm install --frozen-lockfile
 
     - name: '🔨 Build App'
-      if: github.event_name != 'release' || steps.check-artifact.outputs.skip_build != 'true'
-      shell:  sh
+      if: ${{ github.event_name != 'release' || steps.check-artifact.outputs.skip_build != 'true' }}
+      id: build
+      shell: sh
       run: |
         pnpm build ${{ inputs.build-args }}
 
     - name: '📦 Upload Build Artifact'
+      if: ${{ steps.build.outcome == 'success' }}
       uses: actions/upload-artifact@v4
       with:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
 
     - name: '📦 Upload Build Artifact to Release'
-      if: github.event_name == 'release' && steps.check-artifact.outputs.skip_build != 'true'
+      if: ${{ steps.build.outcome == 'success' }}
       shell: sh
       run: |
         # Create a zip file of the dist folder
