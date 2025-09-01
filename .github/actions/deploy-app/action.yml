@@ -30,6 +30,22 @@ runs:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
 
+    - name: '📦 Download Release Artifact for Production'
+      if: inputs.environment == 'prod'
+      shell: sh
+      run: |
+        # Download the release artifact (zip file)
+        gh release download ${{ github.ref_name }} \
+          --pattern "launchpad-${{ github.ref_name }}.zip" \
+          --repo ${{ github.repository }}
+        
+        # Extract the zip to dist folder
+        unzip "launchpad-${{ github.ref_name }}.zip" -d ./dist
+        
+        echo "✅ Downloaded and extracted release artifact: launchpad-${{ github.ref_name }}.zip"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
     - name: '⚙️ Determine wrangler command'
       id: wrangler-command
       shell: sh
