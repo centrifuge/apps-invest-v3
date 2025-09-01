@@ -3,7 +3,7 @@ description: 'Deploy app with environment-based configuration'
 
 inputs:
   environment:
-    description: 'Environment (dev, demo, staging, prod)'
+    description: 'Environment (dev, demo, staging, production)'
     required: true
   cloudflare-api-token:
     description: 'Cloudflare API token'
@@ -24,14 +24,14 @@ runs:
         node-version: '20'
 
     - name: '📦 Download Build Artifact'
-      if: inputs.environment != 'prod'
+      if: inputs.environment != 'production'
       uses: actions/download-artifact@v4
       with:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
 
     - name: '📦 Download Release Artifact for Production'
-      if: inputs.environment == 'prod'
+      if: inputs.environment == 'production'
       shell: sh
       run: |
         # Download the release artifact (zip file)
@@ -66,8 +66,8 @@ runs:
           # Staging: Upload with tag and preview-alias
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message \"Deployed commit: $SHORT_SHA\" --preview-alias staging"
-        elif [ "${{ inputs.environment }}" = "prod" ]; then
-          # Prod: Deploy existing version by tag
+        elif [ "${{ inputs.environment }}" = "production" ]; then
+          # Production: Deploy existing version by tag
           # First, get the version ID for the tag using JSON output
           VERSION_ID=$(wrangler versions list --name invest-v3-$WRANGLER_ENV --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
           if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
