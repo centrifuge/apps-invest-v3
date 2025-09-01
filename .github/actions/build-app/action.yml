@@ -60,7 +60,7 @@ runs:
         path: ./dist
 
     - name: '📦 Upload Build Artifact to Release'
-      if: ${{ steps.build.outcome == 'success' &&  github.event_name == 'pre-release' }}
+      if: ${{ steps.build.outcome == 'success' &&  github.event.action == 'prereleased' }}
       shell: sh
       run: |
         # Create a zip file of the dist folder

@@ -96,8 +96,6 @@ runs:
       run: |
         echo "::warning::Preview URLs disabled for ${{ steps.wrangler-command.outputs.wrangler-env }}. %0A Please enable from https://dash.cloudflare.com/${{ inputs.cloudflare-account-id }}/workers-and-pages"
 
-
-
 outputs:
   deployment-url:
     description: 'URL of the deployed application'
