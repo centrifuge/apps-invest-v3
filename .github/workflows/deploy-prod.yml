@@ -33,7 +33,7 @@ jobs:
     needs: build
     if: github.event.action == 'prereleased'
     environment: 
-      name: staging
+      name: production
       url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code'
