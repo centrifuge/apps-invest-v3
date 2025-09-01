@@ -67,7 +67,7 @@ jobs:
         id: deploy
         uses: ./.github/actions/deploy-app
         with:
-          environment: production
+          environment: prod
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
