@@ -14,7 +14,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event.action != 'prereleased'
+    if: github.event.action == 'prereleased'
     steps:
       - name: '📥 Checkout Code from Release Tag'
         uses: actions/checkout@v4
