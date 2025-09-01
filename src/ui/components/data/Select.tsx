@@ -1,4 +1,4 @@
-import { Box, Input, Select as ChakraSelect, createListCollection, Grid, InputGroup } from '@chakra-ui/react'
+import { Box, Input, Select as ChakraSelect, createListCollection, InputGroup } from '@chakra-ui/react'
 import { IconSearch } from '../icons'
 import React, { useState, useMemo, useEffect } from 'react'
 
