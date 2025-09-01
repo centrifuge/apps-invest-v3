@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Box, useToken } from '@chakra-ui/react'
 import { ResponsiveContainer, ComposedChart, Line, Bar, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
-import { ChartTooltip } from './ChartTooltip'
+import { ChartTooltip } from '@ui'
 
 type Accessor<T> = (row: T) => number
 
@@ -22,11 +22,10 @@ type LineChartProps<T> = {
   margin?: { top?: number; right?: number; bottom?: number; left?: number }
   xTickFormatter?: (x: string) => string
   yTickFormatter?: (y: number) => string
-  yDomain?: [number | 'dataMin' | string, number | 'dataMax' | string]
+  tooltipYTickFormatter?: (y: number) => string
+  yDomain?: (string | number)[]
   showGrid?: boolean
   showTooltip?: boolean
-  tooltipXFormatter?: (x: string) => string
-  tooltipYFormatter?: (y: number) => string
 }
 
 export function LineChart<T>({
@@ -37,22 +36,22 @@ export function LineChart<T>({
   margin = { top: 0, right: 10, bottom: 0, left: -20 },
   xTickFormatter,
   yTickFormatter = (v) => String(v),
-  yDomain = ['dataMin', 'dataMax'],
+  tooltipYTickFormatter = (v) => String(v),
+  yDomain = [0, 100],
   showGrid = true,
   showTooltip = true,
-  tooltipXFormatter = (x) => new Date(x).toLocaleString('en-US', { day: '2-digit', month: 'short', timeZone: 'UTC' }),
-  tooltipYFormatter = (y) => String(y),
 }: LineChartProps<T>) {
+  // Build a token list: border + text + each series color (fallbacks included)
   const seriesTokens = series.map((s, i) => s.colorToken ?? (i === 0 ? 'text-highlight' : 'bg-tertiary'))
-  const [borderPrimary, textSecondary, textPrimary, ...seriesColors] = useToken('colors', [
+  const [borderPrimary, textSecondary, ...seriesColors] = useToken('colors', [
     'border-primary',
     'text-secondary',
-    'text-primary',
     ...seriesTokens,
   ])
 
-  const defaultFormatMonth = (x: string) => new Date(x).toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })
+  const defaultFormatMonth = (x: string) => new Date(x).toLocaleString('en-US', { month: 'short', year: 'numeric' })
 
+  // Normalize raw rows into { timestamp, [series.id]: number }
   const normalized = useMemo(() => {
     return data.map((row) => {
       const x = xAccessor(row)
@@ -98,7 +97,7 @@ export function LineChart<T>({
                       })
                       .toUpperCase()
                   }
-                  yFormatter={yTickFormatter}
+                  yFormatter={tooltipYTickFormatter}
                 />
               }
               wrapperStyle={{ width: '298px', boxShadow: '1px 3px 6px rgba(0, 0, 0, 0.15)', borderRadius: '8px' }}

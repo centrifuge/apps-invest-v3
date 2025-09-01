@@ -1,4 +1,4 @@
-import { AssetId, Balance, HexString, ShareClass } from '@centrifuge/sdk'
+import { HexString, ShareClass } from '@centrifuge/sdk'
 
 export type ShareClassWithDetails = {
   shareClass: ShareClass

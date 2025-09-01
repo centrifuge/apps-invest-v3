@@ -89,8 +89,6 @@ export function balanceMin(min: number, message?: string) {
 
 /** -------- Custom Schema (precision safe) -------- **/
 
-type In = string | bigint | Balance | Price
-
 const sanitize = (x: unknown) =>
   String(x ?? '')
     .replace(/[,_\s]/g, '')
@@ -116,15 +114,14 @@ export function createCustomSchema(decimals: number, isPrice: boolean) {
             ? (val as any).toBigInt()
             : parseUnits(sanitize(val), targetDecimals)
       return new Price(bi)
-    } else {
-      if (val instanceof Balance && val.decimals === targetDecimals) return val
-      const bi =
-        typeof val === 'bigint'
-          ? val
-          : val instanceof Balance || val instanceof Price
-            ? val.toBigInt()
-            : parseUnits(sanitize(val), targetDecimals)
-      return new Balance(bi, targetDecimals)
     }
+    if (val instanceof Balance && val.decimals === targetDecimals) return val
+    const bi =
+      typeof val === 'bigint'
+        ? val
+        : val instanceof Balance || val instanceof Price
+          ? val.toBigInt()
+          : parseUnits(sanitize(val), targetDecimals)
+    return new Balance(bi, targetDecimals)
   })
 }

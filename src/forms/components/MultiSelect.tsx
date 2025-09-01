@@ -6,14 +6,12 @@ import {
   Group,
   Portal,
   SelectRootProps,
-  useSelectContext,
 } from '@chakra-ui/react'
 import { ReactNode, useState } from 'react'
 import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
 import { RiArrowDownSLine } from 'react-icons/ri'
 import { useGetFormError } from '../hooks/useGetFormError'
-import { Checkbox } from './Checkbox'
 
 export interface CustomMultiSelectProps<TFieldValues extends FieldValues = FieldValues>
   extends Omit<SelectRootProps, 'collection'> {
@@ -83,7 +81,7 @@ export function MultiSelect<TFieldValues extends FieldValues = FieldValues>(
 }
 
 const SelectItems = ({ items }: { items: { value: string; children?: ReactNode; label: string }[] }) => {
-  const { value: selectedValues } = useSelectContext()
+  // const { value: selectedValues } = useSelectContext()
   return (
     <>
       <ChakraSelect.HiddenSelect />
