@@ -8,9 +8,10 @@ env:
   ARTIFACT_NAME: invest-v3-${{ github.ref_name }}.zip
 
 permissions:
-  contents: read
+  contents: write
   deployments: write
-
+  
+concurrency: build-${{ github.ref_name }}
 jobs:
   build:
     runs-on: ubuntu-latest
