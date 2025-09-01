@@ -1,5 +1,5 @@
-import { usePortfolio } from '@cfg'
-import { VaultDetails } from '@utils/types'
+import { usePortfolio, VaultDetails } from '@cfg'
+// import { VaultDetails } from '@utils/types'
 
 export function useGetPortfolioDetails(vaultDetails?: VaultDetails) {
   const { data: portfolio, isLoading: isPortfolioLoading } = usePortfolio()

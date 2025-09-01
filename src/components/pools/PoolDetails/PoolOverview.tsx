@@ -26,7 +26,7 @@ export function PoolOverview() {
       value: (
         <Flex gap={1}>
           {networks?.map((network, index) => (
-            <Tooltip content={<Text>View transactions</Text>}>
+            <Tooltip key={network.chainId} content={<Text>View transactions</Text>}>
               <Link
                 to={underlyingAssetAddress ? `${chainExplorer[network.chainId]}/token/${underlyingAssetAddress}` : ''}
                 target="_blank"

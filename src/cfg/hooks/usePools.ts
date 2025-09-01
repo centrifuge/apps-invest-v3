@@ -1,6 +1,6 @@
-import { AssetId, PoolId } from '@centrifuge/sdk'
+import { PoolId } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { combineLatest, map, of, switchMap } from 'rxjs'
+import { combineLatest, of, switchMap } from 'rxjs'
 import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
 
@@ -78,41 +78,4 @@ export function usePoolNetworks(poolId?: PoolId) {
   }, [poolId, centrifuge])
 
   return useObservable(networks$)
-}
-
-export const useRestrictionHooks = (chainId?: number) => {
-  const centrifuge = useCentrifuge()
-  const restrictionHook$ = useMemo(
-    () => (chainId ? centrifuge?.restrictionHooks(chainId) : undefined),
-    [centrifuge, chainId]
-  )
-  return useObservable(restrictionHook$)
-}
-
-export const useAssetCurrency = (assetId: AssetId) => {
-  const centrifuge = useCentrifuge()
-  const currency$ = useMemo(() => (assetId ? centrifuge?.assetCurrency(assetId) : undefined), [centrifuge, assetId])
-  return useObservable(currency$)
-}
-
-export const useAssetCurrencies = (assetIds?: AssetId[]) => {
-  const centrifuge = useCentrifuge()
-
-  const details$ = useMemo(() => {
-    if (!centrifuge || !assetIds?.length) {
-      return of([])
-    }
-    const streams = assetIds.map((id) => centrifuge.assetCurrency(id))
-
-    return combineLatest(streams).pipe(
-      map((currencies) =>
-        currencies.map((currency, idx) => ({
-          assetId: assetIds[idx],
-          currency,
-        }))
-      )
-    )
-  }, [centrifuge, JSON.stringify(assetIds)])
-
-  return useObservable(details$)
 }
