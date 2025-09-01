@@ -29,22 +29,16 @@ runs:
       with:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
+    
+    - name: '📦 Setup pnpm (for Wrangler)'
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
 
-    - name: '📦 Download Release Artifact for Production'
-      if: inputs.environment == 'production'
+    - name: '📦 Install Wrangler'
       shell: sh
       run: |
-        # Download the release artifact (zip file)
-        gh release download ${{ github.ref_name }} \
-          --pattern "launchpad-${{ github.ref_name }}.zip" \
-          --repo ${{ github.repository }}
-        
-        # Extract the zip to dist folder
-        unzip "launchpad-${{ github.ref_name }}.zip" -d ./dist
-        
-        echo "✅ Downloaded and extracted release artifact: launchpad-${{ github.ref_name }}.zip"
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
+        npm install -g wrangler@4.33.1
 
     - name: '⚙️ Determine wrangler command'
       id: wrangler-command
@@ -90,11 +84,6 @@ runs:
         echo "Wrangler command: $CMD"
         echo "cmd=$CMD" >> $GITHUB_OUTPUT
         echo "wrangler-env=$WRANGLER_ENV" >> $GITHUB_OUTPUT
-
-    - name: '📦 Setup pnpm (for Wrangler)'
-      uses: pnpm/action-setup@v3
-      with:
-        version: 10
 
     - name: '🚀 Deploy to Cloudflare'
       uses: cloudflare/wrangler-action@v3
