@@ -7,7 +7,7 @@ export function formatDisplayPrice(
   useGrouping = true
 ): string {
   if (!p) {
-    const zeros = '0.' + '0'.repeat(precision)
+    const zeros = `0.${'0'.repeat(precision)}`
     return currency ? `${zeros} ${currency}` : zeros
   }
 

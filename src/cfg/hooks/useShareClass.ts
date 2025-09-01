@@ -1,9 +1,8 @@
-import { PoolId, ShareClass } from '@centrifuge/sdk'
+import { ShareClass } from '@centrifuge/sdk'
 import { useObservable } from './useObservable'
 import { useMemo } from 'react'
 import { PendingAmount } from '../types'
-import { map, of, switchMap } from 'rxjs'
-import { useCentrifuge } from './CentrifugeContext'
+import { map, of } from 'rxjs'
 
 export function useNavPerNetwork(shareClass?: ShareClass, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true

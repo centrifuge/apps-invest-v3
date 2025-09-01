@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, ReactNode, ChangeEvent } from 'react'
+import { useState, useMemo, useEffect, ReactNode } from 'react'
 import { Key, genericFlagsConfig } from './config'
 import { DebugFlagsContext, Flags, initialFlagsState } from './context'
 import { Button, CloseButton, Drawer, Portal, Field, Input, Checkbox, NativeSelect, Stack } from '@chakra-ui/react'

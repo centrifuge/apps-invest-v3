@@ -7,7 +7,7 @@ type MenuItem = {
   element: ReactNode
 }
 
-const ActionsDropdown = ({ items, ...rest }: { items: MenuItem[] } & ButtonProps) => {
+const ActionsDropdown = ({ items }: { items: MenuItem[] } & ButtonProps) => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>

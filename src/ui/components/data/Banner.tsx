@@ -1,4 +1,4 @@
-import { Badge, BadgeProps, Box, Heading, Text } from '@chakra-ui/react'
+import { BadgeProps, Box, Heading } from '@chakra-ui/react'
 
 const colorStatus: Record<string, { backgroundColor: string; color: string; borderColor: string }> = {
   /// Add more colors

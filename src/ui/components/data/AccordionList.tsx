@@ -1,5 +1,5 @@
 import React from 'react'
-import { Accordion, Box, Flex, Separator, Span } from '@chakra-ui/react'
+import { Accordion, Flex, Separator, Span } from '@chakra-ui/react'
 
 type StatItem = {
   value: string
