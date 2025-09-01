@@ -63,7 +63,8 @@ runs:
         elif [ "${{ inputs.environment }}" = "prod" ]; then
           # Production: Deploy existing version by tag
           # First, get the version ID for the tag using JSON output
-          VERSION_ID=$(wrangler versions list --name invest-v3-$WRANGLER_ENV --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
+          WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
+          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
           if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
             CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
           else
