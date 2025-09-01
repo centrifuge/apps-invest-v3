@@ -94,16 +94,7 @@ runs:
       if: steps.deploy.outputs.deployment-url == ''
       shell: sh
       run: |
-        echo "::warning::No deployment URL generated because preview URLs are disabled for this worker."
-        echo "::warning::Preview URLs need to be enabled manually in the Cloudflare dashboard."
-        echo "::notice::To enable preview URLs:"
-        echo "::notice::1. Go to Cloudflare Dashboard > Workers & Pages"
-        echo "::notice::2. Select your worker (invest-v3-${{ steps.wrangler-command.outputs.wrangler-env }})"
-        echo "::notice::3. Go to Settings > General"
-        echo "::notice::4. Enable 'Preview deployments'"
-        echo "::notice::5. Re-run this job or update the PR to get a deployment URL."
-        echo ""
-        echo "::notice::Note: This is a one-time setup. Once enabled, all future deployments will work automatically."
+        echo "::warning::Preview URLs disabled for ${{ steps.wrangler-command.outputs.wrangler-env }}. %0A Please enable from https://dash.cloudflare.com/${{ vars.CLOUDFLARE_ACCOUNT_ID }}/workers-and-pages"
 
 
 
