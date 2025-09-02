@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
 import { formatBigintToString, useTokenPrices } from '@cfg'
 import { usePoolContext } from '@contexts/usePoolContext'
-import { LineChart } from '@components/dataDisplay/LineChart'
+import { LineChart } from '@ui'
 import { Price } from '@centrifuge/sdk'
 // import { DatePicker } from '@ui'
 

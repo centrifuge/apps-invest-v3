@@ -1,10 +1,10 @@
 import { Box, Flex, Heading } from '@chakra-ui/react'
 import type { PoolMetadata } from '@centrifuge/sdk'
 import { formatPercentage } from '@cfg'
-import { DataTable, type ColumnDefinition } from '@components/dataDisplay/DataTable/DataTable'
 import { RatingPill } from '@components/elements/RatingPill'
 import { mockMetadata } from '@utils/mockMetadata'
-import { Tooltip } from '@ui'
+import { DataTable, Tooltip } from '@ui'
+import type { ColumnDefinition } from '@ui'
 
 type Row = {
   id: number

@@ -1,6 +1,5 @@
 import { Heading, Text } from '@chakra-ui/react'
-import { DataTable } from '@components/dataDisplay/DataTable/DataTable'
-import { normalizeCell } from '@components/dataDisplay/DataTable/utils'
+import { DataTable, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/usePoolContext'
 
 export function PoolHoldings() {
