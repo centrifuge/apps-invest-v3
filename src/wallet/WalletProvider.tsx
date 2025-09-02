@@ -21,7 +21,10 @@ export const WalletProvider = ({ projectId, networks, children }: WalletProvider
     return new WagmiAdapter({
       networks,
       projectId,
-      connectors: [injected()],
+      connectors: [
+        safe({ allowedDomains: [/app\.safe\.global$/, /gnosis-safe\.io$/], shimDisconnect: true }),
+        injected(),
+      ],
       transports: Object.fromEntries(networks.map((chain) => [chain.id, http()])),
     })
   }, [projectId, networks])
