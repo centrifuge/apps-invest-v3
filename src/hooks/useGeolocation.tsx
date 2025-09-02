@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 interface GeolocationData {
   country?: string
   country_code?: string
+  country_name?: string
   region?: string
   city?: string
   coordinates?: {
@@ -28,8 +29,8 @@ const fetchGeolocation = async (): Promise<GeolocationData> => {
 
     return {
       country: data.country,
-      country_code: data.countryCode,
-      region: data.regionName,
+      country_code: data.country_code,
+      country_name: data.country_name,
       city: data.city,
       source: 'ip',
     }
