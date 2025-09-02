@@ -3,13 +3,6 @@ name: '🔄 Manual Rollback'
 on:
   workflow_dispatch:
     inputs:
-      app:
-        description: 'The application to roll back'
-        required: true
-        type: choice
-        options:
-          - derwa
-          - invest-v3
       environment:
         description: 'The environment to roll back'
         required: true
@@ -24,11 +17,12 @@ on:
 
 jobs:
   rollback-and-deploy:
-    name: 'Roll Back ${{ github.event.inputs.app }} to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
+    name: 'Roll Back to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
     environment: ${{ github.event.inputs.environment == 'production' && 'production' || null }}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: ${{ github.event.inputs.app }}-build-${{ github.sha }}
+      ARTIFACT_NAME: launchpad-${{ github.event.inputs.tag }}.zip
+      app-name: "launchpad"
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
@@ -39,18 +33,18 @@ jobs:
         run: |
           gh release download ${{ github.event.inputs.tag }} \
             --repo ${{ github.repository }} \
-            --pattern "$ARTIFACT_NAME.zip" \
-            --dir ./${{ github.event.inputs.app }}
+            --pattern "$ARTIFACT_NAME" \
+            --dir ./${{ env.app-name }}
           
           # Extract the zip file
-          cd ./${{ github.event.inputs.app }}
-          unzip "$ARTIFACT_NAME.zip" -d dist
+          cd ./${{ env.app-name }}
+          unzip "$ARTIFACT_NAME" -d dist
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: '🚀 Deploy to Cloudflare'
         run: |
-          cd ${{ github.event.inputs.app }}
+          cd ${{ env.app-name }}
           if [ "${{ github.event.inputs.environment }}" == "production" ]; then
             CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} wrangler deploy --env prod
           else
