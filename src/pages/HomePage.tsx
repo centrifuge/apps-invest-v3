@@ -1,6 +1,6 @@
 import { Flex, Heading, Separator, Spinner } from '@chakra-ui/react'
-import { PoolCardsSelect } from '@components/pools/PoolsDetails/PoolCardsSelect'
-import { PoolsTvlCard } from '@components/pools/PoolsDetails/PoolsTvlCard'
+import { PoolCards } from '@components/pools/PoolCards/PoolCards'
+import { PoolsTvlCard } from '@components/pools/PoolCards/PoolsTvlCard'
 import { usePoolContext } from '@contexts/usePoolContext'
 
 export default function HomePage() {
@@ -24,7 +24,7 @@ export default function HomePage() {
         <PoolsTvlCard poolIds={poolIds} />
       </Flex>
       <Separator mb={8} />
-      <PoolCardsSelect poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
+      <PoolCards poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
     </>
   )
 }
