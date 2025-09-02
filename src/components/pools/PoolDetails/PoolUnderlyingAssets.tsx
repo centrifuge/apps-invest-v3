@@ -6,8 +6,8 @@ export function PoolUnderlyingAssets() {
   const { poolDetails, pools } = usePoolContext()
 
   // Get underlying pool metadata
-  const underlyingPoolIdNumber = poolDetails?.metadata?.pool.underlying?.poolId
-  const underlyPoolId = pools?.find((pool) => pool.id.toString() === (underlyingPoolIdNumber ?? 0).toString())?.id
+  const underlyingPoolIdNumber = poolDetails?.metadata?.pool.underlying?.poolId ?? 0
+  const underlyPoolId = pools?.find((pool) => pool.id.toString() === underlyingPoolIdNumber.toString())?.id
   const { data: underlyingPoolDetails, isLoading: isUnderlyingLoading } = usePoolDetails(underlyPoolId, {
     enabled: !!underlyPoolId?.toString(),
   })

@@ -1,6 +1,6 @@
 import { Grid, Skeleton } from '@chakra-ui/react'
 
-export function PoolCardsSelectSkeleton() {
+export function PoolCardsSkeleton() {
   // TODO: Change to 6 with 2 rows of 3 after MVP is out
   const cards = Array.from(Array(3).keys())
 

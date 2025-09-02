@@ -1,119 +1,14 @@
 import { useMemo } from 'react'
 import { MdBrokenImage } from 'react-icons/md'
-import { Link } from 'react-router-dom'
-import { Box, Center, Flex, Grid, Heading, Icon, Image, Separator, Spinner, Text } from '@chakra-ui/react'
+import { Box, Center, Flex, Icon, Image, Separator, Spinner, Text } from '@chakra-ui/react'
 import { useChainId } from 'wagmi'
-import { PoolId } from '@centrifuge/sdk'
-import {
-  formatBalanceAbbreviated,
-  ipfsToHttp,
-  PoolDetails,
-  useAllPoolDetails,
-  useIsMember,
-  usePoolActiveNetworks,
-} from '@cfg'
-import { PoolCardsSelectSkeleton } from '@components/Skeletons/PoolCardsSelectSkeleton'
-import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
-import { routePaths } from '@routes/routePaths'
+import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useIsMember, usePoolActiveNetworks } from '@cfg'
 import { Card, ValueText } from '@ui'
 import { getPoolTVL } from '@utils/getPoolTVL'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
-interface DisplayPool {
-  id: string
-  setId: () => void
-  pool: PoolDetails
-  isRwaPool: boolean
-}
-
-interface PoolSelectorProps {
-  poolIds: PoolId[]
-  setSelectedPoolId: (poolId: PoolId) => void
-}
-
-export const PoolCardsSelect = ({ poolIds, setSelectedPoolId }: PoolSelectorProps) => {
-  const { data: pools, isLoading } = useAllPoolDetails(poolIds)
-  const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool } = useGetPoolsByIds()
-
-  const allPools: DisplayPool[] | undefined = useMemo(
-    () =>
-      pools?.map((pool) => ({
-        id: pool.id.toString(),
-        setId: () => setSelectedPoolId(pool.id),
-        pool,
-        isRwaPool: getIsRwaPool(pool.id.toString()),
-      })),
-    [pools]
-  )
-
-  const productionPools = useMemo(
-    () => allPools?.filter((pool) => getIsProductionPool(pool.id)),
-    [allPools, getIsProductionPool]
-  )
-  const displayPools = import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet' ? allPools : productionPools
-  const rwaPools = displayPools?.filter((pool) => pool.isRwaPool) ?? []
-  const deRwaPools = displayPools?.filter((pool) => !pool.isRwaPool) ?? []
-
-  if (isLoading) return <PoolCardsSelectSkeleton />
-
-  if (!displayPools || displayPools.length === 0) return <h3>Sorry, there are no pools available at this time.</h3>
-
-  return (
-    <>
-      <Box mb={8}>
-        <Heading as="h2" size="lg" mb={2}>
-          RWA
-        </Heading>
-        <Text fontSize="sm" mb={4}>
-          Tokenized real-world assets issued under various legal structures. KYB onboarding required.
-        </Text>
-        <RenderPoolCards pools={rwaPools} getIsRestrictedPool={getIsRestrictedPool} isRwaPool />
-      </Box>
-
-      <Heading as="h2" size="lg" mb={2}>
-        deRWA
-      </Heading>
-      <Text fontSize="sm" mb={4}>
-        Decentralized real-world asset tokens. Freely transferable tokens with on-chain transparency and liquidity.
-      </Text>
-      <RenderPoolCards pools={deRwaPools} getIsRestrictedPool={getIsRestrictedPool} isRwaPool={false} />
-    </>
-  )
-}
-
-function RenderPoolCards({
-  pools,
-  getIsRestrictedPool,
-  isRwaPool,
-}: {
-  pools: DisplayPool[]
-  getIsRestrictedPool: (poolId?: string | undefined) => boolean
-  isRwaPool: boolean
-}) {
-  return (
-    <>
-      {pools.length > 0 ? (
-        <Grid
-          templateColumns={{ base: '1fr', md: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(3, minmax(0, 1fr))' }}
-          gap="6"
-        >
-          {pools.map((pool) => (
-            <Link to={`${routePaths.poolPage}/${pool.id}`} onClick={pool.setId} key={pool.id}>
-              <PoolCard poolDetails={pool.pool} isRwaPool={pool.isRwaPool} getIsRestrictedPool={getIsRestrictedPool} />
-            </Link>
-          ))}
-        </Grid>
-      ) : (
-        <Card>
-          <Text fontSize="md">{`There are currently no ${isRwaPool ? 'RWA' : 'deRWA'} pools to display`}.</Text>
-        </Card>
-      )}
-    </>
-  )
-}
-
-function PoolCard({
+export function PoolCard({
   poolDetails,
   getIsRestrictedPool,
   isRwaPool,

@@ -1,4 +1,5 @@
-export * from './data/DataTable'
+export * from './data/DataTable/DataTable'
+export * from './data/DataTable/utils'
 export * from './data/ActionsDropdown'
 export * from './data/ChartTooltip'
 export * from './elements/BalanceDisplay'

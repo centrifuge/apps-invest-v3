@@ -4,7 +4,7 @@ import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  eslint.configs.recommended, 
+  eslint.configs.recommended,
   tseslint.configs.recommended,
   {
     rules: {
@@ -72,9 +72,9 @@ export default tseslint.config(
         },
       ],
       // Complexity rules - warnings only, won't block builds
-      'complexity': ['warn', 15], // Warn when cyclomatic complexity > 15
+      // complexity: ['warn', 15], // Warn when cyclomatic complexity > 15
+      // 'max-lines-per-function': ['warn', 80], // Warn when function > 80 lines
       'max-depth': ['warn', 5], // Warn when nesting depth > 5
-      'max-lines-per-function': ['warn', 80], // Warn when function > 80 lines
       'max-params': ['warn', 6], // Warn when function has > 6 parameters
       '@typescript-eslint/naming-convention': [
         'error',
