@@ -7,7 +7,6 @@ export { mockMetadata } from './mockMetadata'
 /// Formatting
 export * from './formatDate'
 export * from './formatting'
-export * from './formatDisplayBalance'
 export * from './parseBalance'
 export * from './formatDisplayPrice'
 export { formatBalance as formatUIBalance } from './formatBalance'
