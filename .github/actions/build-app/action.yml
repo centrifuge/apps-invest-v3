@@ -29,7 +29,7 @@ runs:
       id: check-artifact
       shell: sh
       run: |
-        ARTIFACT_NAME="launchpad-${{ github.ref_name }}.zip"
+        ARTIFACT_NAME="launchpad-bundle${{ github.ref_name }}.zip"
         echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
         if [ -n "$(gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq '.assets[] | select(.name == "'"$ARTIFACT_NAME"'")')" ]; then
           echo "::info::✅ Build artifact already exists, skipping build: $ARTIFACT_NAME"
@@ -60,7 +60,7 @@ runs:
         path: ./dist
 
     - name: '📦 Upload Build Artifact to Release'
-      if: ${{ steps.build.outcome == 'success' &&  github.event_name == 'pre-release' }}
+      if: ${{ steps.build.outcome == 'success' &&  github.event.action == 'prereleased' }}
       shell: sh
       run: |
         # Create a zip file of the dist folder

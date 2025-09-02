@@ -3,7 +3,7 @@ import { WagmiProvider } from 'wagmi'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createAppKit } from '@reown/appkit/react'
 import { http } from 'wagmi'
-import { injected } from '@wagmi/connectors'
+import { injected, safe } from '@wagmi/connectors'
 import type { AppKitNetwork } from '@reown/appkit/networks'
 
 export interface WalletProviderProps {
@@ -21,7 +21,10 @@ export const WalletProvider = ({ projectId, networks, children }: WalletProvider
     return new WagmiAdapter({
       networks,
       projectId,
-      connectors: [injected()],
+      connectors: [
+        safe({ allowedDomains: [/app\.safe\.global$/, /gnosis-safe\.io$/], shimDisconnect: true }),
+        injected(),
+      ],
       transports: Object.fromEntries(networks.map((chain) => [chain.id, http()])),
     })
   }, [projectId, networks])
