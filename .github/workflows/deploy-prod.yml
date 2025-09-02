@@ -8,13 +8,14 @@ env:
   ARTIFACT_NAME: invest-v3-${{ github.ref_name }}.zip
 
 permissions:
-  contents: read
+  contents: write
   deployments: write
-
+  
+concurrency: build-${{ github.ref_name }}
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event.action != 'prereleased'
+    if: github.event.action == 'prereleased'
     steps:
       - name: '📥 Checkout Code from Release Tag'
         uses: actions/checkout@v4
@@ -28,10 +29,12 @@ jobs:
           build-args: --mode mainnet
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy:
+  deploy-staging:
     runs-on: ubuntu-latest
+    needs: build
+    if: github.event.action == 'prereleased'
     environment: 
-      name: ${{ github.event.action == 'prereleased' && 'staging' || 'production' }}
+      name: staging
       url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code'
@@ -39,11 +42,32 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: '🚀 Deploy App'
+      - name: '🚀 Deploy App to Staging'
         id: deploy
         uses: ./.github/actions/deploy-app
         with:
-          environment: ${{ github.event.action == 'prereleased' && 'staging' || 'prod' }}
+          environment: staging
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'released'
+    environment: 
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - name: '📥 Checkout Code'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: '🚀 Deploy App to Production'
+        id: deploy
+        uses: ./.github/actions/deploy-app
+        with:
+          environment: prod
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

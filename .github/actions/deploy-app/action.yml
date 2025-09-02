@@ -29,6 +29,16 @@ runs:
       with:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
+    
+    - name: '📦 Setup pnpm (for Wrangler)'
+      uses: pnpm/action-setup@v3
+      with:
+        version: 10
+
+    - name: '📦 Install Wrangler'
+      shell: sh
+      run: |
+        npm install -g wrangler@4.33.1
 
     - name: '⚙️ Determine wrangler command'
       id: wrangler-command
@@ -51,9 +61,10 @@ runs:
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message \"Deployed commit: $SHORT_SHA\" --preview-alias staging"
         elif [ "${{ inputs.environment }}" = "prod" ]; then
-          # Prod: Deploy existing version by tag
+          # Production: Deploy existing version by tag
           # First, get the version ID for the tag using JSON output
-          VERSION_ID=$(wrangler versions list --name invest-v3-$WRANGLER_ENV --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
+          WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
+          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
           if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
             CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
           else
@@ -75,11 +86,6 @@ runs:
         echo "cmd=$CMD" >> $GITHUB_OUTPUT
         echo "wrangler-env=$WRANGLER_ENV" >> $GITHUB_OUTPUT
 
-    - name: '📦 Setup pnpm (for Wrangler)'
-      uses: pnpm/action-setup@v3
-      with:
-        version: 10
-
     - name: '🚀 Deploy to Cloudflare'
       uses: cloudflare/wrangler-action@v3
       with:
@@ -94,18 +100,7 @@ runs:
       if: steps.deploy.outputs.deployment-url == ''
       shell: sh
       run: |
-        echo "::warning::No deployment URL generated because preview URLs are disabled for this worker."
-        echo "::warning::Preview URLs need to be enabled manually in the Cloudflare dashboard."
-        echo "::notice::To enable preview URLs:"
-        echo "::notice::1. Go to Cloudflare Dashboard > Workers & Pages"
-        echo "::notice::2. Select your worker (invest-v3-${{ steps.wrangler-command.outputs.wrangler-env }})"
-        echo "::notice::3. Go to Settings > General"
-        echo "::notice::4. Enable 'Preview deployments'"
-        echo "::notice::5. Re-run this job or update the PR to get a deployment URL."
-        echo ""
-        echo "::notice::Note: This is a one-time setup. Once enabled, all future deployments will work automatically."
-
-
+        echo "::warning::Preview URLs disabled for ${{ steps.wrangler-command.outputs.wrangler-env }}. %0A Please enable from https://dash.cloudflare.com/${{ inputs.cloudflare-account-id }}/workers-and-pages"
 
 outputs:
   deployment-url:

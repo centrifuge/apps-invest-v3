@@ -16,7 +16,7 @@ routes = [
 ]
 
 [env.prod]
-name   = "invest-v3-prod"        
+name   = "invest-v3"        
 routes = [
   { pattern = "app.centrifuge.io", custom_domain = true }
 ]
