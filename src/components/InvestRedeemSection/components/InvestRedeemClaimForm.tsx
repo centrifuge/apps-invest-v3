@@ -29,6 +29,8 @@ export function InvestRedeemClaimForm({
   const { execute, isPending } = useCentrifugeTransaction()
 
   const claim = useCallback(() => execute(vault.claim()).then(() => setIsClaimFormDisplayed(false)), [vault, execute])
+  const shareCurrencySymbol = shareCurrency?.symbol ?? ''
+  const investmentCurrencySymbol = investmentCurrency?.symbol ?? ''
 
   return (
     <Box mt={4} height="100%">
@@ -44,9 +46,7 @@ export function InvestRedeemClaimForm({
             <Box mt={6}>
               <Text fontWeight={500}>Claimable shares</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">
-                  {formatBalance(claimableInvestShares ?? 0, shareCurrency?.symbol ?? '', 2)}
-                </Heading>
+                <Heading fontSize="xl">{formatBalance(claimableInvestShares, shareCurrencySymbol, 2)}</Heading>
               </Flex>
             </Box>
           )}
@@ -55,28 +55,26 @@ export function InvestRedeemClaimForm({
               <Text fontWeight={500}>Claimable invest currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableInvestCurrencyEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
-                </Heading>
-              </Flex>
-            </Box>
-          )}
-          {claimableRedeemCurrency && !claimableRedeemCurrency.isZero() && (
-            <Box mt={3}>
-              <Text fontWeight={500}>Claimable redeem amount</Text>
-              <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">
-                  {formatBalance(claimableRedeemCurrency ?? 0, shareCurrency?.symbol ?? '', 2)}
+                  {formatBalance(claimableInvestCurrencyEquivalent, investmentCurrencySymbol, 2)}
                 </Heading>
               </Flex>
             </Box>
           )}
           {claimableRedeemSharesEquivalent && !claimableRedeemSharesEquivalent.isZero() && (
             <Box mt={3}>
-              <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
+              <Text fontWeight={500}>Claimable redeem amount</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableRedeemSharesEquivalent ?? 0, investmentCurrency?.symbol ?? '', 2)}
+                  {formatBalance(claimableRedeemSharesEquivalent, shareCurrencySymbol, 2)}
                 </Heading>
+              </Flex>
+            </Box>
+          )}
+          {claimableRedeemCurrency && !claimableRedeemCurrency.isZero() && (
+            <Box mt={3}>
+              <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
+              <Flex alignItems="center" justifyContent="flex-start">
+                <Heading fontSize="xl">{formatBalance(claimableRedeemCurrency, investmentCurrencySymbol, 2)}</Heading>
               </Flex>
             </Box>
           )}
