@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, redirect } from 'react-router-dom'
 import { LoadingBoundary } from '@ui'
 import MainLayout from '@layouts/MainLayout'
 import { HomeRoute, PoolRoute, RootRoute } from '@routes/routes'
@@ -34,6 +34,10 @@ export const router = createBrowserRouter([
                 <PoolRoute />
               </LoadingBoundary>
             ),
+          },
+          {
+            path: 'pools/*',
+            loader: () => redirect('/'),
           },
           // Add catch-all routes for migrate paths
           {
