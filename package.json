@@ -10,7 +10,13 @@
     "build": "tsc -b && vite build",
     "lint": "pnpm dlx eslint .",
     "lint:fix": "pnpm dlx eslint --fix .",
-    "format": "prettier --write \"**/*.{ts,tsx}\""
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "synpress:cache": "npx synpress",
+    "test:synpress": "playwright test --config=synpress.config.ts",
+    "test:synpress:ui": "playwright test --config=synpress.config.ts --ui",
+    "test:synpress:headed": "playwright test --config=synpress.config.ts --headed",
+    "test:synpress:debug": "playwright test --config=synpress.config.ts --debug",
+    "test:synpress:report": "playwright show-report synpress-report"
   },
   "dependencies": {
     "@ark-ui/react": "^5.15.1",
@@ -48,6 +54,7 @@
   "devDependencies": {
     "@eslint/js": "^9.34.0",
     "@hookform/resolvers": "^5.2.1",
+    "@synthetixio/synpress": "^4.1.1",
     "@types/lodash": "^4.17.20",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.12",

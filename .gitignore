@@ -1,4 +1,6 @@
 node_modules
+synpress-report
+test-results
 .next
 .idea/
 .vscode
@@ -11,6 +13,7 @@ dist
 .react-router/
 .cursor/
 .wrangler/
+.cache-synpress
 
 .env.local
 

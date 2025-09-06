@@ -57,10 +57,11 @@ export function NetworkButton(props: ButtonProps) {
         onClick={onToggle}
         _hover={{ backgroundColor: 'gray.50' }}
         _active={{ backgroundColor: 'gray.100' }}
+        data-testid="network-button"
         {...props}
       >
         <NetworkIcon networkId={connectedChain} />
-        <Icon size="xs" textAlign="right">
+        <Icon size="xs" textAlign="right" data-testid={`network-id-${connectedChain}`}>
           <FaChevronDown fill="#91969B" />
         </Icon>
       </Button>

@@ -33,6 +33,7 @@ export const WalletButton = ({
       label={truncateAddress(address)}
       colorPalette={connectedBtnColor}
       variant={connectedBtnVariant}
+      data-testid="wallet-button"
     />
   ) : (
     <Button
@@ -40,6 +41,7 @@ export const WalletButton = ({
       label="Connect wallet"
       colorPalette={disconnectedBtnColor}
       variant={disconnectedBtnVariant}
+      data-testid="wallet-button"
     />
   )
 }

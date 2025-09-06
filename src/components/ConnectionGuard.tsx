@@ -25,7 +25,9 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
     return (
       <Stack gap={2}>
         <Text>Connect to continue</Text>
-        <Button onClick={() => open()}>Connect</Button>
+        <Button data-testid="connection-guard-connect" onClick={() => open()}>
+          Connect
+        </Button>
       </Stack>
     )
   }
