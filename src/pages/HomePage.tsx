@@ -1,7 +1,7 @@
 import { Flex, Heading, Separator, Spinner } from '@chakra-ui/react'
-import { PoolCards } from '@components/pools/PoolCards/PoolCards'
-import { PoolsTvlCard } from '@components/pools/PoolCards/PoolsTvlCard'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { PoolCards } from '@components/pools/poolCards/PoolCards'
+import { PoolsTvlCard } from '@components/pools/poolCards/PoolsTvlCard'
+import { usePoolContext } from '@contexts/PoolContext'
 
 export default function HomePage() {
   const { pools, isPoolsLoading, setSelectedPoolId } = usePoolContext()

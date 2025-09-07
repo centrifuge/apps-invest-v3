@@ -28,7 +28,7 @@
       "@routes/*": ["src/routes/*"],
       "@ui": ["src/ui/index"],
       "@utils/*": ["src/utils/*"],
-      "@wallet": ["src/wallet/index"]
+      "@wallet/*": ["src/wallet/*"]
     }
   },
   "include": ["src", "vite-env.d.ts", "vite.config.ts"]

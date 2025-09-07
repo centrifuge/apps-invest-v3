@@ -11,9 +11,9 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { TabProps } from '@components/InvestRedeemSection'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
-import { useVaultsContext } from '@contexts/useVaultsContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
 
-export default function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
+export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { isInvestmentLoading, isVaultDetailsLoading, investment, vaultDetails } = useVaultsContext()
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)

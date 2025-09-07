@@ -1,7 +1,7 @@
-import { PoolKeyFacts } from '@components/pools/PoolDetails/PoolKeyFacts/PoolKeyFacts'
-import { PoolHoldings } from '@components/pools/PoolDetails/PoolHoldings'
-import { PoolOverview } from '@components/pools/PoolDetails/PoolOverview'
-import { PoolPerformanceChart } from '@components/pools/PoolDetails/PoolPerformanceChart'
+import { PoolKeyFacts } from '@components/pools/poolDetails/PoolKeyFacts/PoolKeyFacts'
+import { PoolHoldings } from '@components/pools/poolDetails/PoolHoldings'
+import { PoolOverview } from '@components/pools/poolDetails/PoolOverview'
+import { PoolPerformanceChart } from '@components/pools/poolDetails/PoolPerformanceChart'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 
 export function PoolDetailsRwa() {

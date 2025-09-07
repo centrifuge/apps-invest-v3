@@ -8,8 +8,8 @@ import { infoText } from '@utils/infoText'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { debounce, formatBalanceToString } from '@cfg'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
-import { useVaultsContext } from '@contexts/useVaultsContext'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
+import { usePoolContext } from '@contexts/PoolContext'
 
 interface InvestAmountProps {
   isDisabled: boolean

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 import { useIsUserWhitelisted } from '@hooks/useIsUserWhitelisted'
 
 const RWA_POOLS = {

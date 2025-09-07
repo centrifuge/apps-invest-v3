@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 import { Box, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { PoolDetails, useAllPoolDetails } from '@cfg'
-import { PoolCardsSkeleton } from '@components/Skeletons/PoolCardsSkeleton'
+import { PoolCardsSkeleton } from '@components/skeletons/PoolCardsSkeleton'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { routePaths } from '@routes/routePaths'
 import { Card } from '@ui'
-import { PoolCard } from '@components/pools/PoolCards/PoolCard'
+import { PoolCard } from '@components/pools/poolCards/PoolCard'
 
 interface DisplayPool {
   id: string

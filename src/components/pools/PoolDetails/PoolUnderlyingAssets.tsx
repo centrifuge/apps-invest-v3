@@ -1,6 +1,6 @@
 import { usePoolDetails } from '@cfg'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 
 export function PoolUnderlyingAssets() {
   const { poolDetails, pools } = usePoolContext()

@@ -1,9 +1,9 @@
 import { Text } from '@chakra-ui/react'
-import { Panel } from '@components/elements/Panel'
+import { InfoPanel } from '@components/elements/InfoPanel'
 
 export function MigrationBanner() {
   return (
-    <Panel>
+    <InfoPanel>
       <Text fontWeight={600} fontSize="sm">
         Haven't migrated your CFG yet?{' '}
         <a
@@ -15,6 +15,6 @@ export function MigrationBanner() {
           Migrate here now.
         </a>
       </Text>
-    </Panel>
+    </InfoPanel>
   )
 }

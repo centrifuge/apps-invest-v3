@@ -5,8 +5,8 @@ import { Balance, PoolNetwork } from '@centrifuge/sdk'
 import { debounce, formatBalanceToString, formatBalance, divideBigInts } from '@cfg'
 import { BalanceDisplay, NetworkIcons } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { useVaultsContext } from '@contexts/useVaultsContext'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
+import { usePoolContext } from '@contexts/PoolContext'
 
 interface RedeemAmountProps {
   isDisabled: boolean

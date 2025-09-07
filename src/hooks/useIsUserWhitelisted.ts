@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useIsMember } from '@cfg'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 
 export function useIsUserWhitelisted() {
   const { connectedChainId, shareClassId, isPoolDataReady } = usePoolContext()

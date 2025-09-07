@@ -8,7 +8,7 @@ interface PanelProps {
   children?: ReactNode
 }
 
-export function Panel({ height = '40px', label, children }: PanelProps) {
+export function InfoPanel({ height = '40px', label, children }: PanelProps) {
   const [isOpen, setIsOpen] = useState(true)
 
   return (

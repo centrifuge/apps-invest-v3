@@ -1,6 +1,6 @@
 import { formatBigintToString } from '@cfg'
 import { Box, Grid, GridItem, Text } from '@chakra-ui/react'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { roundToDecimal } from '@utils/nums'
 

@@ -4,9 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
 import { CentrifugeProvider, DebugFlags, TransactionProvider } from '@cfg'
 import { LoadingProvider } from '@ui'
-import { WalletProvider } from '@wallet'
-import { PoolProvider } from '@contexts/usePoolContext'
-import { VaultsProvider } from '@contexts/useVaultsContext'
+import { WalletProvider } from '@wallet/WalletProvider'
+import { PoolProvider } from '@contexts/PoolContext'
+import { VaultsProvider } from '@contexts/VaultsContext'
 import { bscTestnet, bsc } from 'wagmi/chains'
 
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
@@ -36,8 +36,8 @@ const TESTNET_RPC_URLS = {
 export default function Root() {
   /**
    * Initialize Centrifuge SDK with any necessary config.
-   * We need to ensure it is created only once, so we must use useMemo.
-   * If we don't use useMemo, it can create a new instance on every render,
+   * We memoize it to ensure it is created only once.
+   * If we do not, it can create a new instance on every render,
    * which can lead to issues with state management and performance.
    * Be sure to always use the same instance of Centrifuge SDK throughout the app,
    * from `useCentrifuge()` set in `CentrifugeProvider`.
