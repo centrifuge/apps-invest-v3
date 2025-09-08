@@ -58,7 +58,11 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     onSubmitError: (error) => console.error('Invest form submission error:', error),
   })
 
-  const { watch } = form
+  const { watch, handleSubmit } = form
+
+  const handleInvestSubmit = () => {
+    handleSubmit()
+  }
   const [investAmount, receiveAmount] = watch(['investAmount', 'receiveAmount'])
 
   const parsedInvestAmount = useMemo(
@@ -93,6 +97,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
           parsedInvestAmount={parsedInvestAmount}
           parsedReceiveAmount={parsedReceiveAmount}
           setActionType={setActionType}
+          onSubmit={handleInvestSubmit}
         />
       </Box>
     </Form>

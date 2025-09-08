@@ -24,6 +24,7 @@ import {
 const MAINNET_CHAINS = [mainnet, base, arbitrum, avalanche, bsc, plumeMainnet]
 const TESTNET_CHAINS = [sepolia, baseSepolia, arbitrumSepolia, bscTestnet, plumeTestnet]
 const ALL_CHAINS = [...MAINNET_CHAINS, ...TESTNET_CHAINS]
+import { TenderlyProvider, useTenderly } from '@contexts/TenderlyContext'
 
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
 // TODO: Use after updating new app keys
@@ -54,6 +55,9 @@ const TESTNET_RPC_URLS = {
 
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
+  const { getRpcUrl } = useTenderly()
+  const tenderlyRpcUrl = getRpcUrl()
+  const testnetUrls = { ...TESTNET_RPC_URLS, 11155111: [tenderlyRpcUrl ?? '', ...TESTNET_RPC_URLS[11155111]] }
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
 
   /**
@@ -70,7 +74,7 @@ function RootProviders() {
     return new Centrifuge({
       environment: isMainnet ? 'mainnet' : 'testnet',
       indexerUrl,
-      rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
+      rpcUrls: isMainnet ? MAINNET_RPC_URLS : testnetUrls,
       pollingInterval: 60000,
     })
   }, [showMainnet])
@@ -108,7 +112,9 @@ function RootProviders() {
 export default function Root() {
   return (
     <DebugFlags>
-      <RootProviders />
+      <TenderlyProvider>
+        <RootProviders />
+      </TenderlyProvider>
     </DebugFlags>
   )
 }

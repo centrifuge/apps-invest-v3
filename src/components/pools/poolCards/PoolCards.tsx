@@ -50,6 +50,8 @@ export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
 
   if (isLoading) return <PoolCardsSkeleton />
 
+  console.log({ allPools, displayPools })
+
   if (!displayPools || displayPools.length === 0) return <h3>Sorry, there are no pools available at this time.</h3>
 
   return (

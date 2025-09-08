@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react'
-import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
+import { BalanceInput, useFormContext } from '@forms'
+import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
 import { debounce, divideBigInts, formatBalanceToString } from '@cfg'
-import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcons } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
@@ -12,6 +12,7 @@ import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { infoText } from '@utils/infoText'
 import { useGetVaultCurrencyOptions } from '@hooks/useGetVaultCurrencyOptions'
+import { TransactionModeSelector } from '@components/TransactionModeSelector'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -20,6 +21,7 @@ interface InvestAmountProps {
   networs?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
+  onSubmit: () => void
 }
 
 export function InvestAmount({
@@ -28,6 +30,7 @@ export function InvestAmount({
   maxInvestAmount,
   parsedInvestAmount,
   parsedReceiveAmount,
+  onSubmit,
 }: InvestAmountProps) {
   const { poolDetails, networks } = usePoolContext()
   const { investment, vaultDetails, vaults, setVault } = useVaultsContext()
@@ -175,10 +178,10 @@ export function InvestAmount({
           )}
         </Box>
         <Box>
-          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled || !isDepositAllowed} mt={6}>
+          <TransactionModeSelector onInvest={onSubmit} disabled={isDisabled}>
             Invest
-          </SubmitButton>
-          {!hasInvestmentCurrency && (
+          </TransactionModeSelector>
+          {!hasInvestmentCurrency ? (
             <InfoWrapper
               text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
               type="error"

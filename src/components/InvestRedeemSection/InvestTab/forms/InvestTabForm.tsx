@@ -13,6 +13,7 @@ interface InvestTabFormProps {
   parsedInvestAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
   setActionType: Dispatch<SetStateAction<InvestActionType>>
+  onSubmit: () => void
 }
 
 export function InvestTabForm({
@@ -23,6 +24,7 @@ export function InvestTabForm({
   parsedInvestAmount,
   parsedReceiveAmount,
   setActionType,
+  onSubmit,
 }: InvestTabFormProps) {
   switch (actionType) {
     case InvestAction.INVEST_AMOUNT:
@@ -33,6 +35,7 @@ export function InvestTabForm({
           parsedInvestAmount={parsedInvestAmount}
           parsedReceiveAmount={parsedReceiveAmount}
           isDisabled={isDisabled}
+          onSubmit={onSubmit}
         />
       )
     // TODO: add this for sync invest form

@@ -38,7 +38,7 @@ pnpm dev
 
 | Application | URL                   | Description            |
 | ----------- | --------------------- | ---------------------- |
-| Invest App  | http://localhost:3003 | Investment Application |
+| Invest App  | http://localhost:5173 | Investment Application |
 
 ## 🛠️ Available Scripts
 
@@ -74,6 +74,53 @@ pnpm dev
 - **Prettier 3** - Code formatting
 - **TypeScript** - Static type checking
 
+## 🧪 Tenderly Integration
+
+Tenderly integration allows you to mock blockchain transactions locally for development and testing purposes. This is particularly useful when working with the `increaseInvestOrder` method and other SDK transactions on testnet.
+
+### Setup
+
+1. **Environment Variables**: Copy `.env.example` to `.env.local` and configure:
+   ```bash
+   # Get these from your Tenderly dashboard
+   VITE_TENDERLY_ACCESS_KEY=your_access_key
+   VITE_TENDERLY_ACCOUNT_SLUG=your_account_slug
+   VITE_TENDERLY_PROJECT_SLUG=your_project_slug
+   ```
+
+2. **Tenderly Account**: Sign up at [tenderly.co](https://tenderly.co) and create a project.
+
+3. **Usage**: When running locally on testnet, the Invest button will show a dropdown allowing you to choose between "Sepolia Testnet" and "Tenderly Fork" modes.
+
+### Features
+
+- **Transaction Mode Switching**: Choose between Sepolia testnet and Tenderly fork for each transaction
+- **Auto Fork Creation**: Automatically creates a Tenderly fork when switching to Tenderly mode
+- **Account Funding**: Pre-funds test accounts with ETH and USDC for testing
+- **Transaction Mocking**: SDK transactions (like `increaseInvestOrder`) use the selected mode
+- **Development Only**: Only available when running locally on testnet environment
+
+### Accessing Tenderly in Code
+
+```tsx
+import { useTenderly } from '@contexts/TenderlyContext'
+
+function MyComponent() {
+  const { 
+    transactionMode,
+    setTransactionMode,
+    impersonateAccount,
+    fundAccountEth,
+    isTransactionModeAvailable
+  } = useTenderly()
+  
+  // Switch to Tenderly mode
+  if (isTransactionModeAvailable) {
+    setTransactionMode('tenderly')
+  }
+}
+```
+
 ## 📦 Package Manager
 
 This project uses [pnpm](https://pnpm.io/) for efficient dependency management and build optimization. The `preinstall` script ensures only pnpm is used for consistency.
@@ -99,7 +146,7 @@ pnpm add -D <dev-dependency>
 
 Default ports are configured but will automatically use the next available port if occupied:
 
-- **Invest App**: 3003
+- **Invest App**: 5173
 
 ## 🚀 Deployment
 
