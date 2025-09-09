@@ -1,20 +1,34 @@
-name: Auto-label new PRs
+name: Notify Slack of New PR
 
-# Use pull_request_target for fork safety (no checkout of PR code)
 on:
-  pull_request_target:
+  pull_request:
     types: [opened]
 
-permissions:
-  pull-requests: write
-
 jobs:
-  add-label:
+  notify-pr:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     steps:
-      - name: Add default label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: |
-            needs-review
+      - name: Send Slack Notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "text": "🎉 New Pull Request Opened!",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🎉 New Pull Request Opened! 🎉"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Repository:* ${{ github.repository }}\n*PR Title:* ${{ github.event.pull_request.title }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Link:* <${{ github.event.pull_request.html_url }}|View Pull Request>"
+                }
+              }
+            ]
+          }' $SLACK_WEBHOOK_URL
