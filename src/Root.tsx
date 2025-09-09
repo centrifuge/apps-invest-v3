@@ -10,7 +10,7 @@ import { VaultsProvider } from '@contexts/VaultsContext'
 import { bscTestnet, bsc } from 'wagmi/chains'
 
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
-// TODO: Use after updating new app keys
+// TODO: Use after updating new app keys to support infura and onfinality
 // const INFURA_KEY = import.meta.env.VITE_INFURA_KEY
 // const ONFINALITY_KEY = import.meta.env.VITE_ONFINALITY_KEY
 
