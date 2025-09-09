@@ -10,27 +10,30 @@ import { VaultsProvider } from '@contexts/VaultsContext'
 import { bscTestnet, bsc } from 'wagmi/chains'
 
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
-const INFURA_KEY = import.meta.env.VITE_INFURA_KEY
-const ONFINALITY_KEY = import.meta.env.VITE_ONFINALITY_KEY
+// TODO: Use after updating new app keys
+// const INFURA_KEY = import.meta.env.VITE_INFURA_KEY
+// const ONFINALITY_KEY = import.meta.env.VITE_ONFINALITY_KEY
 
 const queryClient = new QueryClient()
 
 const MAINNET_RPC_URLS = {
   1: [
     `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
-    `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-    `https://eth.api.onfinality.io/rpc?apikey=${ONFINALITY_KEY}`,
+    // `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    // `https://eth.api.onfinality.io/rpc?apikey=${ONFINALITY_KEY}`,
   ],
   8453: [`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   42161: [`https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   43114: [`https://avax-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  42220: [`https://celo-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
 const TESTNET_RPC_URLS = {
-  11155111: [`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`, `https://sepolia.infura.io/v3/${INFURA_KEY}`],
+  11155111: [`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   84532: [`https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   421612: [`https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   431142: [`https://avax-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  11142220: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
 export default function Root() {
