@@ -39,6 +39,10 @@ export const router = createBrowserRouter([
             path: 'pools/*',
             loader: () => redirect('/'),
           },
+          {
+            path: 'portfolio',
+            loader: () => redirect('/'),
+          },
           // Add catch-all routes for migrate paths
           {
             path: 'portfolio/migrate/*',
