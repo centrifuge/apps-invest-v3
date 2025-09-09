@@ -10,13 +10,13 @@ function truncateAddress(string: Address) {
   return `${first}...${last}`
 }
 
-export const WalletButton = ({
+export function WalletButton({
   colorPalette = ['yellow', 'gray'],
   variant = ['solid', 'solid'],
 }: {
   colorPalette?: ButtonColorPalette[]
   variant?: ButtonVariant[]
-}) => {
+}) {
   const [connectedBtnColor, disconnectedBtnColor] = colorPalette
   const [connectedBtnVariant, disconnectedBtnVariant] = variant
 

@@ -12,7 +12,7 @@ export interface WalletProviderProps {
   children: ReactNode
 }
 
-export const WalletProvider = ({ projectId, networks, children }: WalletProviderProps) => {
+export function WalletProvider({ projectId, networks, children }: WalletProviderProps) {
   if (networks.length === 0) {
     throw new Error('Networks array cannot be empty')
   }

@@ -8,7 +8,7 @@ import {
   useVaultsDetails,
   VaultDetails,
 } from '@cfg'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
 export interface VaultsContextValues {

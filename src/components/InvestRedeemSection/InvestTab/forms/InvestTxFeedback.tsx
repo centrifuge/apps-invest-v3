@@ -6,7 +6,7 @@ import { InvestAction, type InvestActionType } from '@components/InvestRedeemSec
 import { IoClose } from 'react-icons/io5'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { infoText } from '@utils/infoText'
-import { useVaultsContext } from '@contexts/useVaultsContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
 import { StepIndicator } from '@components/elements/StepIndicator'
 import { useTxStateFeedback } from '@components/InvestRedeemSection/hooks/useTxStateFeedback'
 import { Balance } from '@centrifuge/sdk'

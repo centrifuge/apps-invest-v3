@@ -1,7 +1,7 @@
 import { Box, Flex, Grid, GridItem, Heading, Image, Text } from '@chakra-ui/react'
 import { ipfsToHttp } from '@cfg'
-import { LinkPill } from '@components/pools/PoolDetails/PoolKeyFacts/LinkPill'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { LinkPill } from '@components/pools/poolDetails/PoolKeyFacts/LinkPill'
+import { usePoolContext } from '@contexts/PoolContext'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 

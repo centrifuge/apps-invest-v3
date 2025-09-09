@@ -13,7 +13,7 @@ import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/I
 import { TabProps } from '@components/InvestRedeemSection'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 
-export default function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
+export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)

@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 import { CiShare1 } from 'react-icons/ci'
 
 interface InvestorOnboardingFeedbackProps {

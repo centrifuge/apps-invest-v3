@@ -1,6 +1,6 @@
 import { Heading, Text } from '@chakra-ui/react'
 import { DataTable, normalizeCell } from '@ui'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { usePoolContext } from '@contexts/PoolContext'
 
 export function PoolHoldings() {
   const { poolDetails } = usePoolContext()

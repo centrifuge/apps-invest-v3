@@ -2,8 +2,8 @@ import { chainExplorer, formatBalance } from '@cfg'
 import { NetworkIcon, Tooltip } from '@ui'
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
 import { getAgencyNormalisedName, RatingPill } from '@components/elements/RatingPill'
-import { usePoolContext } from '@contexts/usePoolContext'
-import { useVaultsContext } from '@contexts/useVaultsContext'
+import { usePoolContext } from '@contexts/PoolContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
 import { Link } from 'react-router-dom'
 
 export function PoolOverview() {

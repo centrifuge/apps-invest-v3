@@ -3,8 +3,8 @@ import type { Balance } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
 import { RedeemTxFeedback } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxFeedback'
-import { useVaultsContext } from '@contexts/useVaultsContext'
-import { usePoolContext } from '@contexts/usePoolContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
+import { usePoolContext } from '@contexts/PoolContext'
 // import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
