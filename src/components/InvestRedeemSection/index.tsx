@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useMemo, useState, type ComponentType } from 'react'
 import { Box, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react'
 import type { Vault } from '@centrifuge/sdk'
-import { useGeolocation } from '@hooks/useGeolocation'
 import { ConnectionGuard } from '@components/elements/ConnectionGuard'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { InvestTab } from '@components/InvestRedeemSection/InvestTab/InvestTab'
@@ -10,6 +9,9 @@ import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/component
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { InvestorOnboardingFeedback } from '@components/InvestRedeemSection/components/InvestorOnboardingFeedback'
 import { PendingTab } from '@components/InvestRedeemSection/PendingTab/PendingTab'
+import { useGeolocation } from '@hooks/useGeolocation'
+import { useGetPoolRestrictedCountries } from '@hooks/useGetPoolRestrictedCountries'
+import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { useChainId } from 'wagmi'
 import { type PoolDetails, useAddress, useIsMember } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
@@ -45,13 +47,18 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
   })
 
   // Handle check restricted countries
+  const { getIsDeRwaPool } = useGetPoolsByIds()
   const isLocationQueryReady = isPoolDataReady && !isPoolContextLoading && !isVaultsContextLoading
   const { data: location } = useGeolocation({
     enabled: isLocationQueryReady,
   })
+  const poolRestrictedCountries = useGetPoolRestrictedCountries(
+    poolDetails?.id.toString(),
+    getIsDeRwaPool(poolDetails?.id.toString())
+  )
   const kycCountries = poolDetails?.metadata?.onboarding?.kycRestrictedCountries ?? []
   const kybCountries = poolDetails?.metadata?.onboarding?.kybRestrictedCountries ?? []
-  const restrictedCountries = [...kycCountries, ...kybCountries]
+  const restrictedCountries = [...kycCountries, ...kybCountries, ...poolRestrictedCountries]
   const isRestrictedCountry = restrictedCountries.includes(location?.country_code ?? '')
 
   // Find if invest and redeem is possible
