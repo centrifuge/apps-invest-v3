@@ -12,23 +12,9 @@ jobs:
       - name: Send Slack Notification
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          REPO_NAME: ${{ github.repository }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{
-            "text": "🎉 New Pull Request Opened!",
-            "blocks": [
-              {
-                "type": "header",
-                "text": {
-                  "type": "plain_text",
-                  "text": "🎉 New Pull Request Opened! 🎉"
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*Repository:* ${{ github.repository }}\n*PR Title:* ${{ github.event.pull_request.title }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Link:* <${{ github.event.pull_request.html_url }}|View Pull Request>"
-                }
-              }
-            ]
-          }' $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"🎉 New Pull Request Opened!\",\"blocks\":[{\"type\":\"header\",\"text\":{\"type\":\"plain_text\",\"text\":\"🎉 New Pull Request Opened! 🎉\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Repository:* $REPO_NAME\\n*PR Title:* $PR_TITLE\\n*Author:* $PR_AUTHOR\\n*Link:* <$PR_URL|View Pull Request>\"}}]}" $SLACK_WEBHOOK_URL
