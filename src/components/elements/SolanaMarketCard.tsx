@@ -18,7 +18,13 @@ export function SolanaMarketCard() {
           <Image src={solanaIcon} alt="Solana Market" mb={4} h="64px" fit="contain" />
         </Center>
         <Heading size="xl">dJAAA on Solana</Heading>
-        <Link href="" fontSize="lg" color="gray.500" target="_blank" rel="noopener noreferrer">
+        <Link
+          href="https://app.kamino.finance/swap/"
+          fontSize="lg"
+          color="gray.500"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Go to Kamino to find deJAAA on Solana
         </Link>
       </Box>
