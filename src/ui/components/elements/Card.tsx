@@ -13,7 +13,7 @@ export const Card = ({
   children: React.ReactNode
 } & ChakraCard.RootProps) => {
   return (
-    <ChakraCard.Root variant={variant} key={variant} width={width} {...props}>
+    <ChakraCard.Root variant={variant} key={variant} width={width} borderRadius="12px" {...props}>
       {header && (
         <ChakraCard.Header>
           <ChakraCard.Title>{header}</ChakraCard.Title>
