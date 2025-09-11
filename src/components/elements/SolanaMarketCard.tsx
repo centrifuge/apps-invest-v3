@@ -1,4 +1,4 @@
-import { Box, Center, Heading, Link, Text } from '@chakra-ui/react'
+import { Box, Center, Heading, Link } from '@chakra-ui/react'
 import { Card } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
 import solanaIcon from '../../assets/kamino-solana-icons.png'
