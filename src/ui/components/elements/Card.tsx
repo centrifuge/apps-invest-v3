@@ -4,6 +4,7 @@ export const Card = ({
   variant = 'outline',
   width,
   header,
+  borderRadius = '12px',
   children,
   ...props
 }: {
@@ -13,7 +14,7 @@ export const Card = ({
   children: React.ReactNode
 } & ChakraCard.RootProps) => {
   return (
-    <ChakraCard.Root variant={variant} key={variant} width={width} borderRadius="12px" {...props}>
+    <ChakraCard.Root variant={variant} key={variant} width={width} borderRadius={borderRadius} {...props}>
       {header && (
         <ChakraCard.Header>
           <ChakraCard.Title>{header}</ChakraCard.Title>
