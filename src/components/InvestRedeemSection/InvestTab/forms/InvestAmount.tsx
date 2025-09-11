@@ -1,15 +1,16 @@
 import { useCallback, useMemo } from 'react'
-import { Badge, Box, Flex, Text } from '@chakra-ui/react'
-import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
-import { divideBigInts } from '@cfg'
+import { Badge, Box, Flex, Text } from '@chakra-ui/react'
+import { debounce, divideBigInts, formatBalanceToString } from '@cfg'
+import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcons } from '@ui'
-import { infoText } from '@utils/infoText'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { debounce, formatBalanceToString } from '@cfg'
-import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
+import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
+import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { infoText } from '@utils/infoText'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -30,6 +31,7 @@ export function InvestAmount({
   const { poolDetails, networks } = usePoolContext()
   const { vaultDetails, vaultsDetails, vaults, setVault } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
+  const { hasPendingInvestments, investmentCurrency, pendingInvestCurrency } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const networkIds = networks?.map((network) => network.chainId)
 
@@ -98,6 +100,13 @@ export function InvestAmount({
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
+        {hasPendingInvestments && pendingInvestCurrency ? (
+          <PendingInvestmentBanner
+            label="Pending investments"
+            amount={pendingInvestCurrency}
+            currencySymbol={investmentCurrency?.symbol}
+          />
+        ) : null}
         <Box>
           <Flex alignItems="center" justifyContent="space-between">
             <Text fontWeight={500}>You pay</Text>
