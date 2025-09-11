@@ -11,6 +11,7 @@ import { usePoolContext } from '@contexts/PoolContext'
 import { PoolDetailsDeRwa } from '@components/pools/poolDetails/PoolDetailsDeRwa'
 import { PoolDetailsRwa } from '@components/pools/poolDetails/PoolDetailsRwa'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
+import { SolanaMarketCard } from '@components/elements/SolanaMarketCard'
 
 export default function PoolPage() {
   const { isLoading: isPoolLoading, poolId, poolDetails, networks, shareClass } = usePoolContext()
@@ -53,6 +54,9 @@ export default function PoolPage() {
 
           <Box height="fit-content" position="sticky" top={8}>
             <InvestRedeemSection pool={poolDetails} />
+            <Box mt={6}>
+              <SolanaMarketCard />
+            </Box>
           </Box>
         </Grid>
       </Box>
