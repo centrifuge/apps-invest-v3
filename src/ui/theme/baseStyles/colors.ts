@@ -70,9 +70,11 @@ export const grayPalette = {
 
 export const yellowPalette = {
   DEFAULT: { value: yellowScale[500] },
+  10: { value: yellowScale[10] },
   50: { value: yellowScale[50] },
   100: { value: yellowScale[100] },
   200: { value: yellowScale[200] },
+  400: { value: yellowScale[400] },
   500: { value: yellowScale[500] },
   800: { value: yellowScale[800] },
 }
@@ -84,6 +86,8 @@ export const colors = {
   yellow: yellowPalette,
 }
 
+// Read up on semantic tokens and their usage here:
+// https://chakra-ui.com/docs/theming/customization/colors#semantic-tokens
 export const colorTokens = {
   black: {
     solid: { value: '{colors.gray.800}' },
@@ -124,72 +128,72 @@ export const colorTokens = {
   // Defining tokens here allows us to set values for both light and dark themes,
   // and allows the use of the token in various component properties like color and backgroundColor.
   'brand-yellow': {
-    value: { _light: '{colors.yellow.500}' },
+    value: { base: '{colors.yellow.500}' },
   },
   'bg-primary': {
-    value: { _light: white, _dark: 'colors.gray.800' },
+    value: { base: white, _dark: 'colors.gray.800' },
   },
   'bg-secondary': {
-    value: { _light: 'colors.gray.50', _dark: 'colors.gray.50' },
+    value: { base: 'colors.gray.50', _dark: 'colors.gray.50' },
   },
   'bg-tertiary': {
-    value: { _light: 'colors.gray.100' },
+    value: { base: 'colors.gray.100' },
   },
   'bg-accent': {
-    value: { _light: 'colors.yellow.100' },
+    value: { base: 'colors.yellow.100' },
   },
   'bg-disabled': {
-    value: { _light: 'colors.gray.100' },
+    value: { base: 'colors.gray.100' },
   },
   'bg-success': {
-    value: { _light: '#DCEBCF' },
+    value: { base: '#DCEBCF' },
   },
   'bg-promote': {
-    value: { _light: '#f8107114' },
+    value: { base: '#f8107114' },
   },
   'bg-error': {
-    value: { _light: '#fcf0ee' },
+    value: { base: '#fcf0ee' },
   },
   'border-primary': {
-    value: { _light: 'colors.gray.100', _dark: 'colors.gray.50' },
+    value: { base: 'colors.gray.100', _dark: 'colors.gray.50' },
   },
   'border-secondary': {
-    value: { _light: 'rgba(246, 246, 246, 1)' },
+    value: { base: 'rgba(246, 246, 246, 1)' },
   },
   'border-tertiary': {
-    value: { _light: 'colors.gray.10' },
+    value: { base: 'colors.gray.10' },
   },
   'border-highlight': {
-    value: { _light: 'colors.yellow.500' },
+    value: { base: 'colors.yellow.500' },
   },
   'text-primary': {
-    value: { _light: 'colors.gray.800' },
+    value: { base: 'colors.gray.800' },
   },
   'text-secondary': {
-    value: { _light: 'colors.gray.500' },
+    value: { base: 'colors.gray.500' },
   },
   'text-disabled': {
-    value: { _light: 'colors.gray.600' },
+    value: { base: 'colors.gray.600' },
   },
   'text-inverted': {
-    value: { _light: white },
+    value: { base: white },
   },
   'text-highlight': {
-    value: { _light: 'colors.yellow.500' },
-  },
-  info: {
-    value: { _light: 'colors.gray.800' },
-  },
-  success: {
-    value: { _light: '#277917' },
-  },
-  warning: {
-    value: { _light: 'colors.yellow.800' },
+    value: { base: 'colors.yellow.500' },
   },
   error: {
-    value: { _light: '#d43f2b' },
+    value: { base: '#d43f2b' },
+  },
+  info: {
+    value: { base: 'colors.gray.800' },
+  },
+  success: {
+    value: { base: '#277917' },
+  },
+  warning: {
+    value: { base: 'colors.yellow.800' },
   },
   promote: {
-    value: { _light: '#f81071' },
+    value: { base: '#f81071' },
   },
 }
