@@ -1,8 +1,8 @@
 import { defineTextStyles } from '@chakra-ui/react'
 
 export const fonts = {
-  heading: { value: "'Inter', ui-sans-serif" },
-  body: { value: "'Inter', ui-sans-serif" },
+  heading: { value: 'Inter, ui-sans-serif' },
+  body: { value: 'Inter, ui-sans-serif' },
 }
 
 export const fontSizes = {
