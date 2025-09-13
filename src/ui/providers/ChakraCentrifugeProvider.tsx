@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react'
-import { lightTheme } from '../theme/lightTheme'
+import lightTheme from '../theme/lightTheme'
 
 export interface ChakraCentrifugeProviderProps {
   themeKey: 'light' | 'dark'
