@@ -1,4 +1,5 @@
 import { defineRecipe } from '@chakra-ui/react'
+import { textStylesValues } from 'src/ui/theme/baseStyles/text'
 
 export const headingRecipe = defineRecipe({
   className: 'heading',
@@ -8,8 +9,6 @@ export const headingRecipe = defineRecipe({
   },
   variants: {
     size: {
-      h1: { textStyle: 'h1' },
-      h2: { textStyle: 'h2' },
       xs: { fontSize: 'xs' },
       sm: { fontSize: 'sm' },
       md: { fontSize: 'md' },
@@ -22,8 +21,13 @@ export const headingRecipe = defineRecipe({
       '6xl': { fontSize: '6xl' },
       '7xl': { fontSize: '7xl' },
     },
+    variant: {
+      h1: textStylesValues.h1.value,
+      h2: textStylesValues.h2.value,
+    },
   },
   defaultVariants: {
-    size: 'h2',
+    size: 'lg',
+    variant: 'h2',
   },
 })
