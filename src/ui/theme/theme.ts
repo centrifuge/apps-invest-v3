@@ -1,4 +1,4 @@
-import { defineConfig } from '@chakra-ui/react'
+import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 import { blackScale, grayScale, colors, colorTokens } from './baseStyles/colors'
 import { buttonRecipe } from './recipes/buttonRecipe'
 import { inputRecipe } from './recipes/inputRecipe'
@@ -43,4 +43,4 @@ const theme = defineConfig({
   },
 })
 
-export default theme
+export default createSystem(defaultConfig, theme)

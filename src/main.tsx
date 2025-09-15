@@ -6,7 +6,7 @@ import { router } from '@routes/router'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ChakraCentrifugeProvider themeKey="light">
+    <ChakraCentrifugeProvider>
       <RouterProvider router={router} />
     </ChakraCentrifugeProvider>
   </StrictMode>
