@@ -26,7 +26,7 @@ export const buttonRecipe = defineRecipe({
     variant: {
       subtle: {
         background: 'gray.10',
-        color: 'text-inverted',
+        color: 'fg.inverted',
         fontSize: 'sm',
         fontWeight: 600,
         _hover: {
@@ -36,13 +36,13 @@ export const buttonRecipe = defineRecipe({
       },
       outline: {
         background: 'transparent',
-        color: 'text-inverted',
+        color: 'fg.inverted',
         fontSize: 'sm',
         fontWeight: 600,
       },
       plain: {
         background: 'transparent',
-        color: 'text-primary',
+        color: 'fg.solid',
         fontSize: 'sm',
         fontWeight: 600,
         border: 'none',

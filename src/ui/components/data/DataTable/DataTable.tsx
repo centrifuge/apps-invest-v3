@@ -52,7 +52,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
   return (
     // Chakra UI Table has a bug where the border is not applied to the table root
     // This is a workaround to apply the border to the table root
-    <Box borderRadius="lg" border="1px solid" borderColor="border-primary" overflow="hidden">
+    <Box borderRadius="lg" border="1px solid" borderColor="border.solid" overflow="hidden">
       <Table.Root size={size} overflow="hidden" border="none">
         <Table.Header>
           <Table.Row bg={TABLE_HEADER_COLOR}>

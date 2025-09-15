@@ -17,12 +17,12 @@ export function PoolKeyFacts() {
       </Heading>
 
       <Box
-        bg="bg-primary"
+        bg="bg.solid"
         width="100%"
         padding={6}
         borderRadius={10}
         border="1px solid"
-        borderColor="border-primary"
+        borderColor="border.solid"
         shadow="xs"
       >
         <Grid templateColumns={{ base: '1fr', md: '1fr 5fr' }} gap={2}>
@@ -86,7 +86,7 @@ export function PoolKeyFacts() {
             </Flex>
           </GridItem>
           <GridItem colSpan={factKeys.length ? 1 : 0}>
-            <Box bg="bg-primary" shadow="xs" boxShadow="none" pt={4}>
+            <Box bg="bg.solid" shadow="xs" boxShadow="none" pt={4}>
               {factKeys.map((item) => (
                 <Flex justifyContent="space-between" alignItems="center" mt={4} key={item.type}>
                   <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="gray.500">

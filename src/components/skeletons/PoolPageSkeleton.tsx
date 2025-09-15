@@ -19,15 +19,15 @@ export const PoolPageSkeleton = () => {
         </Box>
 
         <Box
-          bg="bg-secondary"
+          bg="bg.secondary"
           position="relative"
           borderRadius="md"
           p={4}
           h="264px"
           border="1px solid"
-          borderColor="border-primary"
+          borderColor="border.solid"
         >
-          <Flex mb={4} borderBottom="1px solid" borderColor="border-primary" pb={2}>
+          <Flex mb={4} borderBottom="1px solid" borderColor="border.solid" pb={2}>
             <Skeleton height="32px" width="80px" borderRadius="md" mr={2} />
             <Skeleton height="32px" width="80px" borderRadius="md" mr={2} />
             <Skeleton height="32px" width="80px" borderRadius="md" />

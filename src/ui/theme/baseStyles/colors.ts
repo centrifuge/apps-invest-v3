@@ -130,55 +130,58 @@ export const colorTokens = {
   'brand-yellow': {
     value: { base: '{colors.yellow.500}' },
   },
-  'bg-primary': {
+  'fg.primary-subtle': {
+    value: { base: '{colors.yellow.100}' },
+  },
+  'bg.solid': {
     value: { base: white, _dark: 'colors.gray.800' },
   },
-  'bg-secondary': {
+  'bg.secondary': {
     value: { base: 'colors.gray.50', _dark: 'colors.gray.50' },
   },
-  'bg-tertiary': {
+  'bg.tertiary': {
     value: { base: 'colors.gray.100' },
   },
-  'bg-accent': {
+  'bg.accent': {
     value: { base: 'colors.yellow.100' },
   },
-  'bg-disabled': {
+  'bg.disabled': {
     value: { base: 'colors.gray.100' },
   },
-  'bg-success': {
+  'bg.success': {
     value: { base: '#DCEBCF' },
   },
-  'bg-promote': {
+  'bg.promote': {
     value: { base: '#f8107114' },
   },
-  'bg-error': {
+  'bg.error': {
     value: { base: '#fcf0ee' },
   },
-  'border-primary': {
+  'border.solid': {
     value: { base: 'colors.gray.100', _dark: 'colors.gray.50' },
   },
-  'border-secondary': {
+  'border.secondary': {
     value: { base: 'rgba(246, 246, 246, 1)' },
   },
-  'border-tertiary': {
+  'border.tertiary': {
     value: { base: 'colors.gray.10' },
   },
-  'border-highlight': {
+  'border.emphasized': {
     value: { base: 'colors.yellow.500' },
   },
-  'text-primary': {
+  'fg.solid': {
     value: { base: 'colors.gray.800' },
   },
-  'text-secondary': {
+  'fg.muted': {
     value: { base: 'colors.gray.500' },
   },
-  'text-disabled': {
+  'fg.disabled': {
     value: { base: 'colors.gray.600' },
   },
-  'text-inverted': {
+  'fg.inverted': {
     value: { base: white },
   },
-  'text-highlight': {
+  'fg.emphasized': {
     value: { base: 'colors.yellow.500' },
   },
   error: {

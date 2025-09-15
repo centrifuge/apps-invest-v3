@@ -14,7 +14,7 @@ const colorStatus: Record<string, { backgroundColor: string; color: string; bord
   },
   info: {
     backgroundColor: 'gray.50',
-    color: 'text-primary',
+    color: 'fg.solid',
     borderColor: 'gray.50',
   },
 }

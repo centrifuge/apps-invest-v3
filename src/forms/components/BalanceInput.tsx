@@ -305,7 +305,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           variant="plain"
           size={inputSizes[buttonSize + 1]}
           backgroundColor="gray.300"
-          color="text-secondary"
+          color="fg.muted"
           onClick={onButtonClick}
           borderRadius="none"
         >

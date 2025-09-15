@@ -29,7 +29,7 @@ export function PoolMainStats() {
   ]
 
   return (
-    <Box bg="bg-primary" padding={6} borderRadius={10} border="1px solid" borderColor="border-primary" shadow="xs">
+    <Box bg="bg.solid" padding={6} borderRadius={10} border="1px solid" borderColor="border.solid" shadow="xs">
       <Grid templateColumns={{ base: 'repeat(3, 1fr)', lg: '7fr 6fr 4fr' }} gap={4}>
         {items.map((item, index) => (
           <GridItem minW={0} overflow="hidden" position="relative" key={item.label}>

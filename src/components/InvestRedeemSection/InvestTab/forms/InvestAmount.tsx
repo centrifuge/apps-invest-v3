@@ -124,8 +124,8 @@ export function InvestAmount({
           <Flex mt={2} justify="space-between">
             <Flex>
               <Badge
-                background="bg-tertiary"
-                color="text-primary"
+                background="bg.tertiary"
+                color="fg.solid"
                 opacity={0.5}
                 borderRadius={10}
                 px={3}
@@ -137,7 +137,7 @@ export function InvestAmount({
               >
                 MAX
               </Badge>
-              <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
+              <Text color="fg.solid" opacity={0.5} alignSelf="flex-end" ml={2}>
                 {formattedMaxInvestAmount} available
               </Text>
             </Flex>

@@ -31,12 +31,12 @@ export function PoolUnderlyingAssets() {
       </Heading>
 
       <Box
-        bg="bg-primary"
+        bg="bg.solid"
         width="100%"
         padding={{ base: 6, md: 8 }}
         borderRadius={10}
         border="1px solid"
-        borderColor="border-primary"
+        borderColor="border.solid"
         shadow="xs"
         position="relative"
       >

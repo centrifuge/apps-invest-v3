@@ -51,7 +51,7 @@ export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
   return (
     <>
       <Box mb={8}>
-        <Heading as="h2" size="lg" mb={2}>
+        <Heading variant="h2" as="h2" size="lg" mb={2}>
           RWA
         </Heading>
         <Text fontSize="sm" mb={4}>

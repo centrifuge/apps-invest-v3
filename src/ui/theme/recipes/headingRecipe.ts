@@ -24,6 +24,7 @@ export const headingRecipe = defineRecipe({
     variant: {
       h1: textStylesValues.h1.value,
       h2: textStylesValues.h2.value,
+      h3: textStylesValues.h3.value,
     },
   },
   defaultVariants: {

@@ -24,17 +24,46 @@ export const textStylesValues = {
     description: 'Hero / page title',
     value: {
       fontFamily: 'heading',
-      fontSize: '4xl',
+      fontSize: '2xl',
       fontWeight: 'bold',
-      lineHeight: 'short',
+      lineHeight: 'shorter',
+      letterSpacing: '0',
     },
   },
   h2: {
     value: {
       fontFamily: 'heading',
-      fontSize: '3xl',
+      fontSize: 'lg',
+      fontWeight: 'semibold',
+      lineHeight: 'shorter',
+      letterSpacing: '0',
+    },
+  },
+  h3: {
+    value: {
+      fontFamily: 'heading',
+      fontSize: 'md',
       fontWeight: 'semibold',
       lineHeight: 'short',
+      letterSpacing: '0',
+    },
+  },
+  h4: {
+    value: {
+      fontFamily: 'heading',
+      fontSize: 'sm',
+      fontWeight: 'semibold',
+      lineHeight: 'short',
+      letterSpacing: '0',
+    },
+  },
+  h5: {
+    value: {
+      fontFamily: 'heading',
+      fontSize: 'sm',
+      fontWeight: '500',
+      lineHeight: 'short',
+      letterSpacing: '0',
     },
   },
   body: {
