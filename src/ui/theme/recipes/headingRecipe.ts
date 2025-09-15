@@ -28,6 +28,5 @@ export const headingRecipe = defineRecipe({
   },
   defaultVariants: {
     size: 'lg',
-    variant: 'h2',
   },
 })
