@@ -9,7 +9,7 @@ import { fonts, fontSizes, textStyles } from 'src/ui/theme/baseStyles/text'
 import { textRecipe } from 'src/ui/theme/recipes/textRecipe'
 import { headingRecipe } from 'src/ui/theme/recipes/headingRecipe'
 
-const lightTheme = defineConfig({
+const theme = defineConfig({
   globalCss: {
     body: {
       color: blackScale[800],
@@ -43,4 +43,4 @@ const lightTheme = defineConfig({
   },
 })
 
-export default lightTheme
+export default theme
