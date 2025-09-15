@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { ChakraProvider } from '@chakra-ui/react'
-import { ColorModeProvider } from './ColorModesProvider'
+import { ColorModeProvider } from './ColorModeProvider'
 import system from '../theme/theme'
 
 export interface ChakraCentrifugeProviderProps {
