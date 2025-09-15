@@ -8,6 +8,7 @@ import { accordionRecipe } from './recipes/accordionRecipe'
 import { fonts, fontSizes, textStyles } from 'src/ui/theme/baseStyles/text'
 import { textRecipe } from 'src/ui/theme/recipes/textRecipe'
 import { headingRecipe } from 'src/ui/theme/recipes/headingRecipe'
+import { cardRecipe } from 'src/ui/theme/recipes/cardRecipe'
 
 const theme = defineConfig({
   globalCss: {
@@ -38,6 +39,7 @@ const theme = defineConfig({
     },
     slotRecipes: {
       accordion: accordionRecipe,
+      card: cardRecipe,
       checkbox: checkboxRecipe,
     },
   },

@@ -157,6 +157,9 @@ export const colorTokens = {
   'bg.error': {
     value: { base: '#fcf0ee' },
   },
+  border: {
+    value: { base: 'colors.gray.100', _dark: 'colors.gray.50' },
+  },
   'border.solid': {
     value: { base: 'colors.gray.100', _dark: 'colors.gray.50' },
   },
