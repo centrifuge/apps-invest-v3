@@ -1,5 +1,5 @@
 import { Box, Text, VStack } from '@chakra-ui/react'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '../../ui/components/elements/Button'
 
 const ThemeDebugger = () => {
@@ -8,6 +8,7 @@ const ThemeDebugger = () => {
       try {
         return getComputedStyle(document.body).fontFamily
       } catch (e) {
+        console.error(e)
         return 'Unable to detect'
       }
     }

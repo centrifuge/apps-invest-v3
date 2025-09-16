@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { Box, Text } from '@chakra-ui/react'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { BalanceInput } from '../../forms/components/BalanceInput'
 
 const meta: Meta<typeof BalanceInput> = {

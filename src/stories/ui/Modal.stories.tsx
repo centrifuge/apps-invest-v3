@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react'
 import { Button, Text, Input, VStack } from '@chakra-ui/react'
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Modal } from '../../ui/components/elements/Modal'
 
 const meta: Meta<typeof Modal> = {
