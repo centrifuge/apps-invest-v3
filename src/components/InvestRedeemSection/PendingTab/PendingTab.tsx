@@ -1,47 +1,19 @@
-import { divideBigInts, formatBalance } from '@cfg'
-import { BalanceDisplay } from '@ui'
-import { Box, Flex, Grid, Heading, Icon, Spinner, Text } from '@chakra-ui/react'
-import { TabProps } from '@components/InvestRedeemSection'
-import { usePoolContext } from '@contexts/PoolContext'
-import { useVaultsContext } from '@contexts/VaultsContext'
-import { useMemo } from 'react'
 import { IoMdTimer } from 'react-icons/io'
+import { Box, Flex, Grid, Heading, Icon, Spinner, Text } from '@chakra-ui/react'
+import { BalanceDisplay } from '@ui'
+import { TabProps } from '@components/InvestRedeemSection'
+import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 
 export function PendingTab({ isLoading: isTabLoading }: TabProps) {
-  const { investment, vaultDetails } = useVaultsContext()
-  const { poolDetails } = usePoolContext()
-
-  const poolShareClass = poolDetails?.shareClasses.find(
-    (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
-  )
-  const pricePerShare = poolShareClass?.details.pricePerShare
-
-  const calculatedInvestSharesEstimate = useMemo(() => {
-    if (
-      !investment ||
-      !investment.pendingInvestCurrency ||
-      investment.pendingInvestCurrency.isZero() ||
-      !pricePerShare
-    ) {
-      return undefined
-    }
-
-    const investAmountBigint = investment.pendingInvestCurrency.toBigInt()
-    const pricePerShareBigint = pricePerShare.toBigInt()
-
-    return divideBigInts(investAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
-      investment.pendingInvestCurrency.decimals,
-      2
-    )
-  }, [investment?.pendingInvestCurrency, pricePerShare])
-
-  const calculatedRedeemAmountEstimate = useMemo(() => {
-    if (!investment || !investment?.pendingRedeemShares || investment?.pendingRedeemShares.isZero() || !pricePerShare) {
-      return undefined
-    }
-
-    return formatBalance(investment.pendingRedeemShares.mul(pricePerShare))
-  }, [])
+  const {
+    investment,
+    investmentCurrency,
+    pendingInvestCurrency,
+    shareCurrency,
+    pendingRedeemShares,
+    calculatedInvestSharesEstimate,
+    calculatedRedeemAmountEstimate,
+  } = useGetPendingInvestments()
 
   if (isTabLoading) {
     return (
@@ -74,13 +46,13 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
         <Box>
           <Text fontSize="sm" mt={2} fontWeight="bold">
-            {investment?.investmentCurrency.symbol}
+            {investmentCurrency?.symbol}
           </Text>
-          <BalanceDisplay balance={investment?.pendingInvestCurrency} fontSize="sm" />
+          <BalanceDisplay balance={pendingInvestCurrency} fontSize="sm" />
         </Box>
         <Box textAlign={'right'}>
           <Text fontSize="sm" fontWeight="bold">
-            Est. {investment?.shareCurrency.symbol}
+            Est. {shareCurrency?.symbol}
           </Text>
           <Text fontSize="sm" mt={2}>
             {calculatedInvestSharesEstimate ?? '0.00'}
@@ -94,26 +66,19 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
         <Box>
           <Text fontSize="sm" mt={2} fontWeight="bold">
-            {investment?.shareCurrency.symbol}
+            {shareCurrency?.symbol}
           </Text>
-          <BalanceDisplay balance={investment?.pendingRedeemShares} fontSize="sm" />
+          <BalanceDisplay balance={pendingRedeemShares} fontSize="sm" />
         </Box>
         <Box textAlign={'right'}>
           <Text fontSize="sm" fontWeight="bold">
-            Est. {investment?.investmentCurrency.symbol}
+            Est. {investmentCurrency?.symbol}
           </Text>
           <Text fontSize="sm" mt={2}>
             {calculatedRedeemAmountEstimate ?? '0.00'}
           </Text>
         </Box>
       </Grid>
-
-      {/* <Flex alignItems="center" justifyContent="space-between" gap="1rem" w="full" mt={8} mb={4}>
-        <Button w="calc(50% - 0.5rem)" colorPalette="black">
-          Redeem more
-        </Button>
-        <Button w="calc(50% - 0.5rem)">Invest more</Button>
-      </Flex> */}
     </Box>
   )
 }

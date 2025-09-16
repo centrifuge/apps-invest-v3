@@ -1,12 +1,14 @@
 import { useCallback, useMemo } from 'react'
-import { Badge, Box, Flex, Text } from '@chakra-ui/react'
-import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { Balance, PoolNetwork } from '@centrifuge/sdk'
+import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce, formatBalanceToString, formatBalance, divideBigInts } from '@cfg'
+import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcons } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
-import { useVaultsContext } from '@contexts/VaultsContext'
+import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
+import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 import { usePoolContext } from '@contexts/PoolContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -25,6 +27,7 @@ export function RedeemAmount({
 }: RedeemAmountProps) {
   const { poolDetails } = usePoolContext()
   const { investment, vaults, vaultDetails, vaultsDetails, setVault } = useVaultsContext()
+  const { hasPendingRedeems, pendingRedeemShares, shareCurrency } = useGetPendingInvestments()
   const { setValue } = useFormContext()
 
   // Get networkIds and currencies for receiveAmount select currency list
@@ -117,6 +120,13 @@ export function RedeemAmount({
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
+        {hasPendingRedeems && pendingRedeemShares ? (
+          <PendingInvestmentBanner
+            label="Pending redemptions"
+            amount={pendingRedeemShares}
+            currencySymbol={shareCurrency?.symbol}
+          />
+        ) : null}
         <Box>
           <Flex alignItems="center" justifyContent="space-between">
             <Text fontWeight={500}>Redeem</Text>

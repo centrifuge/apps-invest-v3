@@ -83,7 +83,8 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     label,
     subLabel,
     buttonLabel,
-    size = 'md',
+    size = '2xl',
+    fontSize = '2xl',
     onButtonClick,
     defaultValue,
     ...rest
@@ -268,8 +269,9 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           onPaste={handlePaste}
           inputMode="decimal"
           variant={rest.variant ?? 'outline'}
-          borderRadius="md"
+          borderRadius="lg"
           size={size}
+          fontSize={fontSize}
           backgroundColor="gray.300"
           {...rest}
         />
@@ -295,7 +297,9 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           variant="subtle"
           defaultValue={defaultValue}
           border="transparent"
-          borderRadius="md"
+          borderRadius="lg"
+          size={size}
+          fontSize={fontSize}
           _focusVisible={{ borderColor: 'transparent' }}
           backgroundColor="gray.300"
           {...rest}

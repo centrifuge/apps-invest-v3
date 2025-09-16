@@ -1,14 +1,14 @@
-import { Badge, Icon, Image, Text } from '@chakra-ui/react'
 import type { PoolMetadata } from '@centrifuge/sdk'
-
-type RatingsArray = NonNullable<PoolMetadata['pool']['poolRatings']>
-
-type FirstRating = RatingsArray[0]
+import { Badge, Icon, Image, Text } from '@chakra-ui/react'
+import { Tooltip } from '@ui'
 
 import moodyLogo from '../../assets/logos/moody.svg'
 import spLogo from '../../assets/logos/sp.svg'
 import particulaLogo from '../../assets/logos/particula.svg'
-import { Tooltip } from '@ui'
+
+type RatingsArray = NonNullable<PoolMetadata['pool']['poolRatings']>
+
+type FirstRating = RatingsArray[0]
 
 export const getAgencyNormalisedName = (agency: string | undefined): string => {
   switch (agency) {
@@ -40,7 +40,7 @@ const logos = [
 
 export const RatingPill = ({ rating }: { rating: FirstRating }) => {
   const logo = logos.find((logo) => rating.agency?.toLowerCase().includes(logo.agency))
-  if (!rating) return null
+  if (!rating || !rating.agency || !rating.reportUrl) return null
   return (
     <Tooltip content={<Text>View rating</Text>}>
       <a href={rating.reportUrl ?? ''} target="_blank" rel="noopener noreferrer">
