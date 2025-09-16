@@ -1,6 +1,0 @@
-minimumReleaseAge: 43200
-
-overrides:
-  'debug': 4.3.7
-  '@metamask/sdk': 0.33.1
-  '@metamask/sdk-communication-layer': 0.33.1
