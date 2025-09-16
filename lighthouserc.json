@@ -14,8 +14,6 @@
     },
     "upload": {
       "target": "temporary-public-storage"
-    },
-    "server": {},
-    "wizard": {}
+    }
   }
 }
