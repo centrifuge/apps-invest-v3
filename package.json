@@ -12,6 +12,13 @@
     "lint:fix": "pnpm dlx eslint --fix .",
     "format": "prettier --write \"**/*.{ts,tsx}\""
   },
+  "pnpm": {
+    "overrides": {
+      "debug": "4.3.7",
+      "@metamask/sdk": "0.33.1",
+      "@metamask/sdk-communication-layer": "0.33.1"
+    }
+  },
   "dependencies": {
     "@ark-ui/react": "5.15.1",
     "@centrifuge/sdk": "0.0.0-alpha.62",

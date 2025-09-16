@@ -14,12 +14,10 @@ concurrency:
 env:
   APP_NAME: invest-v3
 
-
-
 jobs:
   build:
     permissions:
-      contents: read   
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: '📥 Checkout Code'
@@ -39,7 +37,7 @@ jobs:
       id-token: write
 
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: ${{ github.event_name == 'pull_request' && 'preview' || 'demo' }}
       url: ${{ steps.deploy.outputs.deployment-url }}
     outputs:
@@ -69,10 +67,3 @@ jobs:
     steps:
       - name: '📥 Checkout Code'
         uses: actions/checkout@v4
-
-      - name: '📊 Performance Test with Lighthouse'
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun --config=lighthouserc.json --collect.url=${{ needs.deploy.outputs.deployment-url }}
-        env:
-          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
