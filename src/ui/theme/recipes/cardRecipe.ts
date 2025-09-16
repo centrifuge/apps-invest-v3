@@ -11,14 +11,15 @@ export const cardRecipe = defineSlotRecipe({
       border: '1px solid',
       borderColor: grayScale[100],
     },
-    header: {},
+    header: { p: 0, mb: 2 },
     title: {
-      fontSize: 'md',
       color: grayScale[800],
+      fontSize: 'lg',
     },
     body: {
       padding: 0,
       color: grayScale[800],
+      fontSize: 'md',
     },
   },
 })
