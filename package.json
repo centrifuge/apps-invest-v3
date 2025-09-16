@@ -70,5 +70,13 @@
     "vite-plugin-node-polyfills": "0.24.0",
     "vite-tsconfig-paths": "5.1.4"
   },
+  "pnpm": {
+    "overrides": {
+      "@metamask/sdk": "0.33.1",
+      "@metamask/sdk-communication-layer": "0.33.1",
+      "debug": "^4.4.3",
+      "@eslint/plugin-kit": "0.3.4"
+    }
+  },
   "packageManager": "pnpm@10.10.0"
 }
