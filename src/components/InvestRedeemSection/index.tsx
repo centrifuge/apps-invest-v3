@@ -33,7 +33,7 @@ const RestrictedCountry = () => {
   return (
     <Flex direction="column" gap={2} mt={4} flex={1}>
       <Heading>Investor requirements</Heading>
-      <InfoWrapper text="Unfortunately you are unable to invest at this time due to your location.  Geo restrictions apply to all US citizens and countries that are sanctioned." />
+      <InfoWrapper text="Unfortunately you are unable to invest at this time due to your location. Restrictions apply to US Persons and residents of sanctioned jurisdictions." />
     </Flex>
   )
 }
