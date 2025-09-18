@@ -52,6 +52,7 @@ export default function Root() {
         environment: import.meta.env.VITE_CENTRIFUGE_ENV,
         indexerUrl: import.meta.env.VITE_INDEXER_URL,
         rpcUrls: import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet' ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
+        pollingInterval: 15000,
       }),
     []
   )
