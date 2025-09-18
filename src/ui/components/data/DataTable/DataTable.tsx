@@ -5,7 +5,8 @@ import { FiChevronUp, FiChevronDown, FiCode } from 'react-icons/fi'
 export type ColumnDefinition<RowType> = {
   header: string
   accessor?: keyof RowType
-  textAlign?: 'start' | 'center' | 'end'
+  textAlign?: 'center' | 'left' | 'right'
+  justifyContent?: 'flex-start' | 'flex-end' | 'center'
   width?: string
   sortKey?: string
   render?: (row: RowType) => React.ReactNode
@@ -68,8 +69,8 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                 color="gray.800"
                 role="group"
               >
-                <Flex alignItems="center" justifyContent="center">
-                  {col.header}
+                <Flex alignItems="center" justifyContent={col.justifyContent ?? 'center'}>
+                  <Box marginLeft={col.sortKey && col.justifyContent === 'center' ? '16px' : '0'}>{col.header}</Box>
                   {col.sortKey && (
                     <>
                       {sortConfig?.key === col.sortKey ? (
