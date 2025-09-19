@@ -28,7 +28,7 @@ const MainLayout = memo(() => {
             <MigrationBanner />
             <Box>
               <NetworkButton mr={4} size="sm" height="40px" />
-              <WalletButton colorPalette={['black', 'black']} />
+              <WalletButton />
             </Box>
           </Flex>
           <Separator mb={4} />
