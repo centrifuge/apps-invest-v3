@@ -16,9 +16,6 @@ const theme = defineConfig({
       color: blackScale[500],
       backgroundColor: grayScale[300],
     },
-    button: {
-      color: blackScale[500],
-    },
   },
   theme: {
     tokens: {
