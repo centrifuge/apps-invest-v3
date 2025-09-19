@@ -99,7 +99,7 @@ export const PoolPerformanceChart = () => {
       {isLoading ? (
         <Box pos="absolute" inset="0" bg="bg/80">
           <Center h="full">
-            <Spinner size="lg" color="black.500" />
+            <Spinner size="lg" color="fg.solid" />
           </Center>
         </Box>
       ) : null}
