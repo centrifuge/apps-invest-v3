@@ -73,7 +73,7 @@ export function Input<TFieldValues extends FieldValues = FieldValues>(props: Inp
           onBlur={mergedOnBlur}
           padding="10px 14px"
           borderRadius="md"
-          bg={rest.bg ?? 'gray.50'}
+          bg={rest.bg ?? 'gray.200'}
         />
       </InputGroup>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>

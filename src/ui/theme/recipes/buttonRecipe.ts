@@ -25,24 +25,20 @@ export const buttonRecipe = defineRecipe({
     },
     variant: {
       subtle: {
-        background: 'gray.10',
-        color: 'text-inverted',
         fontSize: 'sm',
         fontWeight: 600,
-        _hover: {
-          background: 'gray.0',
-          boxShadow: 'md',
-        },
       },
       outline: {
         background: 'transparent',
-        color: 'text-inverted',
+        color: 'fg.solid',
         fontSize: 'sm',
         fontWeight: 600,
+        borderColor: 'var(--chakra-colors-color-palette-solid) !important',
+        border: '1px solid',
       },
       plain: {
         background: 'transparent',
-        color: 'text-primary',
+        color: 'fg.solid',
         fontSize: 'sm',
         fontWeight: 600,
         border: 'none',

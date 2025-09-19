@@ -44,11 +44,13 @@ export const RatingPill = ({ rating }: { rating: FirstRating }) => {
   return (
     <Tooltip content={<Text>View rating</Text>}>
       <a href={rating.reportUrl ?? ''} target="_blank" rel="noopener noreferrer">
-        <Badge variant="outline">
+        <Badge variant="outline" py={3} px={2}>
           <Icon>
             <Image src={logo?.logo || spLogo} alt={rating.agency} />
           </Icon>
-          <Text>{rating.value}</Text>
+          <Text fontSize="xs" color="fg.subtle">
+            {rating.value}
+          </Text>
         </Badge>
       </a>
     </Tooltip>

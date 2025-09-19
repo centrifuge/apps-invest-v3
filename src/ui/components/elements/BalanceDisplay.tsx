@@ -18,7 +18,7 @@ export function BalanceDisplay(props: BalanceDisplayProps) {
   }, [balance, currency, precision, minPrecision])
 
   return (
-    <Text color="gray.800" {...rest}>
+    <Text color="fg.solid" {...rest}>
       {formattedValue}
     </Text>
   )

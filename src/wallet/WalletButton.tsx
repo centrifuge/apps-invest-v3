@@ -11,7 +11,7 @@ function truncateAddress(string: Address) {
 }
 
 export function WalletButton({
-  colorPalette = ['yellow', 'gray'],
+  colorPalette = ['black', 'black'],
   variant = ['solid', 'solid'],
 }: {
   colorPalette?: ButtonColorPalette[]

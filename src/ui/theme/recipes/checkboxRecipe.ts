@@ -1,5 +1,5 @@
 import { defineSlotRecipe } from '@chakra-ui/react'
-import { white } from '../colors'
+import { white } from '../baseStyles/colors'
 
 export const checkboxRecipe = defineSlotRecipe({
   className: 'checkbox',

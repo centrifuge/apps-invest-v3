@@ -1,3 +1,5 @@
+import storybook from 'eslint-plugin-storybook'
+
 // @ts-check
 
 import eslint from '@eslint/js'
@@ -100,8 +102,7 @@ export default tseslint.config(
       '@typescript-eslint/semi': ['off', null],
       '@typescript-eslint/type-annotation-spacing': 'off',
     },
-  },
-  // Separate ignore configuration object - no other properties allowed
+  }, // Separate ignore configuration object - no other properties allowed
   {
     ignores: [
       'dist/**',
@@ -116,5 +117,6 @@ export default tseslint.config(
       '.cache/**',
       '.temp/**',
     ],
-  }
+  },
+  storybook.configs['flat/recommended']
 )

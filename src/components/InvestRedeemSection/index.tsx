@@ -89,7 +89,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     <Flex
       direction="column"
       border="1px solid"
-      borderColor="border-primary"
+      borderColor="border.solid"
       borderRadius="10px"
       shadow="xs"
       bg="white"

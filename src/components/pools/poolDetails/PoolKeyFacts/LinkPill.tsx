@@ -10,9 +10,9 @@ export const LinkPill = ({ href, label, ...rest }: LinkPillProps) => {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer">
         <Box
-          color="gray.500"
+          color="fg.subtle"
           border="1px solid"
-          borderColor="gray.500"
+          borderColor="border.subtle"
           background="transparent"
           borderRadius="full"
           height="2rem"
@@ -39,9 +39,9 @@ export const LinkPill = ({ href, label, ...rest }: LinkPillProps) => {
 
   return (
     <Button
-      color="gray.500"
+      color="fg.subtle"
       border="1px solid"
-      borderColor="gray.500"
+      borderColor="border.subtle"
       background="transparent"
       borderRadius="full"
       height="2rem"

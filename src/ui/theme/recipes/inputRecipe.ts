@@ -1,5 +1,5 @@
 import { defineRecipe } from '@chakra-ui/react'
-import { white } from '../colors'
+import { white } from '../baseStyles/colors'
 
 export const inputRecipe = defineRecipe({
   base: {
@@ -16,7 +16,7 @@ export const inputRecipe = defineRecipe({
       outline: {
         bg: white,
         _disabled: {
-          bg: 'gray.50',
+          bg: 'gray.200',
         },
       },
     },

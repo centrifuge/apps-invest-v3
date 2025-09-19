@@ -35,7 +35,7 @@ export const AddressInputLabel = ({
     <Flex
       justifyContent="space-between"
       border="1px solid"
-      borderColor="border-primary"
+      borderColor="border.solid"
       alignItems="center"
       mt={4}
       pl={1}
@@ -51,7 +51,7 @@ export const AddressInputLabel = ({
         disabled={disabled}
         size="sm"
         backgroundColor="white"
-        color="text-disabled"
+        color="fg.disabled"
         onClick={() => onDelete({ address, chainId })}
       >
         <FaRegTrashAlt />
@@ -95,7 +95,7 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
             }}
             onBlur={() => setIsValid(isAddress(value))}
             size="sm"
-            background="border-secondary"
+            background="border.secondary"
             borderRadius={4}
             borderTopRightRadius={0}
             borderBottomRightRadius={0}
@@ -105,9 +105,9 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
             onClick={handleClick}
             aria-label="Add address"
             size="sm"
-            backgroundColor="border-secondary"
-            color="text-disabled"
-            borderColor="border-primary"
+            backgroundColor="border.secondary"
+            color="fg.disabled"
+            borderColor="border.solid"
             borderTopLeftRadius={0}
             borderBottomLeftRadius={0}
             borderLeft="none"
