@@ -13,11 +13,11 @@ import { cardRecipe } from 'src/ui/theme/recipes/cardRecipe'
 const theme = defineConfig({
   globalCss: {
     body: {
-      color: blackScale[800],
-      backgroundColor: grayScale[50],
+      color: blackScale[500],
+      backgroundColor: grayScale[300],
     },
     button: {
-      color: blackScale[800],
+      color: blackScale[500],
     },
   },
   theme: {
