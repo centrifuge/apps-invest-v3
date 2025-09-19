@@ -53,7 +53,7 @@ const advancedColumns: ColumnDefinition<SampleUser>[] = [
     render: (row) => (
       <Box className="test">
         <Text fontWeight="bold">{row.name}</Text>
-        <Text fontSize="xs" color="gray.500">
+        <Text fontSize="xs" color="fg.subtle">
           {row.email}
         </Text>
       </Box>

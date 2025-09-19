@@ -16,7 +16,7 @@ const ThemeDebugger = () => {
   }
 
   return (
-    <Box p={4} bg="gray.50" border="1px solid" borderColor="gray.200" borderRadius="md" fontSize="sm">
+    <Box p={4} bg="gray.200" border="1px solid" borderColor="gray.200" borderRadius="md" fontSize="sm">
       <Text fontWeight="bold" mb={2}>
         🔍 CSS Debug Info:
       </Text>
@@ -34,7 +34,7 @@ const ThemeDebugger = () => {
         </Text>
         <Text>
           <strong>Background color:</strong>{' '}
-          <span style={{ color: 'var(--chakra-colors-yellow-500, #FFC012)' }}>#FFC012 (yellow.50)</span>
+          <span style={{ color: 'var(--chakra-colors-yellow-500, #FFC012)' }}>#FFC012 (yellow.500)</span>
         </Text>
         <Box mt={2} p={2} border="1px dashed" borderColor="gray.300">
           <Text fontSize="xs" fontWeight="bold">

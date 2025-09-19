@@ -94,7 +94,7 @@ export const MultipleLines: Story = {
         id: 'volume',
         type: 'line',
         accessor: (row: unknown) => (row as PerformanceData).volume * 10,
-        colorToken: 'gray.800',
+        colorToken: 'fg.solid',
         strokeWidth: 2,
       },
     ],
@@ -126,7 +126,7 @@ export const WithBars: Story = {
         id: 'profit',
         type: 'line',
         accessor: (row: unknown) => (row as SalesData).profit,
-        colorToken: 'gray.800',
+        colorToken: 'fg.solid',
         strokeWidth: 3,
       },
     ],
@@ -261,7 +261,7 @@ export const LargeChart: Story = {
         id: 'profit',
         type: 'line',
         accessor: (row: unknown) => (row as SalesData).profit,
-        colorToken: 'gray.800',
+        colorToken: 'fg.solid',
         strokeWidth: 3,
       },
       {
@@ -297,7 +297,7 @@ export const WithWrapper: Story = {
         </Text>
         <LineChart {...args} />
       </Box>
-      <Box p={4} bg="gray.50" borderRadius="md">
+      <Box p={4} bg="gray.200" borderRadius="md">
         <Text fontSize="sm">
           <strong>Current Value:</strong> {(args.data as PerformanceData[])?.[args.data.length - 1]?.value || 'N/A'}
         </Text>

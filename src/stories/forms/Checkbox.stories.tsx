@@ -53,7 +53,7 @@ const FormWrapper = ({
             {children}
           </Box>
           {showFormState && (
-            <Box p={4} bg="gray.50" borderRadius="md">
+            <Box p={4} bg="gray.200" borderRadius="md">
               <Text fontSize="sm" color="gray.600" fontWeight="bold" mb={2}>
                 Form State:
               </Text>
@@ -210,7 +210,7 @@ export const ComplexLabel: Story = {
         label={
           <Box>
             <Text fontWeight="bold">Terms and Conditions</Text>
-            <Text fontSize="sm" color="gray.800" mt={1}>
+            <Text fontSize="sm" color="fg.solid" mt={1}>
               I agree to the{' '}
               <Text as="span" color="blue.500" textDecoration="underline">
                 terms of service
@@ -240,7 +240,7 @@ export const ComplexLabel: Story = {
 export const CustomStyling: Story = {
   render: (args) => (
     <FormWrapper defaultValues={{ styled: false }}>
-      <Box p={4} bg="blue.50" borderRadius="lg" border="1px solid" borderColor="blue.200">
+      <Box p={4} bg="blue.100" borderRadius="lg" border="1px solid" borderColor="blue.200">
         <Checkbox {...args} />
       </Box>
     </FormWrapper>
