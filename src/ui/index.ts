@@ -1,5 +1,0 @@
-export * from './components/icons'
-export * from './components/index'
-export * from './providers'
-export * from './theme/index'
-export * from './types/index'
