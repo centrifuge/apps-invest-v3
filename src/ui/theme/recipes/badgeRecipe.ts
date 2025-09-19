@@ -17,7 +17,7 @@ export const badgeRecipe = defineRecipe({
         backgroundColor: 'white',
         borderRadius: 'full',
         border: '1px solid',
-        borderColor: 'gray.800',
+        borderColor: 'border.dark',
         opacity: 1,
       },
     },

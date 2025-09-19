@@ -11,7 +11,7 @@ interface PendingInvestmentBannerProps {
 
 export function PendingInvestmentBanner({ label, amount, currencySymbol }: PendingInvestmentBannerProps) {
   return (
-    <Box border="1px solid" borderColor="gray.800" borderRadius="12px" p={4} mb={4}>
+    <Box border="1px solid" borderColor="border.dark" borderRadius="12px" p={4} mb={4}>
       <Flex alignItems="center" justifyContent="space-between">
         <Flex alignItems="center" justifyContent="flex-start">
           <Icon size="sm" mr={2} mt={1}>

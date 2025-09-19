@@ -21,7 +21,7 @@ export function SolanaMarketCard() {
         <Link
           href="https://app.kamino.finance/swap/"
           fontSize="lg"
-          color="gray.500"
+          color="fg.subtle"
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -43,19 +43,19 @@ export function PoolUnderlyingAssets() {
         {isUnderlyingLoading ? (
           <Box pos="absolute" inset="0" bg="bg/80">
             <Center h="full">
-              <Spinner size="lg" color="gray.800" />
+              <Spinner size="lg" color="black.500" />
             </Center>
           </Box>
         ) : null}
         {items.map((item) => (
           <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
-            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="gray.500">
+            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.subtle">
               {item.label}
             </Text>
             {typeof item.value !== 'string' ? (
               item.value
             ) : (
-              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="gray.800" textAlign="right">
+              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
                 {item.value}
               </Text>
             )}

@@ -52,11 +52,11 @@ export function NetworkButton(props: ButtonProps) {
     <>
       <Button
         ref={buttonRef}
-        backgroundColor="white"
+        backgroundColor="gray.100"
         variant="solid"
         onClick={onToggle}
-        _hover={{ backgroundColor: 'gray.50' }}
-        _active={{ backgroundColor: 'gray.100' }}
+        _hover={{ backgroundColor: 'gray.200' }}
+        _active={{ backgroundColor: 'gray.200' }}
         {...props}
       >
         <NetworkIcon networkId={connectedChain} />
@@ -70,7 +70,7 @@ export function NetworkButton(props: ButtonProps) {
           <Box
             ref={dropdownRef}
             {...getDropdownPosition()}
-            backgroundColor="white"
+            backgroundColor="gray.100"
             border="1px solid"
             borderColor="gray.200"
             borderRadius="md"
@@ -87,7 +87,7 @@ export function NetworkButton(props: ButtonProps) {
                     px={3}
                     py={2}
                     cursor="pointer"
-                    _hover={{ backgroundColor: 'gray.50' }}
+                    _hover={{ backgroundColor: 'gray.200' }}
                     onClick={() => handleChainSwitch(chain.id)}
                     display="flex"
                     alignItems="center"

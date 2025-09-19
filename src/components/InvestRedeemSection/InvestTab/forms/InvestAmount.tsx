@@ -117,7 +117,7 @@ export function InvestAmount({
                 precision={2}
                 ml={4}
                 fontSize="xs"
-                color="gray.500"
+                color="fg.subtle"
               />
             ) : null}
           </Flex>
@@ -140,7 +140,7 @@ export function InvestAmount({
                 px={3}
                 h="24px"
                 onClick={setMaxInvestAmount}
-                borderColor="gray.500 !important"
+                borderColor="gray.600 !important"
                 border="1px solid"
                 cursor="pointer"
               >
@@ -164,7 +164,7 @@ export function InvestAmount({
                   precision={2}
                   mt={6}
                   fontSize="xs"
-                  color="gray.500"
+                  color="fg.subtle"
                 />
               </Flex>
               <BalanceInput

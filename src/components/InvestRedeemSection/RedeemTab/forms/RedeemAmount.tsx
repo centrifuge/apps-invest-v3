@@ -137,7 +137,7 @@ export function RedeemAmount({
                 precision={2}
                 ml={4}
                 fontSize="xs"
-                color="gray.500"
+                color="fg.subtle"
               />
             ) : null}
           </Flex>
@@ -158,7 +158,7 @@ export function RedeemAmount({
                 borderRadius={10}
                 px={3}
                 h="24px"
-                borderColor="gray.500 !important"
+                borderColor="gray.600 !important"
                 border="1px solid"
                 cursor="pointer"
                 onClick={setMaxRedeemAmount}
@@ -181,7 +181,7 @@ export function RedeemAmount({
                   precision={2}
                   ml={4}
                   fontSize="xs"
-                  color="gray.500"
+                  color="fg.subtle"
                 />
               </Flex>
               <BalanceInput

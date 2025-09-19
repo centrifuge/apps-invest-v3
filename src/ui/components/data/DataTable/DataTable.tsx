@@ -66,7 +66,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                 cursor={col.sortKey ? 'pointer' : 'default'}
                 userSelect="none"
                 fontSize="xs"
-                color="gray.800"
+                color="fg.solid"
                 role="group"
               >
                 <Flex alignItems="center" justifyContent={col.justifyContent ?? 'center'}>
@@ -79,7 +79,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                           aria-label={sortConfig.direction}
                           ml={2}
                           boxSize={4}
-                          color="gray.800"
+                          color="fg.solid"
                         />
                       ) : (
                         <Icon

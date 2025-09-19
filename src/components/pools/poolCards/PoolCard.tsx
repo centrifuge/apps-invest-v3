@@ -60,7 +60,7 @@ export function PoolCard({
             {poolName}
           </Text>
           {!isRwaPool && poolIssuerName ? (
-            <Text fontSize="x-small" color="gray.500">
+            <Text fontSize="x-small" color="fg.subtle">
               {poolIssuerName}
             </Text>
           ) : null}
@@ -99,7 +99,7 @@ export function PoolCard({
         </>
       )}
       <Separator my={4} />
-      <Text color="gray.400" fontSize="sm">
+      <Text color="fg.subtle" fontSize="sm">
         {shortDescription.length > 0 ? shortDescription : `${poolName} pool`}
       </Text>
       <Separator my={4} />
