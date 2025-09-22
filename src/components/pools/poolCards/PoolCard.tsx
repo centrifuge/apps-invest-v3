@@ -29,7 +29,7 @@ export function PoolCard({
     poolDetails?.shareClasses[0]?.shareClass.id,
     currentNetworkChainId,
     {
-      enabled: !!poolDetails?.shareClasses[0]?.shareClass.id && !!currentNetworkChainId,
+      enabled: !!poolDetails?.shareClasses[0]?.shareClass.id.toString() && !!currentNetworkChainId,
     }
   )
   const isWhitelisted = isMember ?? false
