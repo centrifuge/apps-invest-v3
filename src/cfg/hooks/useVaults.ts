@@ -13,13 +13,13 @@ export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId, option
   const vaults$ = useMemo(() => {
     if (!poolNetwork || !scId || !enabled) return undefined
     return poolNetwork.vaults(scId)
-  }, [poolNetwork, scId, enabled])
+  }, [poolNetwork?.chainId, scId?.toString(), enabled])
   return useObservable(vaults$)
 }
 
 export function useVaultDetails(vault?: Vault | null, options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaultDetails$ = useMemo(() => (vault && enabled ? vault.details() : undefined), [vault, enabled])
+  const vaultDetails$ = useMemo(() => (vault && enabled ? vault.details() : undefined), [vault?.address, enabled])
   return useObservable(vaultDetails$)
 }
 
@@ -39,7 +39,7 @@ export function useInvestment(vault?: Vault, options?: Options) {
   const { address } = useAddress()
   const investment$ = useMemo(
     () => (vault && address && enabled ? vault.investment(address) : undefined),
-    [vault, address, enabled]
+    [vault?.address, address, enabled]
   )
   return useObservable(investment$)
 }

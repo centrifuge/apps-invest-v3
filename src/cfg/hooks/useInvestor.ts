@@ -17,7 +17,7 @@ export function useInvestor() {
 
 export function usePortfolio() {
   const { data: account } = useInvestor()
-  const portfolio$ = useMemo(() => (account ? account?.portfolio() : undefined), [account])
+  const portfolio$ = useMemo(() => (account ? account?.portfolio() : undefined), [account?.address])
   return useObservable(portfolio$)
 }
 
@@ -27,6 +27,6 @@ export function useIsMember(shareClassId?: ShareClassId, chainId?: number, optio
   const isMember$ = useMemo(() => {
     if (!account || !shareClassId || !chainId || !enabled) return undefined
     return account.isMember(shareClassId, chainId)
-  }, [account, chainId, shareClassId])
+  }, [account?.address, chainId, shareClassId?.toString()])
   return useObservable(isMember$)
 }

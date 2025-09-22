@@ -24,7 +24,7 @@ export function usePool(poolId?: PoolId, options?: Options) {
   const pool$ = useMemo(() => {
     if (!poolId || !enabled) return undefined
     return centrifuge.pool(poolId)
-  }, [poolId, enabled])
+  }, [poolId?.toString(), enabled])
 
   return useObservable(pool$)
 }
@@ -36,7 +36,7 @@ export function usePoolDetails(poolId?: PoolId, options?: Options) {
   const details$ = useMemo(() => {
     if (!enabled || !poolId) return undefined
     return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))
-  }, [poolId, centrifuge, enabled])
+  }, [poolId?.toString(), centrifuge, enabled])
 
   return useObservable(details$)
 }
@@ -65,7 +65,7 @@ export function usePoolActiveNetworks(poolId?: PoolId, options?: Options) {
   const vaults$ = useMemo(() => {
     if (!enabled || !poolId) return undefined
     return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
-  }, [poolId, centrifuge])
+  }, [poolId?.toString(), centrifuge])
 
   return useObservable(vaults$)
 }
@@ -75,7 +75,7 @@ export function usePoolNetworks(poolId?: PoolId) {
   const networks$ = useMemo(() => {
     if (!poolId) return undefined
     return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))
-  }, [poolId, centrifuge])
+  }, [poolId?.toString(), centrifuge])
 
   return useObservable(networks$)
 }
