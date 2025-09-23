@@ -6,6 +6,7 @@ const RWA_POOLS = {
   // Production accounts
   '281474976710662': 'Tokenized AAA CLO',
   '281474976710663': '',
+  '281474976710665': 'SPXA',
   // test accounts
   '281474976710657': 'Sepolia Janus Henderson Anemoy Treasury Fund',
 } as const
@@ -25,11 +26,13 @@ const PRODUCTION_POOLS = {
   '281474976710660': '',
   '281474976710662': 'Tokenized AAA CLO',
   '281474976710663': '',
+  '281474976710665': 'SPXA',
 } as const
 
 const RESTRICTED_POOLS = {
-  '281474976710664': '',
   '281474976710657': '',
+  '281474976710664': '',
+  '281474976710665': 'SPXA',
 } as const
 
 export function useGetPoolsByIds() {
