@@ -17,8 +17,8 @@ importers:
         specifier: 5.15.1
         version: 5.15.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@centrifuge/sdk':
-        specifier: 0.4.3
-        version: 0.4.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76)
+        specifier: 0.4.4
+        version: 0.4.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76)
       '@chakra-ui/react':
         specifier: 3.19.1
         version: 3.19.1(@emotion/react@11.14.0(@types/react@19.1.12)(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -276,8 +276,8 @@ packages:
   '@base-org/account@1.1.1':
     resolution: {integrity: sha512-IfVJPrDPhHfqXRDb89472hXkpvJuQQR7FDI9isLPHEqSYt/45whIoBxSPgZ0ssTt379VhQo4+87PWI1DoLSfAQ==}
 
-  '@centrifuge/sdk@0.4.3':
-    resolution: {integrity: sha512-/yKq1Tpm8eO4OQgDyFOICerjVOMTj+rb/izRkKT1qkP8MZHwTopXEPzyJw2BLNQGXA1D6RJMimmf8DgEh00Djg==}
+  '@centrifuge/sdk@0.4.4':
+    resolution: {integrity: sha512-hHdJ4EyoAX2rtlNap0rF4c8lh5vgtx5TBi8YAGWMwfINXXpVQrSNGLcDx7erPNEraslVoPGFTVDePw8EaS8mTQ==}
     engines: {node: '>=18.18'}
 
   '@chakra-ui/anatomy@2.2.2':
@@ -5059,7 +5059,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@centrifuge/sdk@0.4.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76)':
+  '@centrifuge/sdk@0.4.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76)':
     dependencies:
       '@openzeppelin/merkle-tree': 1.0.8
       decimal.js-light: 2.5.1
