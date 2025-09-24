@@ -1,9 +1,12 @@
 import { Heading, Text } from '@chakra-ui/react'
 import { DataTable, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
+import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
+import { AccreditedOnlyValueBlock } from '@components/elements/AccreditedOnlyValueBlock'
 
 export function PoolHoldings() {
   const { poolDetails } = usePoolContext()
+  const { isRestrictedPool } = useGetPoolsByIds()
   const { holdings } = poolDetails?.metadata ?? {}
   const headers = holdings?.headers ?? []
 
@@ -36,7 +39,11 @@ export function PoolHoldings() {
         Holdings shown are the approximate market value of invested assets only and do not reflect the total NAV of the
         pool.
       </Text>
-      <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
+      {isRestrictedPool ? (
+        <AccreditedOnlyValueBlock />
+      ) : (
+        <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
+      )}
     </>
   )
 }

@@ -5,6 +5,7 @@ import { useChainId } from 'wagmi'
 import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useIsMember, usePoolActiveNetworks } from '@cfg'
 import { Card, ValueText } from '@ui'
 import { getPoolTVL } from '@utils/getPoolTVL'
+import { AccreditedOnlyValueBlock } from '@components/elements/AccreditedOnlyValueBlock'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
@@ -73,9 +74,21 @@ export function PoolCard({
           </Icon>
         )}
       </Flex>
-      {isRestrictedPool ? null : (
+      <Separator my={4} />
+      {isRestrictedPool ? (
+        <Box>
+          <Flex alignItems="center" justifyContent="space-between" overflow="hidden">
+            <Text color="gray.400" fontSize="0.75rem" fontWeight={500}>
+              TVL(USD)
+            </Text>
+            <Text color="gray.400" fontSize="0.75rem" fontWeight={500} mr={8}>
+              APY
+            </Text>
+          </Flex>
+          <AccreditedOnlyValueBlock />
+        </Box>
+      ) : (
         <>
-          <Separator my={4} />
           <Flex alignItems="center" justifyContent="space-between" overflow="hidden">
             <ValueText
               label="TVL(USD)"
