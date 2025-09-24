@@ -13,7 +13,7 @@ export function PoolDetailsRwa() {
       {isRestrictedPool ? null : <PoolPerformanceChart />}
       <PoolOverview />
       <PoolKeyFacts />
-      {isRestrictedPool ? null : <PoolHoldings />}
+      <PoolHoldings />
       <TermsAndConditions />
     </>
   )
