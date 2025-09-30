@@ -1,5 +1,6 @@
 import { formatBigintToString } from '@cfg'
 import { Box, Grid, GridItem, Text } from '@chakra-ui/react'
+import { AccreditedOnlyValueBlock } from '@components/elements/AccreditedOnlyValueBlock'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { roundToDecimal } from '@utils/nums'
@@ -12,7 +13,7 @@ export function PoolMainStats() {
   const items = [
     {
       label: 'TVL (USD)',
-      value: isRestrictedPool ? '' : (poolTVL ?? '0.00'),
+      value: isRestrictedPool ? <AccreditedOnlyValueBlock /> : (poolTVL ?? '0.00'),
     },
     {
       label: 'Token price (USD)',
@@ -24,13 +25,13 @@ export function PoolMainStats() {
     },
     {
       label: 'APY',
-      value: isRestrictedPool ? '%' : `${apy}%`,
+      value: isRestrictedPool ? <AccreditedOnlyValueBlock /> : `${apy}%`,
     },
   ]
 
   return (
     <Box bg="bg.solid" padding={6} borderRadius={10} border="1px solid" borderColor="border.solid" shadow="xs">
-      <Grid templateColumns={{ base: 'repeat(3, 1fr)', lg: '7fr 6fr 4fr' }} gap={4}>
+      <Grid templateColumns={{ base: 'repeat(3, 1fr)' }} gap={4}>
         {items.map((item, index) => (
           <GridItem minW={0} overflow="hidden" position="relative" key={item.label}>
             <Box

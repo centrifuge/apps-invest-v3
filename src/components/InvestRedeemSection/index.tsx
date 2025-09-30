@@ -67,10 +67,12 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     [networks, connectedChain]
   )
   const isInvestorWhiteListed = useMemo(() => !!isMember, [isMember, vault, connectedChain])
+  // Account for leftover dust that is technically claimable but not worth claiming
+  const oneUSDC = 10n ** 6n
   const hasClaimableAssets = useMemo(
     () =>
-      (investment?.claimableInvestShares.toBigInt() ?? 0n) > 0n ||
-      (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) > 0n,
+      (investment?.claimableInvestShares.toBigInt() ?? 0n) >= oneUSDC ||
+      (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) >= oneUSDC,
     [investment, vault, connectedChain]
   )
   const [isClaimFormDisplayed, setIsClaimFormDisplayed] = useState(hasClaimableAssets)
