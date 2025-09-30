@@ -78,10 +78,10 @@ export function PoolCard({
       {isRestrictedPool ? (
         <Box>
           <Flex alignItems="center" justifyContent="space-between" overflow="hidden">
-            <Text color="gray.400" fontSize="0.75rem" fontWeight={500}>
+            <Text color="fg.subtle" fontSize="0.75rem" fontWeight={500}>
               TVL(USD)
             </Text>
-            <Text color="gray.400" fontSize="0.75rem" fontWeight={500} mr={8}>
+            <Text color="fg.subtle" fontSize="0.75rem" fontWeight={500} mr={8}>
               APY
             </Text>
           </Flex>
