@@ -17,7 +17,7 @@
   },
   "pnpm": {
     "overrides": {
-      "debug": "4.4.3",
+      "debug": "4.3.7",
       "@metamask/sdk": "0.33.1",
       "@metamask/sdk-communication-layer": "0.33.1"
     }
@@ -33,7 +33,7 @@
     "@reown/appkit": "1.8.2",
     "@reown/appkit-adapter-wagmi": "1.8.2",
     "@tanstack/react-query": "5.85.9",
-    "@wagmi/connectors": "5.9.9",
+    "@wagmi/connectors": "5.9.4",
     "decimal.js": "10.6.0",
     "next-themes": "0.4.6",
     "npm": "11.5.2",
