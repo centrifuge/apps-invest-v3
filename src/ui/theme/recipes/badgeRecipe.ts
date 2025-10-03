@@ -1,5 +1,5 @@
 import { defineRecipe } from '@chakra-ui/react'
-import { grayScale } from '../baseStyles/colors'
+import { grayScale } from 'src/ui/theme/baseStyles/colors'
 
 export const badgeRecipe = defineRecipe({
   base: {

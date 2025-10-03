@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react-vite'
-import { ChakraProvider as ChakraUiProvider } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import system from '../src/ui/theme/theme'
 import './storybook.css'
 
@@ -35,11 +35,11 @@ const preview: Preview = {
 
   decorators: [
     (Story) => (
-      <ChakraUiProvider value={system}>
-        <div style={{ fontFamily: 'Inter, ui-sans-serif', minHeight: '100vh' }}>
+      <ChakraProvider value={system}>
+        <div style={{ fontFamily: 'Inter, ui-sans-serif' }}>
           <Story />
         </div>
-      </ChakraUiProvider>
+      </ChakraProvider>
     ),
   ],
 }

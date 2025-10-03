@@ -1,5 +1,5 @@
 import { defineSlotRecipe } from '@chakra-ui/react'
-import { grayScale, white } from '../baseStyles/colors'
+import { grayScale, white } from 'src/ui/theme/baseStyles/colors'
 
 export const cardRecipe = defineSlotRecipe({
   slots: ['root', 'header', 'title', 'body'],

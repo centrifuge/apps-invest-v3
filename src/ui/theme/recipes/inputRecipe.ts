@@ -1,5 +1,5 @@
 import { defineRecipe } from '@chakra-ui/react'
-import { white } from '../baseStyles/colors'
+import { white } from 'src/ui/theme/baseStyles/colors'
 
 export const inputRecipe = defineRecipe({
   base: {
