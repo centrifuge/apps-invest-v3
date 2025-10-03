@@ -338,7 +338,7 @@ export const colorTokens = {
     value: { _light: yellowScale[200] },
   },
   'border.error': {
-    value: { _light: redScale[100] },
+    value: { _light: redScale[600] },
   },
   'fg.solid': {
     value: { _light: brandScale[500] },

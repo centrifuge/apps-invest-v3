@@ -23,7 +23,7 @@ const preview: Preview = {
       values: [
         {
           name: 'light',
-          value: '#F6F6F6', // grayScale[50]
+          value: '#F5F5F5', // grayScale[300]
         },
         {
           name: 'white',

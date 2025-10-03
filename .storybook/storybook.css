@@ -34,8 +34,8 @@ body {
 }
 
 body {
-  color: #252b34; /* blackScale[800] */
-  background-color: #f6f6f6; /* grayScale[50] */
+  color: #252b34; /* brandScale[500] */
+  background-color: #f5f5f5; /* grayScale[300] */
 }
 
 button {
