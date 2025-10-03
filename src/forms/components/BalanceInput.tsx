@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import type {
   ChangeEvent as ReactChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
@@ -67,6 +68,23 @@ const CurrencySelect = ({
   )
 }
 
+const formatWithThousandSeparators = (value: string | number): string => {
+  if (value === null || value === undefined) return ''
+  const strValue = value.toString()
+  if (strValue === '.' || isNaN(Number(strValue.replace(/,/g, '')))) return strValue
+  const [intPart, decimalPart] = strValue.replace(/,/g, '').split('.')
+  const formattedInt = Number(intPart).toLocaleString('en-US')
+  return decimalPart !== undefined ? `${formattedInt}.${decimalPart}` : formattedInt
+}
+
+const limitDecimals = (value: string, maxDecimals: number): string => {
+  if (!value || value === '' || value === '.') return value
+  const parts = value.split('.')
+  if (parts.length <= 1) return value
+  const limitedDecimalPart = parts[1].slice(0, maxDecimals)
+  return `${parts[0]}.${limitedDecimalPart}`
+}
+
 export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(props: BalanceInputProps<TFieldValues>) {
   const {
     currency,
@@ -103,32 +121,21 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     rules,
   })
 
-  const limitDecimals = (value: string, maxDecimals: number): string => {
-    if (!value || value === '' || value === '.') return value
-    const parts = value.split('.')
-    if (parts.length <= 1) return value
-    const limitedDecimalPart = parts[1].slice(0, maxDecimals)
-    return `${parts[0]}.${limitedDecimalPart}`
-  }
+  const [displayValue, setDisplayValue] = useState<string>(formatWithThousandSeparators(field.value || ''))
 
-  const getDisplayValue = (value: Balance | number | string): string => {
-    let displayValue = ''
-    if (value instanceof Balance) {
-      displayValue = value.toFloat().toString()
-    } else if (typeof value === 'number') {
-      displayValue = value.toString()
-    } else if (typeof value === 'string') {
-      displayValue = value
+  useEffect(() => {
+    if (field.value !== undefined) {
+      setDisplayValue(formatWithThousandSeparators(field.value?.toString() ?? ''))
     }
-    return limitDecimals(displayValue, currentDisplayDecimals)
-  }
+    if (field.value === '') setDisplayValue('')
+  }, [field.value])
 
   const mergedOnChange = (e: ReactChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value
+    let value = e.target.value.replace(/,/g, '')
     if (value === '' || value === '.' || /^\d*\.?\d*$/.test(value)) {
       value = limitDecimals(value, currentDisplayDecimals)
-      e.target.value = value
       field.onChange(value)
+      setDisplayValue(formatWithThousandSeparators(value))
       if (onChange) {
         try {
           const numValue = parseFloat(value)
@@ -146,18 +153,17 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
   }
 
   const mergedOnBlur = (e: ReactFocusEvent<HTMLInputElement>) => {
-    const currentValue = e.target.value
+    const currentValue = e.target.value.replace(/,/g, '')
     if (currentValue && currentValue !== '' && currentValue !== '.') {
       const decimalValue = new Decimal(currentValue)
       const truncatedValue = decimalValue.toDecimalPlaces(currentDisplayDecimals, Decimal.ROUND_DOWN)
       const formattedValue = truncatedValue.toString()
       field.onChange(formattedValue)
+      setDisplayValue(formatWithThousandSeparators(formattedValue))
     }
     field.onBlur()
     trigger(name)
-    if (onBlur) {
-      onBlur(e)
-    }
+    if (onBlur) onBlur(e)
   }
 
   const handlePaste = (e: ReactClipboardEvent<HTMLInputElement>) => {
@@ -166,21 +172,15 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     const numericValue = pastedText.replace(/[^0-9.]/g, '')
     if (/^\d*\.?\d*$/.test(numericValue)) {
       const limitedValue = limitDecimals(numericValue, currentDisplayDecimals)
-      const syntheticEvent = { target: { value: limitedValue } } as React.ChangeEvent<HTMLInputElement>
-      mergedOnChange(syntheticEvent)
+      field.onChange(limitedValue)
+      setDisplayValue(formatWithThousandSeparators(limitedValue))
     }
   }
 
   const handleKeyPress = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     const { key, ctrlKey, metaKey } = e
-    const currentValue = (e.target as HTMLInputElement).value
-
-    // Allow shortcuts like Cmd/Ctrl + C, V, A, X, Z, Y
-    if ((ctrlKey || metaKey) && ['a', 'c', 'v', 'x', 'z', 'y'].includes(key.toLowerCase())) {
-      return
-    }
-
-    // Allow control/navigation keys
+    const currentValue = (e.target as HTMLInputElement).value.replace(/,/g, '')
+    if ((ctrlKey || metaKey) && ['a', 'c', 'v', 'x', 'z', 'y'].includes(key.toLowerCase())) return
     if (
       [
         'Backspace',
@@ -198,20 +198,14 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     ) {
       return
     }
-
-    // Allow only numbers and decimal point
     if (!/[\d.]/.test(key)) {
       e.preventDefault()
       return
     }
-
-    // Prevent multiple decimal points
     if (key === '.' && currentValue.includes('.')) {
       e.preventDefault()
       return
     }
-
-    // Enforce decimal precision
     if (currentValue.includes('.')) {
       const decimalPart = currentValue.split('.')[1]
       if (decimalPart && decimalPart.length >= currentDisplayDecimals && key !== '.') {
@@ -221,11 +215,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
     }
   }
 
-  const { isError, errorMessage } = useGetFormError<TFieldValues>({
-    error,
-    name,
-  })
-
+  const { isError, errorMessage } = useGetFormError<TFieldValues>({ error, name })
   const isDisabled = formState.isSubmitting || disabled
   const buttonSize = typeof size === 'string' ? inputSizes.indexOf(size) : 1
 
@@ -234,7 +224,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       <Flex alignItems="center" gap={2}>
         {label && <Field.Label>{label}</Field.Label>}
         {subLabel && (
-          <Text fontSize="sm" color="fg.subtle">
+          <Text fontSize="sm" color="fg.input">
             {subLabel}
           </Text>
         )}
@@ -243,14 +233,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
         {...inputGroupProps}
         endElement={
           selectOptions && selectOptions.length > 0 ? (
-            <CurrencySelect
-              options={selectOptions}
-              onChange={(value) => {
-                if (onSelectChange) {
-                  onSelectChange(value)
-                }
-              }}
-            />
+            <CurrencySelect options={selectOptions} onChange={(value) => onSelectChange?.(value)} />
           ) : currency ? (
             currency
           ) : undefined
@@ -261,7 +244,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           name={name}
           ref={field.ref}
           type="text"
-          value={getDisplayValue(field.value)}
+          value={displayValue}
           disabled={isDisabled}
           onChange={mergedOnChange}
           onBlur={mergedOnBlur}
@@ -272,7 +255,7 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           borderRadius="lg"
           size={size}
           fontSize={fontSize}
-          backgroundColor="gray.300"
+          backgroundColor="bg.input"
           {...rest}
         />
       </InputGroup>
@@ -281,13 +264,13 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
   ) : (
     <Field.Root invalid={isError}>
       {label && <Field.Label>{label}</Field.Label>}
-      <Group attached border="1px solid" borderColor={isError ? 'red.500' : 'gray.200'} borderRadius="md">
+      <Group attached border="1px solid" borderColor={isError ? 'border.error' : 'border.input'} borderRadius="md">
         <ChakraInput
           id={name}
           name={name}
           ref={field.ref}
           type="text"
-          value={getDisplayValue(field.value)}
+          value={displayValue}
           disabled={isDisabled}
           onChange={mergedOnChange}
           onBlur={mergedOnBlur}
@@ -301,15 +284,15 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
           size={size}
           fontSize={fontSize}
           _focusVisible={{ borderColor: 'transparent' }}
-          backgroundColor="gray.300"
+          backgroundColor="bg.input"
           {...rest}
         />
         {currency && <Text marginRight={2}>{currency}</Text>}
         <Button
           variant="plain"
           size={inputSizes[buttonSize + 1]}
-          backgroundColor="gray.300"
-          color="fg.muted"
+          backgroundColor="bg.input"
+          color="red"
           onClick={onButtonClick}
           borderRadius="none"
         >
