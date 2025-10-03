@@ -26,7 +26,7 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
 
   return (
     <Card borderRadius="xl">
-      <Text color="fg.subtle" fontSize="xs">
+      <Text color="fg.muted" fontSize="xs">
         TVL on {formatDate(new Date(), 'short')}
       </Text>
       <Flex alignItems="center" justifyContent="flex-start">

@@ -39,7 +39,7 @@ export function LegendItem({ color, label, value }: { color?: string; label: str
     <Box display="flex" flexDir="column" justifyContent="flex-start">
       <Box display="flex" alignItems="center" gap={2}>
         {color && <SmallCircle color={color} />}
-        <Text color="gray.600" fontWeight={500} fontSize="xs">
+        <Text color="fg.muted" fontWeight={500} fontSize="xs">
           {label}
         </Text>
       </Box>

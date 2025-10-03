@@ -41,7 +41,7 @@ export function PoolMainStats() {
             >
               <Text
                 fontSize="0.75rem"
-                color="fg.subtle"
+                color="fg.muted"
                 fontWeight={500}
                 width="auto"
                 textAlign={{ base: 'center', md: 'left' }}

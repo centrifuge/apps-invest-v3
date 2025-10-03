@@ -65,7 +65,7 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   if (isLoading) {
     return (
       <Box height="182px" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="lg" color="black.solid" />
+        <Spinner size="lg" color="fg.solid" />
       </Box>
     )
   }

@@ -34,7 +34,7 @@ export const TransactionToaster = () => {
         {(toast: ChakraToastType) => {
           return (
             <Toast.Root width={{ md: 'sm' }}>
-              {toast.type === 'loading' ? <Spinner size="sm" color="black.solid" /> : <Toast.Indicator />}
+              {toast.type === 'loading' ? <Spinner size="sm" color="fg.solid" /> : <Toast.Indicator />}
               <Stack gap="1" flex="1" maxWidth="100%">
                 {toast.title && <Toast.Title>{toast.title}</Toast.Title>}
                 {toast.description && <Toast.Description wordBreak="break-word">{toast.description}</Toast.Description>}

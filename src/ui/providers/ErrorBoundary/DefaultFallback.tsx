@@ -65,7 +65,7 @@ export function DefaultFallback({ error, resetError, errorInfo }: FallbackProps)
                     wordBreak="break-word"
                     _dark={{
                       bg: 'fg.solid',
-                      borderColor: 'gray.600',
+                      borderColor: 'border.subtle',
                     }}
                   >
                     {error.message}

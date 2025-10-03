@@ -80,7 +80,7 @@ export function PoolKeyFacts() {
               >
                 {metadata?.pool.issuer.name || 'Pool'}
               </Heading>
-              <Text fontSize="14px" color="fg.subtle" fontWeight={400} lineHeight={'160%'} mt={3}>
+              <Text fontSize="14px" color="fg.muted" fontWeight={400} lineHeight={'160%'} mt={3}>
                 {metadata?.pool.issuer.description.replace(/"/g, '') || 'No description available'}
               </Text>
             </Flex>
@@ -89,7 +89,7 @@ export function PoolKeyFacts() {
             <Box bg="bg.solid" shadow="xs" boxShadow="none" pt={4}>
               {factKeys.map((item) => (
                 <Flex justifyContent="space-between" alignItems="center" mt={4} key={item.type}>
-                  <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="fg.subtle">
+                  <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="fg.muted">
                     {item.type}
                   </Text>
                   <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="fg.solid" textAlign="right">

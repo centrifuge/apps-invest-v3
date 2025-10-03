@@ -14,7 +14,7 @@ export const accordionRecipe = defineSlotRecipe({
       borderColor: 'border.solid',
     },
     itemBody: {
-      color: 'fg.muted',
+      color: 'fg.subtle',
     },
   },
 })

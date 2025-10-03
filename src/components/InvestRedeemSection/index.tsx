@@ -174,7 +174,7 @@ function VaultGuard({
   if (isLoading) {
     return (
       <Box height="100%" minH="182px" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="lg" color="black.solid" />
+        <Spinner size="lg" color="fg.solid" />
       </Box>
     )
   }

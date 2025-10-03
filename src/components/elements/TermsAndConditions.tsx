@@ -23,7 +23,7 @@ export function TermsAndConditions() {
         borderColor="border-primary"
         shadow="xs"
       >
-        <Text color="gray.500" fontSize="sm">
+        <Text color="fg.muted" fontSize="sm">
           You acknowledge and agree that the price, net asset value and other trade data related to a Anemoy Janus
           Henderson S&P 500 Fund (“Trade Data”) is the exclusive property of S&P Dow Jones Indices LLC, its affiliates
           or licensors (“S&P DJI”). You shall not create derivative works from such Trade Data (including, without

@@ -52,7 +52,7 @@ export function InvestTxFeedback({ setActionType, parsedInvestAmount, parsedRece
               {txState.isSuccessful || txState.isFailed ? (
                 <IoClose onClick={handleClose} cursor="pointer" />
               ) : (
-                <IoMdTimer color="fg.muted" />
+                <IoMdTimer color="fg.subtle" />
               )}
             </Icon>
           </Flex>

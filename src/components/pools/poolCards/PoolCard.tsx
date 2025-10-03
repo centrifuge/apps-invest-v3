@@ -61,7 +61,7 @@ export function PoolCard({
             {poolName}
           </Text>
           {!isRwaPool && poolIssuerName ? (
-            <Text fontSize="x-small" color="fg.subtle">
+            <Text fontSize="x-small" color="fg.muted">
               {poolIssuerName}
             </Text>
           ) : null}
@@ -78,10 +78,10 @@ export function PoolCard({
       {isRestrictedPool ? (
         <Box>
           <Flex alignItems="center" justifyContent="space-between" overflow="hidden">
-            <Text color="fg.subtle" fontSize="0.75rem" fontWeight={500}>
+            <Text color="fg.muted" fontSize="0.75rem" fontWeight={500}>
               TVL(USD)
             </Text>
-            <Text color="fg.subtle" fontSize="0.75rem" fontWeight={500} mr={8}>
+            <Text color="fg.muted" fontSize="0.75rem" fontWeight={500} mr={8}>
               APY
             </Text>
           </Flex>
@@ -112,7 +112,7 @@ export function PoolCard({
         </>
       )}
       <Separator my={4} />
-      <Text color="fg.subtle" fontSize="sm">
+      <Text color="fg.muted" fontSize="sm">
         {shortDescription.length > 0 ? shortDescription : `${poolName} pool`}
       </Text>
       <Separator my={4} />

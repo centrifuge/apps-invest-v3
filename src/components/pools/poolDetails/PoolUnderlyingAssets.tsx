@@ -49,7 +49,7 @@ export function PoolUnderlyingAssets() {
         ) : null}
         {items.map((item) => (
           <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
-            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.subtle">
+            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
               {item.label}
             </Text>
             {typeof item.value !== 'string' ? (

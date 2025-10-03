@@ -18,7 +18,7 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
   if (isTabLoading) {
     return (
       <Box height="182px" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="lg" color="black.solid" />
+        <Spinner size="lg" color="fg.solid" />
       </Box>
     )
   }
@@ -38,7 +38,7 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
       <Flex alignItems="center" gap={2} justifyContent="space-between" mb={8}>
         <Heading size="xl">Pending transactions</Heading>
         <Icon size="lg">
-          <IoMdTimer color="fg.muted" />
+          <IoMdTimer color="fg.subtle" />
         </Icon>
       </Flex>
 

@@ -1,5 +1,4 @@
 import { defineSlotRecipe } from '@chakra-ui/react'
-import { white } from 'src/ui/theme/baseStyles/colors'
 
 export const checkboxRecipe = defineSlotRecipe({
   className: 'checkbox',
@@ -7,14 +6,14 @@ export const checkboxRecipe = defineSlotRecipe({
   base: {
     root: {},
     control: {
-      bg: white,
+      bg: 'bg.solid',
     },
   },
   variants: {
     variant: {
       outline: {
         control: {
-          color: 'gray.600 !important',
+          color: 'fg.muted !important',
         },
       },
     },

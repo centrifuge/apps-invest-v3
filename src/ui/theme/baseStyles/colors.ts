@@ -347,10 +347,10 @@ export const colorTokens = {
     value: { _light: brandScale[300] },
   },
   'fg.subtle': {
-    value: { _light: brandScale[300] },
+    value: { _light: grayScale[400] },
   },
   'fg.muted': {
-    value: { _light: grayScale[400] },
+    value: { _light: brandScale[300] },
   },
   'fg.disabled': {
     value: { _light: grayScale[600] },
