@@ -1,14 +1,6 @@
 export const black = '#252B34'
 export const white = '#FFFFFF'
 
-export const blackScale = {
-  50: '#E2E4E7',
-  100: '#C5C9D0',
-  300: '#91969B',
-  500: '#252B34',
-  800: '#0F1115',
-}
-
 export const blueScale = {
   100: '#EEF4FC',
   200: '#CBDEF6',
@@ -94,12 +86,16 @@ export const yellowScale = {
 }
 
 export const blackPalette = {
-  DEFAULT: { value: blackScale[800] },
-  50: { value: blackScale[50] },
-  100: { value: blackScale[100] },
-  300: { value: blackScale[300] },
-  500: { value: blackScale[500] },
-  800: { value: blackScale[800] },
+  DEFAULT: { value: brandScale[500] },
+  100: { value: brandScale[100] },
+  200: { value: brandScale[200] },
+  300: { value: brandScale[300] },
+  400: { value: brandScale[400] },
+  500: { value: brandScale[500] },
+  600: { value: brandScale[600] },
+  700: { value: brandScale[700] },
+  800: { value: brandScale[800] },
+  900: { value: brandScale[900] },
 }
 
 export const bluePalette = {
@@ -208,20 +204,20 @@ export const colors = {
 // https://chakra-ui.com/docs/theming/customization/colors#semantic-tokens
 export const colorTokens = {
   black: {
-    solid: { value: blackScale[500] },
+    solid: { value: brandScale[500] },
     contrast: { value: grayScale[100] },
-    fg: { value: blackScale[500] },
-    muted: { value: grayScale[600] },
+    fg: { value: brandScale[500] },
     subtle: { value: grayScale[300] },
+    muted: { value: grayScale[600] },
     emphasized: { value: grayScale[500] },
-    focusRing: { value: blackScale[500] },
+    focusRing: { value: brandScale[500] },
   },
   blue: {
     solid: { value: blueScale[500] },
-    contrast: { value: blackScale[800] },
+    contrast: { value: brandScale[500] },
     fg: { value: blueScale[500] },
-    muted: { value: blueScale[100] },
     subtle: { value: blueScale[200] },
+    muted: { value: blueScale[300] },
     emphasized: { value: blueScale[800] },
     focusRing: { value: blueScale[400] },
   },
@@ -229,69 +225,72 @@ export const colorTokens = {
     solid: { value: brandScale[500] },
     contrast: { value: grayScale[100] },
     fg: { value: brandScale[500] },
-    muted: { value: brandScale[100] },
     subtle: { value: brandScale[200] },
+    muted: { value: brandScale[300] },
     emphasized: { value: brandScale[800] },
     focusRing: { value: brandScale[400] },
   },
   gray: {
     solid: { value: grayScale[400] },
-    contrast: { value: blackScale[500] },
+    contrast: { value: brandScale[500] },
     fg: { value: grayScale[500] },
-    muted: { value: grayScale[200] },
-    subtle: { value: grayScale[300] },
+    subtle: { value: grayScale[200] },
+    muted: { value: grayScale[300] },
     emphasized: { value: grayScale[700] },
     focusRing: { value: grayScale[400] },
   },
   green: {
     solid: { value: greenScale[500] },
-    contrast: { value: blackScale[100] },
+    contrast: { value: brandScale[100] },
     fg: { value: greenScale[500] },
-    muted: { value: greenScale[200] },
-    subtle: { value: greenScale[300] },
+    subtle: { value: greenScale[200] },
+    muted: { value: greenScale[300] },
     emphasized: { value: greenScale[700] },
     focusRing: { value: greenScale[600] },
   },
   orange: {
     solid: { value: orangeScale[500] },
-    contrast: { value: blackScale[100] },
+    contrast: { value: brandScale[100] },
     fg: { value: orangeScale[500] },
-    muted: { value: orangeScale[200] },
-    subtle: { value: orangeScale[300] },
+    subtle: { value: orangeScale[200] },
+    muted: { value: orangeScale[300] },
     emphasized: { value: orangeScale[700] },
     focusRing: { value: orangeScale[600] },
   },
   red: {
     solid: { value: redScale[500] },
-    contrast: { value: blackScale[100] },
+    contrast: { value: brandScale[100] },
     fg: { value: redScale[500] },
-    muted: { value: redScale[200] },
-    subtle: { value: redScale[300] },
+    subtle: { value: redScale[200] },
+    muted: { value: redScale[300] },
     emphasized: { value: redScale[700] },
     focusRing: { value: redScale[600] },
   },
   yellow: {
     solid: { value: yellowScale[500] },
-    contrast: { value: blackScale[800] },
-    fg: { value: yellowScale[400] },
-    muted: { value: yellowScale[100] },
+    contrast: { value: brandScale[800] },
+    fg: { value: yellowScale[500] },
     subtle: { value: yellowScale[200] },
+    muted: { value: yellowScale[300] },
     emphasized: { value: yellowScale[800] },
-    focusRing: { value: yellowScale[300] },
+    focusRing: { value: yellowScale[400] },
   },
   // Defining tokens here allows us to set values for both light and dark themes,
   // and allows the use of the token in various component properties like color and backgroundColor.
-  'fg.primary-subtle': {
-    value: { _light: yellowScale[100] },
-  },
   'bg.solid': {
-    value: { _light: white, _dark: grayScale[800] },
+    value: { _light: grayScale[100], _dark: grayScale[800] },
   },
-  'bg.secondary': {
-    value: { _light: grayScale[200], _dark: grayScale[200] },
+  'bg.input': {
+    value: { _light: grayScale[300] },
   },
-  'bg.tertiary': {
+  'bg.subtle': {
     value: { _light: grayScale[200] },
+  },
+  'bg.muted': {
+    value: { _light: grayScale[400] },
+  },
+  'bg.emphasized': {
+    value: { _light: yellowScale[500] },
   },
   'bg.accent': {
     value: { _light: yellowScale[100] },
@@ -311,32 +310,47 @@ export const colorTokens = {
   'bg.warning': {
     value: { _light: orangeScale[200] },
   },
-  'bg.promote': {
-    value: { _light: '#f8107114' },
-  },
   border: {
-    value: { _light: grayScale[400], _dark: grayScale[200] },
+    value: { _light: grayScale[400] },
+  },
+  'border.input': {
+    value: { _light: grayScale[200] },
   },
   'border.solid': {
-    value: { _light: grayScale[400], _dark: grayScale[200] },
+    value: { _light: grayScale[400] },
   },
-  'border.secondary': {
+  'border.light': {
     value: { _light: 'rgba(246, 246, 246, 1)' },
   },
   'border.dark': {
-    value: { _light: blackScale[500] },
+    value: { _light: brandScale[500] },
   },
   'border.subtle': {
-    value: { _light: blackScale[300] },
+    value: { _light: brandScale[300] },
   },
   'border.emphasized': {
     value: { _light: yellowScale[500] },
   },
+  'border.accent': {
+    value: { _light: yellowScale[200] },
+  },
+  'border.warning': {
+    value: { _light: yellowScale[200] },
+  },
+  'border.error': {
+    value: { _light: redScale[100] },
+  },
   'fg.solid': {
-    value: { _light: blackScale[500] },
+    value: { _light: brandScale[500] },
+  },
+  'fg.input': {
+    value: { _light: brandScale[300] },
   },
   'fg.subtle': {
-    value: { _light: blackScale[300] },
+    value: { _light: brandScale[300] },
+  },
+  'fg.muted': {
+    value: { _light: grayScale[400] },
   },
   'fg.disabled': {
     value: { _light: grayScale[600] },
@@ -348,7 +362,7 @@ export const colorTokens = {
     value: { _light: yellowScale[500] },
   },
   'fg.error': {
-    value: { _light: redScale[500] },
+    value: { _light: redScale[600] },
   },
   'fg.info': {
     value: { _light: blueScale[500] },
@@ -357,7 +371,7 @@ export const colorTokens = {
     value: { _light: greenScale[500] },
   },
   'fg.warning': {
-    value: { _light: orangeScale[500] },
+    value: { _light: yellowScale[800] },
   },
   error: {
     value: { _light: redScale[500] },
@@ -370,8 +384,5 @@ export const colorTokens = {
   },
   warning: {
     value: { _light: yellowScale[800] },
-  },
-  promote: {
-    value: { _light: '#f81071' },
   },
 }

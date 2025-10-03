@@ -152,7 +152,7 @@ export function RedeemAmount({
           <Flex mt={2} justify="space-between">
             <Flex>
               <Badge
-                background="bg.tertiary"
+                background="bg.subtle"
                 color="fg.solid"
                 opacity={0.5}
                 borderRadius={10}

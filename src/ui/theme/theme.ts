@@ -1,5 +1,5 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
-import { blackScale, grayScale, colors, colorTokens } from './baseStyles/colors'
+import { brandScale, grayScale, colors, colorTokens } from './baseStyles/colors'
 import { buttonRecipe } from './recipes/buttonRecipe'
 import { inputRecipe } from './recipes/inputRecipe'
 import { checkboxRecipe } from './recipes/checkboxRecipe'
@@ -13,7 +13,7 @@ import { cardRecipe } from 'src/ui/theme/recipes/cardRecipe'
 const theme = defineConfig({
   globalCss: {
     body: {
-      color: blackScale[500],
+      color: brandScale[500],
       backgroundColor: grayScale[300],
     },
   },

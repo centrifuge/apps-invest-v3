@@ -30,7 +30,7 @@ export function RedeemTxCancelled({
           <Flex alignItems="center" gap={2} justifyContent="space-between">
             <Heading>Redemption cancelled</Heading>
             <Icon size="xl">
-              <IoMdTimer color="gray.400" />
+              <IoMdTimer color="fg.muted" />
             </Icon>
           </Flex>
           <Box opacity={0.5}>

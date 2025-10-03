@@ -15,7 +15,7 @@ export function PendingInvestmentBanner({ label, amount, currencySymbol }: Pendi
       <Flex alignItems="center" justifyContent="space-between">
         <Flex alignItems="center" justifyContent="flex-start">
           <Icon size="sm" mr={2} mt={1}>
-            <IoMdTimer color="gray.400" />
+            <IoMdTimer color="fg.muted" />
           </Icon>
           <Text fontSize="sm">{label}</Text>
         </Flex>

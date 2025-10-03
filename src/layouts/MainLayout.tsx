@@ -10,7 +10,7 @@ import mainBg from '../assets/main_bg.jpg'
 
 const MainLayout = memo(() => {
   return (
-    <Box bg="bg.secondary" minH="100vh">
+    <Box bg="bg.subtle" minH="100vh">
       <Box minH="100vh" bgImage={`url(${mainBg})`} bgRepeat="no-repeat" bgSize="cover" backgroundPosition="left">
         <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
           <Flex

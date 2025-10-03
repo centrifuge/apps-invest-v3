@@ -3,19 +3,19 @@ import { BadgeProps, Box, Heading } from '@chakra-ui/react'
 const colorStatus: Record<string, { backgroundColor: string; color: string; borderColor: string }> = {
   /// Add more colors
   warning: {
-    backgroundColor: 'yellow.100',
-    color: 'yellow.800',
-    borderColor: 'yellow.100',
+    backgroundColor: 'bg.warning',
+    color: 'fg.warning',
+    borderColor: 'border.warning',
   },
   error: {
-    backgroundColor: 'red.100',
-    color: 'red.600',
-    borderColor: 'red.100',
+    backgroundColor: 'bg.error',
+    color: 'bg.error',
+    borderColor: 'border.error',
   },
   info: {
-    backgroundColor: 'gray.200',
+    backgroundColor: 'bg.subtle',
     color: 'fg.solid',
-    borderColor: 'gray.200',
+    borderColor: 'border.solid',
   },
 }
 

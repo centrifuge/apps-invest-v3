@@ -38,7 +38,7 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
       <Flex alignItems="center" gap={2} justifyContent="space-between" mb={8}>
         <Heading size="xl">Pending transactions</Heading>
         <Icon size="lg">
-          <IoMdTimer color="gray.400" />
+          <IoMdTimer color="fg.muted" />
         </Icon>
       </Flex>
 

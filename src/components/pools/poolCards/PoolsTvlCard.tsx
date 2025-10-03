@@ -21,7 +21,7 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   const formattedTotalTVL = totalTVL ? formatBalance(totalTVL, 'USD', 0) : 'unknown'
 
   if (isLoading) {
-    return <Skeleton height="102px" width="380px" borderRadius="md" />
+    return <Skeleton height="102px" width="380px" borderRadius="md" bg="bg.muted" />
   }
 
   return (

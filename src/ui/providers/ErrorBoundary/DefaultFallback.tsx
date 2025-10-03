@@ -54,9 +54,9 @@ export function DefaultFallback({ error, resetError, errorInfo }: FallbackProps)
                     display="block"
                     p={3}
                     mt={2}
-                    bg="gray.200"
+                    bg="bg.subtle"
                     border="1px solid"
-                    borderColor="gray.200"
+                    borderColor="border.input"
                     borderRadius="md"
                     fontSize="xs"
                     overflow="auto"

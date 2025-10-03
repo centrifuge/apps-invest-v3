@@ -26,7 +26,7 @@ export const AssetIcon: React.FC<AssetIconProps> = ({ assetSymbol, boxSize = '24
   return src ? (
     <Image src={src} boxSize={boxSize} objectFit="contain" alt={alt ?? `${assetSymbol} logo`} {...rest} />
   ) : (
-    <Box borderRadius={8} border="1px solid" borderColor="gray.200">
+    <Box borderRadius={8} border="1px solid" borderColor="border.input">
       <Text fontSize="10px" mx={1} my={1}>
         {assetSymbol}
       </Text>

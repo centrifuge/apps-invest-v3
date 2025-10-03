@@ -95,7 +95,7 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
             }}
             onBlur={() => setIsValid(isAddress(value))}
             size="sm"
-            background="border.secondary"
+            background="border.light"
             borderRadius={4}
             borderTopRightRadius={0}
             borderBottomRightRadius={0}
@@ -105,7 +105,7 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
             onClick={handleClick}
             aria-label="Add address"
             size="sm"
-            backgroundColor="border.secondary"
+            backgroundColor="border.light"
             color="fg.disabled"
             borderColor="border.solid"
             borderTopLeftRadius={0}

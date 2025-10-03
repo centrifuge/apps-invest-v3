@@ -42,7 +42,7 @@ export function LineChart<T>({
   showTooltip = true,
 }: LineChartProps<T>) {
   // Build a token list: border + text + each series color (fallbacks included)
-  const seriesTokens = series.map((s, i) => s.colorToken ?? (i === 0 ? 'fg.emphasized' : 'bg.tertiary'))
+  const seriesTokens = series.map((s, i) => s.colorToken ?? (i === 0 ? 'fg.emphasized' : 'bg.subtle'))
   const [borderPrimary, textSecondary, ...seriesColors] = useToken('colors', [
     'border.solid',
     'fg.muted',
