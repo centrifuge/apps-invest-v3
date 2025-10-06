@@ -11,25 +11,6 @@ export const inputRecipe = defineRecipe({
     },
   },
   variants: {
-    variant: {
-      outline: {
-        bg: 'bg.input !important',
-        border: '1px solid',
-        borderColor: 'border.solid !important',
-        _disabled: {
-          bg: 'bg.subtle',
-        },
-        _focus: {
-          borderColor: 'border.accent !important',
-        },
-        _focusVisible: {
-          borderColor: 'transparent !important',
-        },
-        _invalid: {
-          borderColor: 'border.error !important',
-        },
-      },
-    },
     size: {
       lg: {
         fontSize: 'lg',
