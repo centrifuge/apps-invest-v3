@@ -45,6 +45,11 @@ runs:
       shell: sh
       run: pnpm install --frozen-lockfile
 
+    - name: '🎨 Generate Chakra UI Types'
+      if: ${{ github.event_name != 'release' || steps.check-artifact.outputs.skip_build != 'true' }}
+      shell: sh
+      run: pnpm theme:typings
+
     - name: '🔨 Build App'
       if: ${{ github.event_name != 'release' || steps.check-artifact.outputs.skip_build != 'true' }}
       id: build
@@ -65,11 +70,10 @@ runs:
       run: |
         # Create a zip file of the dist folder
         cd dist && zip -r ../${{ steps.check-artifact.outputs.artifact-name }} . && cd ..
-        
+
         # Upload to release using GitHub CLI
         gh release upload ${{ github.ref_name }} ${{ steps.check-artifact.outputs.artifact-name }} \
           --repo ${{ github.repository }} \
           --clobber
       env:
         GH_TOKEN: ${{ inputs.github-token }}
-
