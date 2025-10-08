@@ -1,7 +1,7 @@
 import { Box, Center, Heading, Link } from '@chakra-ui/react'
 import { Card } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
-import solanaIcon from '../../assets/kamino-solana-icons.png'
+import solanaIcon from '../../assets/kamino-solana-icons.svg'
 import { Image } from '@chakra-ui/react'
 
 export function SolanaMarketCard() {
@@ -17,7 +17,7 @@ export function SolanaMarketCard() {
         <Center>
           <Image src={solanaIcon} alt="Solana Market" mb={4} h="64px" fit="contain" />
         </Center>
-        <Heading size="xl">dJAAA on Solana</Heading>
+        <Heading size="xl">deJAAA on Solana</Heading>
         <Link
           href="https://app.kamino.finance/swap/"
           fontSize="lg"
