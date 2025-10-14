@@ -40,6 +40,7 @@ jobs:
         uses: codespell-project/actions-codespell@v2
         with:
           path: src
+          skip: src/assets/*
 
       - name: Audit dependencies with pnpm
         if: always()
