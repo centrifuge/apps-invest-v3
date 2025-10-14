@@ -41,6 +41,7 @@ jobs:
         with:
           path: src
           skip: src/assets/**, src/ui/assets/**, .svg, .png, .jpg, .jpeg, .ico
+          exclude_file: src/ui/assets/logos/moody.svg
 
       - name: Audit dependencies with pnpm
         if: always()
