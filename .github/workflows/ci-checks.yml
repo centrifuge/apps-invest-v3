@@ -1,4 +1,4 @@
-name: '🔍 CI Checks'
+name: "🔍 CI Checks"
 
 on:
   pull_request:
@@ -9,20 +9,20 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: '📥 Checkout Code'
+      - name: "📥 Checkout Code"
         uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 10
-  
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-  
+          node-version: "20"
+          cache: "pnpm"
+
       - name: Install dependencies
         shell: sh
         run: pnpm install --frozen-lockfile
@@ -30,24 +30,29 @@ jobs:
       - name: Check code formatting
         shell: sh
         run: pnpm dlx prettier --check "**/*.{ts,tsx,js,jsx,json,md}"
-  
+
       - name: Lint
         if: always()
         shell: sh
         run: pnpm run lint
+
+      - name: Run codespell
+        uses: codespell-project/actions-codespell@v2
+        with:
+          path: src
+          skip: src/assets/**, src/ui/assets/**, .svg, .png, .jpg, .jpeg, .ico
+          exclude_file: src/ui/assets/logos/moody.svg
 
       - name: Audit dependencies with pnpm
         if: always()
         shell: sh
         run: pnpm audit --audit-level moderate
 
-
-
   osv-dependency-sec-check:
     permissions:
       contents: read
       security-events: write
-      actions: read    
+      actions: read
     uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.2.2"
     with:
       fail-on-vuln: true
@@ -57,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    steps:      
+    steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
