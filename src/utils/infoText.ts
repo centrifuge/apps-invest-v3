@@ -4,7 +4,7 @@ export const infoText = (currency?: string) => ({
   asyncRedeem:
     'Redeeming token happens asynchronously and can take up to 24hrs to reflect on the network. You may close this window.',
   portfolioMissingInvestmentCurrency: `You do not hold any of the currency needed for investing in this fund. Please purchase some ${currency} to invest.`,
-  investClaimable: 'Investment happens asyncronously and can take up to 24hrs to process. You may close this window.',
+  investClaimable: 'Investment happens asynchronously and can take up to 24hrs to process. You may close this window.',
   investFailed: 'Sorry, the investment transaction failed or reverted. Please try again later.',
   redeemFailed: 'Sorry, the redeem transaction failed or reverted. Please try again later.',
 })
