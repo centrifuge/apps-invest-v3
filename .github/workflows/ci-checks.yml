@@ -40,7 +40,7 @@ jobs:
         uses: codespell-project/actions-codespell@v2
         with:
           path: src
-          skip: src/assets/*, src/assets/logos/*, src/ui/assets/*, src/ui/assets/logos/*
+          skip: src/assets/**, src/assets/logos/**, src/ui/assets/**, src/ui/assets/logos/**, .svg, .png, .jpg, .jpeg, .ico
 
       - name: Audit dependencies with pnpm
         if: always()
