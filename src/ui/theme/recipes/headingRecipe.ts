@@ -6,6 +6,7 @@ export const headingRecipe = defineRecipe({
   base: {
     margin: '0',
     fontFamily: 'heading',
+    color: 'fg.solid',
   },
   variants: {
     size: {
@@ -29,8 +30,5 @@ export const headingRecipe = defineRecipe({
       h5: textStylesValues.h5.value,
       h6: textStylesValues.h6.value,
     },
-  },
-  defaultVariants: {
-    size: 'xl',
   },
 })

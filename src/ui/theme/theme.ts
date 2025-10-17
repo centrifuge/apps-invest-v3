@@ -1,11 +1,11 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
-import { brandScale, grayScale, colors, colorTokens } from './baseStyles/colors'
+import { charcoalScale, grayScale, colors, colorTokens } from './baseStyles/colors'
 import { buttonRecipe } from './recipes/buttonRecipe'
 import { inputRecipe } from './recipes/inputRecipe'
 import { checkboxRecipe } from './recipes/checkboxRecipe'
 import { badgeRecipe } from './recipes/badgeRecipe'
 import { accordionRecipe } from './recipes/accordionRecipe'
-import { fonts, fontSizes, textStyles } from 'src/ui/theme/baseStyles/text'
+import { fonts } from 'src/ui/theme/baseStyles/text'
 import { textRecipe } from 'src/ui/theme/recipes/textRecipe'
 import { headingRecipe } from 'src/ui/theme/recipes/headingRecipe'
 import { cardRecipe } from 'src/ui/theme/recipes/cardRecipe'
@@ -13,20 +13,18 @@ import { cardRecipe } from 'src/ui/theme/recipes/cardRecipe'
 const theme = defineConfig({
   globalCss: {
     body: {
-      color: brandScale[500],
+      color: charcoalScale[500],
       backgroundColor: grayScale[300],
     },
   },
   theme: {
     tokens: {
       fonts,
-      fontSizes,
       colors,
     },
     semanticTokens: {
       colors: colorTokens,
     },
-    textStyles,
     recipes: {
       badge: badgeRecipe,
       button: buttonRecipe,
