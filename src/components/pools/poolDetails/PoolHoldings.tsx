@@ -2,7 +2,7 @@ import { Heading, Text } from '@chakra-ui/react'
 import { DataTable, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
-import { AccreditedOnlyValueBlock } from '@components/elements/AccreditedOnlyValueBlock'
+import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 
 export function PoolHoldings() {
   const { poolDetails } = usePoolContext()
@@ -40,7 +40,7 @@ export function PoolHoldings() {
         pool.
       </Text>
       {isRestrictedPool ? (
-        <AccreditedOnlyValueBlock />
+        <InvestorsOnlyValueBlock />
       ) : (
         <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
       )}
