@@ -6,15 +6,15 @@ export const accordionRecipe = defineSlotRecipe({
   base: {
     root: {},
     item: {
-      backgroundColor: 'bg-primary',
+      backgroundColor: 'bg.solid',
       mt: 2,
       p: 4,
       borderRadius: 10,
       border: '1px solid',
-      borderColor: 'border-primary',
+      borderColor: 'border.solid',
     },
     itemBody: {
-      color: 'text-secondary',
+      color: 'fg.subtle',
     },
   },
 })

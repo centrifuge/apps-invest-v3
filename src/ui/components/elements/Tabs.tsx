@@ -43,7 +43,7 @@ export const Tabs = ({ elements, ...rest }: TabsProps) => {
             {element.label}
           </ChakraTabs.Trigger>
         ))}
-        {hasEnabledTabs && <ChakraTabs.Indicator bg="text-highlight" height="2px" borderRadius="1px" bottom="0" />}
+        {hasEnabledTabs && <ChakraTabs.Indicator bg="fg.emphasized" height="2px" borderRadius="1px" bottom="0" />}
       </ChakraTabs.List>
 
       {elements.map((element) => (

@@ -21,12 +21,12 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   const formattedTotalTVL = totalTVL ? formatBalance(totalTVL, 'USD', 0) : 'unknown'
 
   if (isLoading) {
-    return <Skeleton height="102px" width="380px" borderRadius="md" />
+    return <Skeleton height="102px" width="380px" borderRadius="md" bg="bg.muted" />
   }
 
   return (
     <Card borderRadius="xl">
-      <Text color="gray.500" fontSize="xs">
+      <Text color="fg.muted" fontSize="xs">
         TVL on {formatDate(new Date(), 'short')}
       </Text>
       <Flex alignItems="center" justifyContent="flex-start">

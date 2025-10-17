@@ -14,7 +14,7 @@ export function InfoPanel({ height = '40px', label, children }: PanelProps) {
   return (
     <>
       {isOpen ? (
-        <Box borderBottomWidth="1px" mx="auto" bgColor="yellow.100" borderRadius="4px" height={height}>
+        <Box borderBottomWidth="1px" mx="auto" bgColor="bg.accent" borderRadius="4px" height={height}>
           <Container px={4} width="fit-content" centerContent>
             <Stack direction="row" gap={4} justify="center" align="center">
               <Box>
@@ -32,7 +32,7 @@ export function InfoPanel({ height = '40px', label, children }: PanelProps) {
                 aria-label="Close banner"
                 onClick={() => setIsOpen(false)}
               >
-                <IoClose color="gray.900" opacity="0.7" />
+                <IoClose color="fg.solid" opacity="0.7" />
               </IconButton>
             </Stack>
           </Container>

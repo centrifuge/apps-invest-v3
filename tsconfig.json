@@ -31,5 +31,12 @@
       "@wallet/*": ["src/wallet/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts", "vite.config.ts"]
+  "include": [
+    "src",
+    "vite-env.d.ts",
+    "vite.config.ts",
+    "src/stories/ui/Card.stories.tsx",
+    "src/stories/ui/Button.stories.tsx",
+    "src/stories/forms/BalanceInput.stories.tsx"
+  ]
 }

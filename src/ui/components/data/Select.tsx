@@ -103,13 +103,13 @@ export const Select = ({
               alignItems="center"
               p={2}
               border="1px solid"
-              borderColor={withSearch ? 'gray.200' : 'transparent'}
+              borderColor={withSearch ? 'bg.input' : 'transparent'}
               bg={withSearch ? 'white' : 'transparent'}
               borderRadius="md"
-              _hover={{ bg: 'gray.100' }}
-              _selected={{ bg: 'gray.100' }}
-              _focus={{ bg: 'gray.100' }}
-              _active={{ bg: 'gray.100' }}
+              _hover={{ bg: 'bg.subtle' }}
+              _selected={{ bg: 'bg.subtle' }}
+              _focus={{ bg: 'bg.subtle' }}
+              _active={{ bg: 'bg.subtle' }}
               mt={withSearch ? 2 : 0}
             >
               {item.children ?? item.label}

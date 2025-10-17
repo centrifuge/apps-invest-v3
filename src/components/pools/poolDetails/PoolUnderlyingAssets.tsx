@@ -31,31 +31,31 @@ export function PoolUnderlyingAssets() {
       </Heading>
 
       <Box
-        bg="bg-primary"
+        bg="bg.solid"
         width="100%"
         padding={{ base: 6, md: 8 }}
         borderRadius={10}
         border="1px solid"
-        borderColor="border-primary"
+        borderColor="border.solid"
         shadow="xs"
         position="relative"
       >
         {isUnderlyingLoading ? (
           <Box pos="absolute" inset="0" bg="bg/80">
             <Center h="full">
-              <Spinner size="lg" color="gray.800" />
+              <Spinner size="lg" color="fg.solid" />
             </Center>
           </Box>
         ) : null}
         {items.map((item) => (
           <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
-            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="gray.500">
+            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
               {item.label}
             </Text>
             {typeof item.value !== 'string' ? (
               item.value
             ) : (
-              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="gray.800" textAlign="right">
+              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
                 {item.value}
               </Text>
             )}

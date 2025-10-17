@@ -81,7 +81,7 @@ export function UploadFiles({
               whiteSpace="nowrap"
               overflow="hidden"
               textOverflow="ellipsis"
-              color={fileName ? 'inherit' : 'fg.subtle'}
+              color={fileName ? 'inherit' : 'fg.muted'}
               fontSize="xs"
             >
               {fileName || placeholder}

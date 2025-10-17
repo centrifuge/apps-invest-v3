@@ -1,5 +1,4 @@
 import { defineRecipe } from '@chakra-ui/react'
-import { white } from '../colors'
 
 export const inputRecipe = defineRecipe({
   base: {
@@ -12,14 +11,6 @@ export const inputRecipe = defineRecipe({
     },
   },
   variants: {
-    variant: {
-      outline: {
-        bg: white,
-        _disabled: {
-          bg: 'gray.50',
-        },
-      },
-    },
     size: {
       lg: {
         fontSize: 'lg',

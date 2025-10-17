@@ -12,6 +12,8 @@ export const Button = ({
   variant = 'solid',
   ...props
 }: ButtonProps) => {
+  const textColor = colorPalette === 'black' && variant === 'solid' ? 'white' : 'inherit'
+
   return (
     <ChakraButton
       colorPalette={colorPalette}
@@ -19,6 +21,7 @@ export const Button = ({
       onClick={onClick}
       disabled={disabled}
       variant={variant}
+      color={textColor}
       {...props}
     >
       {label}

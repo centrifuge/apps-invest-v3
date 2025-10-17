@@ -13,7 +13,7 @@ interface DatePickerProps {
 
 const CustomInput = forwardRef(({ value, onClick }: any, ref: any) => (
   <Flex onClick={onClick} ref={ref} alignItems="center" position="relative" cursor="pointer">
-    <Box position="absolute" left="12px" zIndex="1" color="gray.600">
+    <Box position="absolute" left="12px" zIndex="1" color="fg.muted">
       <Icon as={CiCalendar} />
     </Box>
     <Input height="40px" fontSize="md" value={value} readOnly pl="40px" />

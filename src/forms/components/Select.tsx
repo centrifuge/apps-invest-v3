@@ -49,7 +49,7 @@ export function Select<TFieldValues extends FieldValues = FieldValues>(props: Cu
           onValueChange={handleValueChange}
           value={field.value ? [field.value] : []}
           positioning={{ strategy: 'absolute', sameWidth: true, placement: 'top' }}
-          backgroundColor={backgroundColor ?? 'gray.50'}
+          backgroundColor={backgroundColor ?? 'bg.subtle'}
           borderRadius="md"
           {...rest}
         >

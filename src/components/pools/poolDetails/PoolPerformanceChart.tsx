@@ -39,7 +39,7 @@ export function LegendItem({ color, label, value }: { color?: string; label: str
     <Box display="flex" flexDir="column" justifyContent="flex-start">
       <Box display="flex" alignItems="center" gap={2}>
         {color && <SmallCircle color={color} />}
-        <Text color="gray.600" fontWeight={500} fontSize="xs">
+        <Text color="fg.muted" fontWeight={500} fontSize="xs">
           {label}
         </Text>
       </Box>
@@ -99,17 +99,17 @@ export const PoolPerformanceChart = () => {
       {isLoading ? (
         <Box pos="absolute" inset="0" bg="bg/80">
           <Center h="full">
-            <Spinner size="lg" color="gray.800" />
+            <Spinner size="lg" color="fg.solid" />
           </Center>
         </Box>
       ) : null}
       <Box
-        bg="bg-primary"
+        bg="bg.solid"
         width="100%"
         padding={6}
         borderRadius={10}
         border="1px solid"
-        borderColor="border-primary"
+        borderColor="border.solid"
         shadow="xs"
       >
         <Flex justifyContent="space-between" alignItems="center" mb={8}>
@@ -119,7 +119,7 @@ export const PoolPerformanceChart = () => {
             <DatePicker label="To" date={toDate} onChange={setToDate} />
           </Flex> */}
           <Heading size="lg">Performance</Heading>
-          <LegendItem color="text-highlight" label="Token price" value={currentTokenPrice} />
+          <LegendItem color="fg.emphasized" label="Token price" value={currentTokenPrice} />
         </Flex>
         <LineChart
           height={260}
@@ -134,7 +134,7 @@ export const PoolPerformanceChart = () => {
               id: 'token price',
               type: 'line',
               accessor: (r) => r.price,
-              colorToken: 'text-highlight',
+              colorToken: 'fg.emphasized',
               strokeWidth: 2,
             },
           ]}

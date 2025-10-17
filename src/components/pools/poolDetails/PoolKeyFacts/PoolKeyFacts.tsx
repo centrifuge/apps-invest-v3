@@ -17,12 +17,12 @@ export function PoolKeyFacts() {
       </Heading>
 
       <Box
-        bg="bg-primary"
+        bg="bg.solid"
         width="100%"
         padding={6}
         borderRadius={10}
         border="1px solid"
-        borderColor="border-primary"
+        borderColor="border.solid"
         shadow="xs"
       >
         <Grid templateColumns={{ base: '1fr', md: '1fr 5fr' }} gap={2}>
@@ -75,24 +75,24 @@ export function PoolKeyFacts() {
                   left: 0,
                   width: '54px',
                   height: '2px',
-                  bg: 'yellow.500',
+                  bg: 'fg.emphasized',
                 }}
               >
                 {metadata?.pool.issuer.name || 'Pool'}
               </Heading>
-              <Text fontSize="14px" color="gray.500" fontWeight={400} lineHeight={'160%'} mt={3}>
+              <Text fontSize="14px" color="fg.muted" fontWeight={400} lineHeight={'160%'} mt={3}>
                 {metadata?.pool.issuer.description.replace(/"/g, '') || 'No description available'}
               </Text>
             </Flex>
           </GridItem>
           <GridItem colSpan={factKeys.length ? 1 : 0}>
-            <Box bg="bg-primary" shadow="xs" boxShadow="none" pt={4}>
+            <Box bg="bg.solid" shadow="xs" boxShadow="none" pt={4}>
               {factKeys.map((item) => (
                 <Flex justifyContent="space-between" alignItems="center" mt={4} key={item.type}>
-                  <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="gray.500">
+                  <Text fontWeight={500} fontSize="14px" lineHeight="100%" color="fg.muted">
                     {item.type}
                   </Text>
-                  <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="gray.800" textAlign="right">
+                  <Text fontWeight={600} fontSize="14px" lineHeight="100%" color="fg.solid" textAlign="right">
                     {item.value}
                   </Text>
                 </Flex>

@@ -137,7 +137,7 @@ export function RedeemAmount({
                 precision={2}
                 ml={4}
                 fontSize="xs"
-                color="gray.500"
+                color="fg.muted"
               />
             ) : null}
           </Flex>
@@ -152,20 +152,20 @@ export function RedeemAmount({
           <Flex mt={2} justify="space-between">
             <Flex>
               <Badge
-                background="bg-tertiary"
-                color="text-primary"
+                background="bg.subtle"
+                color="fg.solid"
                 opacity={0.5}
                 borderRadius={10}
                 px={3}
                 h="24px"
-                borderColor="gray.500 !important"
+                borderColor="border.dark-muted !important"
                 border="1px solid"
                 cursor="pointer"
                 onClick={setMaxRedeemAmount}
               >
                 MAX
               </Badge>
-              <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
+              <Text color="fg.solid" opacity={0.5} alignSelf="flex-end" ml={2}>
                 {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)} available
               </Text>
             </Flex>
@@ -181,7 +181,7 @@ export function RedeemAmount({
                   precision={2}
                   ml={4}
                   fontSize="xs"
-                  color="gray.500"
+                  color="fg.muted"
                 />
               </Flex>
               <BalanceInput

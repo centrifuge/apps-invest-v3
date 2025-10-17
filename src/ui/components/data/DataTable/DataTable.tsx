@@ -5,7 +5,8 @@ import { FiChevronUp, FiChevronDown, FiCode } from 'react-icons/fi'
 export type ColumnDefinition<RowType> = {
   header: string
   accessor?: keyof RowType
-  textAlign?: 'start' | 'center' | 'end'
+  textAlign?: 'center' | 'left' | 'right'
+  justifyContent?: 'flex-start' | 'flex-end' | 'center'
   width?: string
   sortKey?: string
   render?: (row: RowType) => React.ReactNode
@@ -52,7 +53,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
   return (
     // Chakra UI Table has a bug where the border is not applied to the table root
     // This is a workaround to apply the border to the table root
-    <Box borderRadius="lg" border="1px solid" borderColor="border-primary" overflow="hidden">
+    <Box borderRadius="lg" border="1px solid" borderColor="border.solid" overflow="hidden">
       <Table.Root size={size} overflow="hidden" border="none">
         <Table.Header>
           <Table.Row bg={TABLE_HEADER_COLOR}>
@@ -65,11 +66,11 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                 cursor={col.sortKey ? 'pointer' : 'default'}
                 userSelect="none"
                 fontSize="xs"
-                color="gray.800"
+                color="fg.solid"
                 role="group"
               >
-                <Flex alignItems="center" justifyContent="center">
-                  {col.header}
+                <Flex alignItems="center" justifyContent={col.justifyContent ?? 'center'}>
+                  <Box marginLeft={col.sortKey && col.justifyContent === 'center' ? '16px' : '0'}>{col.header}</Box>
                   {col.sortKey && (
                     <>
                       {sortConfig?.key === col.sortKey ? (
@@ -78,7 +79,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                           aria-label={sortConfig.direction}
                           ml={2}
                           boxSize={4}
-                          color="gray.800"
+                          color="fg.solid"
                         />
                       ) : (
                         <Icon
@@ -86,7 +87,7 @@ export const DataTable = <RowType extends { id?: string | number; actions?: (row
                           aria-label="Sortable"
                           ml={2}
                           boxSize={3}
-                          color="gray.400"
+                          color="fg.subtle"
                           transform="rotate(90deg)"
                           opacity={0}
                           _groupHover={{ opacity: 1 }}

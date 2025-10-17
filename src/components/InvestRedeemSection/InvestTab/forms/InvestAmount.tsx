@@ -117,7 +117,7 @@ export function InvestAmount({
                 precision={2}
                 ml={4}
                 fontSize="xs"
-                color="gray.500"
+                color="fg.muted"
               />
             ) : null}
           </Flex>
@@ -133,20 +133,20 @@ export function InvestAmount({
           <Flex mt={2} justify="space-between">
             <Flex>
               <Badge
-                background="bg-tertiary"
-                color="text-primary"
+                background="bg.subtle"
+                color="fg.solid"
                 opacity={0.5}
                 borderRadius={10}
                 px={3}
                 h="24px"
                 onClick={setMaxInvestAmount}
-                borderColor="gray.500 !important"
+                borderColor="border.dark-muted !important"
                 border="1px solid"
                 cursor="pointer"
               >
                 MAX
               </Badge>
-              <Text color="text-primary" opacity={0.5} alignSelf="flex-end" ml={2}>
+              <Text color="fg.solid" opacity={0.5} alignSelf="flex-end" ml={2}>
                 {formattedMaxInvestAmount} available
               </Text>
             </Flex>
@@ -164,7 +164,7 @@ export function InvestAmount({
                   precision={2}
                   mt={6}
                   fontSize="xs"
-                  color="gray.500"
+                  color="fg.muted"
                 />
               </Flex>
               <BalanceInput

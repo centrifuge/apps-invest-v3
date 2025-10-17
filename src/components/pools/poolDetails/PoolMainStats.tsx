@@ -30,7 +30,7 @@ export function PoolMainStats() {
   ]
 
   return (
-    <Box bg="bg-primary" padding={6} borderRadius={10} border="1px solid" borderColor="border-primary" shadow="xs">
+    <Box bg="bg.solid" padding={6} borderRadius={10} border="1px solid" borderColor="border.solid" shadow="xs">
       <Grid templateColumns={{ base: 'repeat(3, 1fr)' }} gap={4}>
         {items.map((item, index) => (
           <GridItem minW={0} overflow="hidden" position="relative" key={item.label}>
@@ -41,7 +41,7 @@ export function PoolMainStats() {
             >
               <Text
                 fontSize="0.75rem"
-                color="gray.500"
+                color="fg.muted"
                 fontWeight={500}
                 width="auto"
                 textAlign={{ base: 'center', md: 'left' }}

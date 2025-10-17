@@ -54,9 +54,9 @@ export function DefaultFallback({ error, resetError, errorInfo }: FallbackProps)
                     display="block"
                     p={3}
                     mt={2}
-                    bg="gray.50"
+                    bg="bg.subtle"
                     border="1px solid"
-                    borderColor="gray.200"
+                    borderColor="border.input"
                     borderRadius="md"
                     fontSize="xs"
                     overflow="auto"
@@ -64,8 +64,8 @@ export function DefaultFallback({ error, resetError, errorInfo }: FallbackProps)
                     whiteSpace="pre-wrap"
                     wordBreak="break-word"
                     _dark={{
-                      bg: 'gray.800',
-                      borderColor: 'gray.600',
+                      bg: 'fg.solid',
+                      borderColor: 'border.dark-muted',
                     }}
                   >
                     {error.message}

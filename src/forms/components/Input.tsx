@@ -73,7 +73,17 @@ export function Input<TFieldValues extends FieldValues = FieldValues>(props: Inp
           onBlur={mergedOnBlur}
           padding="10px 14px"
           borderRadius="md"
-          bg={rest.bg ?? 'gray.50'}
+          borderColor={rest.borderColor ?? 'border.solid'}
+          bg={rest.bg ?? 'bg.input'}
+          _focus={{
+            borderColor: 'border.accent',
+          }}
+          _focusVisible={{
+            borderColor: 'transparent',
+          }}
+          _invalid={{
+            borderColor: 'border.error',
+          }}
         />
       </InputGroup>
       <Field.ErrorText>{errorMessage}</Field.ErrorText>

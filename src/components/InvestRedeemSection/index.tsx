@@ -91,7 +91,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     <Flex
       direction="column"
       border="1px solid"
-      borderColor="border-primary"
+      borderColor="border.solid"
       borderRadius="10px"
       shadow="xs"
       bg="white"
@@ -174,7 +174,7 @@ function VaultGuard({
   if (isLoading) {
     return (
       <Box height="100%" minH="182px" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="lg" color="black.solid" />
+        <Spinner size="lg" color="fg.solid" />
       </Box>
     )
   }
