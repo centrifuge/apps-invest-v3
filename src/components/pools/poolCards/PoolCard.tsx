@@ -5,7 +5,7 @@ import { useChainId } from 'wagmi'
 import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useIsMember, usePoolActiveNetworks } from '@cfg'
 import { Card, ValueText } from '@ui'
 import { getPoolTVL } from '@utils/getPoolTVL'
-import { AccreditedOnlyValueBlock } from '@components/elements/AccreditedOnlyValueBlock'
+import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
@@ -45,6 +45,7 @@ export function PoolCard({
   const poolIssuerName = poolMetadata?.issuer.name
   const shortDescription = poolMetadata?.issuer?.shortDescription.trim() ?? ''
   const isPoolCardLoading = isNetworksLoading || isMemberLoading
+  const subClass = poolMetadata?.asset.subClass === 'S&P 500' ? 'Equities' : (poolMetadata?.asset.subClass ?? '')
 
   return (
     <Card height="100%" position="relative" _hover={{ boxShadow: 'md' }}>
@@ -85,7 +86,7 @@ export function PoolCard({
               APY
             </Text>
           </Flex>
-          <AccreditedOnlyValueBlock />
+          <InvestorsOnlyValueBlock />
         </Box>
       ) : (
         <>
@@ -122,7 +123,7 @@ export function PoolCard({
             Asset type
           </Text>
           <Text fontSize="xs" fontWeight={500} textAlign="right">
-            {poolMetadata?.asset.subClass ?? ''}
+            {subClass}
           </Text>
         </Flex>
         <Flex alignItems="center" justifyContent="space-between">

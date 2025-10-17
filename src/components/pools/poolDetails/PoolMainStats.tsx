@@ -1,6 +1,6 @@
 import { formatBigintToString } from '@cfg'
 import { Box, Grid, GridItem, Text } from '@chakra-ui/react'
-import { AccreditedOnlyValueBlock } from '@components/elements/AccreditedOnlyValueBlock'
+import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { roundToDecimal } from '@utils/nums'
@@ -13,7 +13,7 @@ export function PoolMainStats() {
   const items = [
     {
       label: 'TVL (USD)',
-      value: isRestrictedPool ? <AccreditedOnlyValueBlock /> : (poolTVL ?? '0.00'),
+      value: isRestrictedPool ? <InvestorsOnlyValueBlock /> : (poolTVL ?? '0.00'),
     },
     {
       label: 'Token price (USD)',
@@ -25,7 +25,7 @@ export function PoolMainStats() {
     },
     {
       label: 'APY',
-      value: isRestrictedPool ? <AccreditedOnlyValueBlock /> : `${apy}%`,
+      value: isRestrictedPool ? <InvestorsOnlyValueBlock /> : `${apy}%`,
     },
   ]
 
