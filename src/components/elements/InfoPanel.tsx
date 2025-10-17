@@ -32,7 +32,7 @@ export function InfoPanel({ height = '40px', label, children }: PanelProps) {
                 aria-label="Close banner"
                 onClick={() => setIsOpen(false)}
               >
-                <IoClose color="gray.900" opacity="0.7" />
+                <IoClose color="fg.solid" opacity="0.7" />
               </IconButton>
             </Stack>
           </Container>

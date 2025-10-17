@@ -158,7 +158,7 @@ export function RedeemAmount({
                 borderRadius={10}
                 px={3}
                 h="24px"
-                borderColor="border.subtle !important"
+                borderColor="border.dark-muted !important"
                 border="1px solid"
                 cursor="pointer"
                 onClick={setMaxRedeemAmount}

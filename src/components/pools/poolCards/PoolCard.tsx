@@ -58,7 +58,7 @@ export function PoolCard({
       ) : null}
       <Flex alignItems="center" justifyContent="space-between">
         <Box>
-          <Text fontSize="sm" color="themeBlack.500" fontWeight={600}>
+          <Text fontSize="sm" color="fg.solid" fontWeight={600}>
             {poolName}
           </Text>
           {!isRwaPool && poolIssuerName ? (

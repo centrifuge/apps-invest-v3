@@ -12,7 +12,7 @@ export const LinkPill = ({ href, label, ...rest }: LinkPillProps) => {
         <Box
           color="fg.muted"
           border="1px solid"
-          borderColor="border.subtle"
+          borderColor="border.dark-muted"
           background="transparent"
           borderRadius="full"
           height="2rem"
@@ -41,7 +41,7 @@ export const LinkPill = ({ href, label, ...rest }: LinkPillProps) => {
     <Button
       color="fg.muted"
       border="1px solid"
-      borderColor="border.subtle"
+      borderColor="border.dark-muted"
       background="transparent"
       borderRadius="full"
       height="2rem"

@@ -75,7 +75,7 @@ export function PoolKeyFacts() {
                   left: 0,
                   width: '54px',
                   height: '2px',
-                  bg: 'bg.emphasized',
+                  bg: 'fg.emphasized',
                 }}
               >
                 {metadata?.pool.issuer.name || 'Pool'}
