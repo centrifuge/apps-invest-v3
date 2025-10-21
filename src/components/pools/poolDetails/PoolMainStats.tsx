@@ -48,15 +48,19 @@ export function PoolMainStats() {
               >
                 {item.label}
               </Text>
-              <Text
-                fontSize="clamp(1rem, 1.25rem, 1.5rem)"
-                whiteSpace="nowrap"
-                overflow="hidden"
-                textOverflow="ellipsis"
-                fontWeight={600}
-              >
-                {item.value}
-              </Text>
+              {typeof item.value === 'string' ? (
+                <Text
+                  fontSize="clamp(1rem, 1.25rem, 1.5rem)"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  fontWeight={600}
+                >
+                  {item.value}
+                </Text>
+              ) : (
+                item.value
+              )}
             </Box>
           </GridItem>
         ))}
