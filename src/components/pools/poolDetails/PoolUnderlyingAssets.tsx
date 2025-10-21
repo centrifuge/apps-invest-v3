@@ -1,9 +1,12 @@
 import { usePoolDetails } from '@cfg'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
+import { ChronicleBadge } from '@components/elements/ChronicleBadge'
 import { usePoolContext } from '@contexts/PoolContext'
+import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 
 export function PoolUnderlyingAssets() {
-  const { poolDetails, pools } = usePoolContext()
+  const { poolDetails, pools, poolId } = usePoolContext()
+  const { getIsChroniclePool } = useGetPoolsByIds()
 
   // Get underlying pool metadata
   const underlyingPoolIdNumber = poolDetails?.metadata?.pool.underlying?.poolId ?? 0
@@ -22,6 +25,10 @@ export function PoolUnderlyingAssets() {
     { label: 'Investor type', value: underlyingMetadata?.pool.investorType || 'Non-US Professional' },
     // Todo: expense ratio in the future would come from onchain and not metadata
     { label: 'Expense ratio', value: (underlyingMetadata?.pool as any)?.expenseRatio || 'Unknown' },
+    {
+      label: 'Verified by',
+      value: getIsChroniclePool(poolId) ? <ChronicleBadge /> : null,
+    },
   ]
 
   return (
@@ -47,20 +54,22 @@ export function PoolUnderlyingAssets() {
             </Center>
           </Box>
         ) : null}
-        {items.map((item) => (
-          <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
-            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
-              {item.label}
-            </Text>
-            {typeof item.value !== 'string' ? (
-              item.value
-            ) : (
-              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
-                {item.value}
+        {items
+          .filter((i) => !!i.value)
+          .map((item) => (
+            <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
+              <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
+                {item.label}
               </Text>
-            )}
-          </Flex>
-        ))}
+              {typeof item.value !== 'string' ? (
+                item.value
+              ) : (
+                <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
+                  {item.value}
+                </Text>
+              )}
+            </Flex>
+          ))}
       </Box>
     </>
   )
