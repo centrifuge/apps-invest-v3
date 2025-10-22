@@ -1,5 +1,19 @@
-import { ipfsToHttp } from '@cfg'
 import { keccak256 } from 'js-sha3'
+import { ipfsToHttp } from '@cfg'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+
+export function useIpfsQuery<T = any>(uri: string | null, gateways?: string[]): UseQueryResult<T> {
+  return useQuery({
+    queryKey: ['ipfs', uri],
+    queryFn: async () => {
+      if (!uri) throw new Error('IPFS URI is required')
+      return fetchIpfsJson<T>(uri, gateways)
+    },
+    enabled: !!uri,
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
+  })
+}
 
 export async function fetchIpfsJson<T = any>(uri: string, gateways: string[] = ['https://ipfs.io']): Promise<T> {
   const url = ipfsToHttp(uri, gateways)

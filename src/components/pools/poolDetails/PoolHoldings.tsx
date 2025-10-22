@@ -3,8 +3,7 @@ import { DataTable, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
-import { useEffect, useState } from 'react'
-import { fetchIpfsJson } from '@utils/fetchIpfsJson'
+import { useIpfsQuery } from '@cfg'
 
 interface ChronicleHoldings {
   current_price: string
@@ -20,23 +19,9 @@ export function PoolHoldings() {
   const { poolDetails, poolId } = usePoolContext()
   const { isRestrictedPool, getChroniclePoolIpfsUri, getIsChroniclePool } = useGetPoolsByIds()
   const isChronicleVerified = getIsChroniclePool(poolId)
-  const [chronicleData, setChronicleData] = useState<any>(null)
-  const [error, setError] = useState<string | null>(null)
 
   const chronicleIpfsUri = poolId && isChronicleVerified ? getChroniclePoolIpfsUri(poolId) : ''
-
-  useEffect(() => {
-    if (poolId && isChronicleVerified && !chronicleData) {
-      ;(async () => {
-        try {
-          const json = await fetchIpfsJson(chronicleIpfsUri)
-          setChronicleData(json)
-        } catch (err: any) {
-          setError(err.message)
-        }
-      })()
-    }
-  }, [isChronicleVerified, chronicleData])
+  const { data: chronicleData, error } = useIpfsQuery(chronicleIpfsUri)
 
   const chronicleHoldings: ChronicleHoldings[] =
     !chronicleData || !chronicleData.payload ? [] : chronicleData?.payload?.output?.dashboard?.portfolio?.positions
@@ -68,7 +53,7 @@ export function PoolHoldings() {
   }))
 
   if (!holdingsData || holdingsData.length === 0) return null
-  if (error) return <Text color="fg.error">Error: {error}</Text>
+  if (error) return <Text color="fg.error">Error: {error.message}</Text>
 
   return (
     <>
