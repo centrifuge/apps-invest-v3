@@ -1,5 +1,5 @@
 import { Heading, Text } from '@chakra-ui/react'
-import { DataTable, normalizeCell } from '@ui'
+import { DataTable, formatHeaderLabel, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
@@ -46,7 +46,7 @@ export function PoolHoldings() {
     }) ?? []
 
   const holdingsColumns = headers.map((h) => ({
-    header: h,
+    header: formatHeaderLabel(h),
     accessor: h,
     sortKey: `__sort__${h}`,
     justifyContent: 'flex-start',
