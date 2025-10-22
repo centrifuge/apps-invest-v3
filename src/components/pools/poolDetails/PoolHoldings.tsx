@@ -1,5 +1,5 @@
 import { Heading, Text } from '@chakra-ui/react'
-import { DataTable, formatHeaderLabel, normalizeCell } from '@ui'
+import { Card, DataTable, formatHeaderLabel, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
@@ -13,7 +13,7 @@ export function PoolHoldings() {
   // Try to fetch Chronicle holdings
   const isChronicleVerified = getIsChroniclePool(poolId)
   const chronicleIpfsUri = poolId && isChronicleVerified ? getChroniclePoolIpfsUri(poolId) : ''
-  const { data: chronicleData, error } = useIpfsQuery(chronicleIpfsUri)
+  const { data: chronicleData, isError, error } = useIpfsQuery(chronicleIpfsUri)
   const {
     hasChronicleHoldings,
     headers: chronicleHeaders,
@@ -46,23 +46,30 @@ export function PoolHoldings() {
     justifyContent: 'flex-start',
   }))
 
-  if (!holdingsData || holdingsData.length === 0) return null
-  if (error) return <Text color="fg.error">Error: {error.message}</Text>
+  if (!isError && (!holdingsData || holdingsData.length === 0)) return null
 
   return (
     <>
       <Heading size="lg" mt={8} mb={2}>
         Holdings
       </Heading>
-      <Text fontSize="sm" mb={4}>
-        Holdings shown are the approximate market value of invested assets only and do not reflect the total NAV of the
-        pool.
-      </Text>
-      {isRestrictedPool ? (
-        <InvestorsOnlyValueBlock />
-      ) : (
-        <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
-      )}
+      <>
+        <Text fontSize="sm" mb={4}>
+          Holdings shown are the approximate market value of invested assets only and do not reflect the total NAV of
+          the pool.
+        </Text>
+        {isError ? (
+          <Card>
+            <Text color="fg.error" fontSize="sm">
+              Error: {error.message}
+            </Text>
+          </Card>
+        ) : isRestrictedPool ? (
+          <InvestorsOnlyValueBlock />
+        ) : (
+          <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
+        )}
+      </>
     </>
   )
 }
