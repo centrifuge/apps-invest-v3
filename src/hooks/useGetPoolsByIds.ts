@@ -38,8 +38,8 @@ const PRODUCTION_POOLS = {
 } as const
 
 const CHRONICLE_POOLS: Record<string, { name: string; ipfsUri: string }> = {
-  '281474976710660': {
-    name: 'deJTRSY',
+  '281474976710662': {
+    name: 'JTRSY',
     ipfsUri:
       'ipfs://QmPgCBS2mUzYoGd5Zx5DRRU8tyHqunEGVjHKvgDf29TnwK?checksum=0x39f63929f6e561825ddb6f8a1b84fdced7e30f879f40b03771d2119f9ee61d04',
   },
