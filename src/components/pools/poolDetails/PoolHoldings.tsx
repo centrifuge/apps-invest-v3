@@ -4,36 +4,30 @@ import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { useIpfsQuery } from '@cfg'
-
-interface ChronicleHoldings {
-  current_price: string
-  description: string
-  market_value: string
-  maturity_date: string
-  units: number
-  yield_to_maturity: string
-  isin?: string
-}
+import { getChronicleHoldings, type Positions } from '@utils/getChronicleHoldings'
 
 export function PoolHoldings() {
   const { poolDetails, poolId } = usePoolContext()
   const { isRestrictedPool, getChroniclePoolIpfsUri, getIsChroniclePool } = useGetPoolsByIds()
-  const isChronicleVerified = getIsChroniclePool(poolId)
 
+  // Try to fetch Chronicle holdings
+  const isChronicleVerified = getIsChroniclePool(poolId)
   const chronicleIpfsUri = poolId && isChronicleVerified ? getChroniclePoolIpfsUri(poolId) : ''
   const { data: chronicleData, error } = useIpfsQuery(chronicleIpfsUri)
-
-  const chronicleHoldings: ChronicleHoldings[] =
-    !chronicleData || !chronicleData.payload ? [] : chronicleData?.payload?.output?.dashboard?.portfolio?.positions
-  chronicleHoldings.forEach((p: ChronicleHoldings) => delete p.isin)
-  const chronicleHeaders = chronicleHoldings.length ? Object.keys(chronicleHoldings[0]) : []
+  const {
+    hasChronicleHoldings,
+    headers: chronicleHeaders,
+    holdings: chronicleHoldings,
+  } = getChronicleHoldings(chronicleData)
+  // Try to fetch cfg metadata holdings
   const cfgMetadataHoldings = poolDetails?.metadata?.holdings ?? { headers: [], data: [] }
   const cfgMetadataHeaders = cfgMetadataHoldings?.headers ?? []
-  const holdings = chronicleHoldings ? chronicleHoldings : cfgMetadataHoldings?.data
-  const headers = chronicleHeaders ? chronicleHeaders : cfgMetadataHeaders
+  // Use Chronicle holdings else use cfg holdings
+  const holdings = hasChronicleHoldings ? chronicleHoldings : cfgMetadataHoldings?.data
+  const headers = hasChronicleHoldings ? chronicleHeaders : cfgMetadataHeaders
 
   const holdingsData =
-    holdings?.map((row: Record<string, unknown> | ChronicleHoldings, i: number) => {
+    holdings?.map((row: Record<string, unknown> | Positions, i: number) => {
       const out: Record<string, unknown> = { id: i + 1 }
       headers.forEach((h) => {
         // @ts-expect-error - element implicitly has an any type
