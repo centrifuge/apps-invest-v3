@@ -48,7 +48,7 @@ export const RatingPill = ({ rating }: { rating: FirstRating }) => {
           <Icon>
             <Image src={logo?.logo || spLogo} alt={rating.agency} />
           </Icon>
-          <Text fontSize="xs" color="fg.muted">
+          <Text fontSize="xs" color="fg.solid">
             {rating.value}
           </Text>
         </Badge>

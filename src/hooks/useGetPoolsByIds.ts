@@ -37,6 +37,21 @@ const PRODUCTION_POOLS = {
   '281474976710665': 'SPXA',
 } as const
 
+const CHRONICLE_POOLS: Record<string, { name: string; ipfsUri: string }> = {
+  '281474976710662': {
+    name: 'JTRSY',
+    ipfsUri:
+      'ipfs://QmPgCBS2mUzYoGd5Zx5DRRU8tyHqunEGVjHKvgDf29TnwK?checksum=0x39f63929f6e561825ddb6f8a1b84fdced7e30f879f40b03771d2119f9ee61d04',
+  },
+  // test accounts
+  '281474976710657': {
+    name: 'Sepolia Janus Henderson Anemoy Treasury Fund',
+    // ipfsUri: 'ipfs://QmZDmnQmcbC7wjMqr3pxusK1Dv67aHBjTDQTj8a7Hwb6eR',
+    ipfsUri:
+      'ipfs://QmPgCBS2mUzYoGd5Zx5DRRU8tyHqunEGVjHKvgDf29TnwK?checksum=0x39f63929f6e561825ddb6f8a1b84fdced7e30f879f40b03771d2119f9ee61d04',
+  },
+}
+
 export function useGetPoolsByIds() {
   const { poolId } = usePoolContext()
   const { isWhitelisted } = useIsUserWhitelisted()
@@ -44,6 +59,7 @@ export function useGetPoolsByIds() {
   const rwaPoolIds = Object.keys(RWA_POOLS)
   const deRwaPoolIds = Object.keys(DE_RWA_POOLS)
   const restrictedPoolIds = Object.keys(RESTRICTED_POOLS)
+  const chroniclePoolIds = Object.keys(CHRONICLE_POOLS)
   const isRestrictedPool = useMemo(
     () => restrictedPoolIds.includes(poolId ?? '0') && !isWhitelisted,
     [poolId, isWhitelisted]
@@ -54,6 +70,8 @@ export function useGetPoolsByIds() {
 
   const getIsRwaPool = (poolId?: string) => (poolId ? rwaPoolIds.includes(poolId) : false)
   const getIsDeRwaPool = (poolId?: string) => (poolId ? deRwaPoolIds.includes(poolId) : false)
+  const getIsChroniclePool = (poolId?: string) => (poolId ? chroniclePoolIds.includes(poolId) : false)
+  const getChroniclePoolIpfsUri = (poolId: string) => CHRONICLE_POOLS[poolId].ipfsUri
 
   return {
     deRwaPoolIds,
@@ -61,9 +79,12 @@ export function useGetPoolsByIds() {
     productionPoolIds,
     restrictedPoolIds,
     isRestrictedPool,
+    chroniclePoolIds,
     getIsDeRwaPool,
     getIsRwaPool,
     getIsProductionPool,
     getIsRestrictedPool,
+    getIsChroniclePool,
+    getChroniclePoolIpfsUri,
   }
 }

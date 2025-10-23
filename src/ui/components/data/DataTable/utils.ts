@@ -51,3 +51,10 @@ export function normalizeCell(header: string, value: unknown): Normalized {
   // 4) fallback: case-insensitive string sorting
   return { display: raw, sortVal: raw.toLowerCase() }
 }
+
+export function formatHeaderLabel(header: string): string {
+  const needsFormatting = /^[a-z0-9_]+$/i.test(header)
+  const normalized = header.replace(/_/g, ' ').toLowerCase()
+  const formatted = normalized.charAt(0).toUpperCase() + normalized.slice(1)
+  return needsFormatting ? formatted : header
+}

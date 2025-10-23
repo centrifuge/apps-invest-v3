@@ -5,10 +5,13 @@ import { getAgencyNormalisedName, RatingPill } from '@components/elements/Rating
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { Link } from 'react-router-dom'
+import { ChronicleBadge } from '@components/elements/ChronicleBadge'
+import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 
 export function PoolOverview() {
-  const { networks, poolDetails, shareClass, shareClassId } = usePoolContext()
+  const { networks, poolDetails, poolId, shareClass, shareClassId } = usePoolContext()
   const { investment } = useVaultsContext()
+  const { getIsChroniclePool } = useGetPoolsByIds()
   const metadata = poolDetails?.metadata
   const assetType = `${metadata?.pool.asset.class ? metadata.pool.asset.class : ''}${metadata?.pool.asset.subClass ? ` - ${metadata.pool.asset.subClass}` : '-'}`
   const metadataShareClass = shareClassId ? metadata?.shareClasses[shareClassId.toString()] : undefined
@@ -67,6 +70,10 @@ export function PoolOverview() {
     },
     // Todo: expense ratio in the future would come from onchain and not metadata
     { label: 'Expense ratio', value: (poolDetails?.metadata?.pool as any)?.expenseRatio || 'Unknown' },
+    {
+      label: 'Verified by',
+      value: getIsChroniclePool(poolId) ? <ChronicleBadge /> : null,
+    },
   ]
 
   return (
@@ -84,20 +91,22 @@ export function PoolOverview() {
         borderColor="border.solid"
         shadow="xs"
       >
-        {items.map((item) => (
-          <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
-            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
-              {item.label}
-            </Text>
-            {typeof item.value !== 'string' ? (
-              item.value
-            ) : (
-              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
-                {item.value}
+        {items
+          .filter((i) => !!i.value)
+          .map((item) => (
+            <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
+              <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
+                {item.label}
               </Text>
-            )}
-          </Flex>
-        ))}
+              {typeof item.value !== 'string' ? (
+                item.value
+              ) : (
+                <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
+                  {item.value}
+                </Text>
+              )}
+            </Flex>
+          ))}
       </Box>
     </>
   )
