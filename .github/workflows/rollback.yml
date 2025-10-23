@@ -22,6 +22,7 @@ jobs:
     env:
       ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
       app-name: 'launchpad'
+
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
