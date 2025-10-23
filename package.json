@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@ark-ui/react": "5.15.1",
-    "@centrifuge/sdk": "0.16.1",
+    "@centrifuge/sdk": "0.17.0",
     "@chakra-ui/react": "3.19.1",
     "@chakra-ui/system": "2.6.2",
     "@chakra-ui/theme": "3.4.6",
