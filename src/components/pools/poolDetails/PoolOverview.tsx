@@ -12,13 +12,14 @@ export function PoolOverview() {
   const metadata = poolDetails?.metadata
   const assetType = `${metadata?.pool.asset.class ? metadata.pool.asset.class : ''}${metadata?.pool.asset.subClass ? ` - ${metadata.pool.asset.subClass}` : '-'}`
   const metadataShareClass = shareClassId ? metadata?.shareClasses[shareClassId.toString()] : undefined
-  const apy = (shareClass?.details.apyPercentage || metadataShareClass?.apyPercentage) ?? 0
+  const apyPercentage = shareClass?.details.apyPercentage || metadataShareClass?.apyPercentage
+  const apy = shareClass?.details.apy || metadataShareClass?.apy
   const underlyingAssetAddress = investment?.shareCurrency.address
 
   const items = [
     { label: 'Asset type', value: assetType },
-    { label: 'APY', value: `${apy}%` },
-    { label: 'Average asset maturity', value: '-' },
+    { label: 'APY', value: apyPercentage ? `${apyPercentage}%` : null },
+    { label: 'Average asset maturity', value: apy },
     { label: 'Min. investment', value: formatBalance(shareClass?.details.minInitialInvestment ?? 0, 'USD') },
     { label: 'Investor type', value: metadata?.pool.investorType || 'Non-US Professional' },
     {
@@ -84,20 +85,22 @@ export function PoolOverview() {
         borderColor="border.solid"
         shadow="xs"
       >
-        {items.map((item) => (
-          <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
-            <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
-              {item.label}
-            </Text>
-            {typeof item.value !== 'string' ? (
-              item.value
-            ) : (
-              <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
-                {item.value}
+        {items
+          .filter((i) => !!i.value)
+          .map((item) => (
+            <Flex key={item.label} justifyContent="space-between" alignItems="center" mb={4} _last={{ mb: 0 }}>
+              <Text fontWeight={500} fontSize="0.75rem" lineHeight="100%" color="fg.muted">
+                {item.label}
               </Text>
-            )}
-          </Flex>
-        ))}
+              {typeof item.value === 'string' ? (
+                <Text fontWeight={600} fontSize="0.75rem" lineHeight="100%" color="fg.solid" textAlign="right">
+                  {item.value}
+                </Text>
+              ) : (
+                item.value
+              )}
+            </Flex>
+          ))}
       </Box>
     </>
   )
