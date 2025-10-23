@@ -21,8 +21,9 @@ jobs:
     environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || null }}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: launchpad-${{ github.event.inputs.tag }}.zip
-      app-name: "launchpad"
+      ARTIFACT_NAME: invest-v3-${{ github.event.inputs.tag }}.zip
+      app-name: 'apps-invest-v3'
+
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
@@ -32,10 +33,10 @@ jobs:
       - name: '📦 Download Build Artifact from Release'
         run: |
           gh release download ${{ github.event.inputs.tag }} \
-            --repo ${{ github.repository }} \
+            --repo centrifuge/apps-invest-v3 \
             --pattern "$ARTIFACT_NAME" \
             --dir ./${{ env.app-name }}
-          
+
           # Extract the zip file
           cd ./${{ env.app-name }}
           unzip "$ARTIFACT_NAME" -d dist
