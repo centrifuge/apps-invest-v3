@@ -18,11 +18,11 @@ on:
 jobs:
   rollback-and-deploy:
     name: 'Roll Back to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
-    environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || null }}
     runs-on: ubuntu-latest
     env:
       ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
       app-name: 'launchpad'
+
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
@@ -40,11 +40,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: '🚀 Deploy to Cloudflare'
-        run: |
-          cd ${{ env.app-name }}
-          if [ "${{ github.event.inputs.environment }}" == "prod" ]; then
-            CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} wrangler deploy --env prod
-          else
-            CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} wrangler versions upload --env prod --preview-alias staging
-          fi
+      - name: '🚀 Deploy App'
+        uses: ./.github/actions/deploy-app
+        with:
+          environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || 'staging' }}
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
