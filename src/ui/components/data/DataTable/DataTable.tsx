@@ -6,7 +6,7 @@ export type ColumnDefinition<RowType> = {
   header: string
   accessor?: keyof RowType
   textAlign?: 'center' | 'left' | 'right'
-  justifyContent?: string
+  justifyContent?: 'flex-start' | 'flex-end' | 'center'
   width?: string
   sortKey?: string
   render?: (row: RowType) => React.ReactNode
