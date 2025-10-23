@@ -4,45 +4,47 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'The environment to roll back'
+        description: 'Environment to roll back'
         required: true
         type: choice
         options:
           - staging
           - prod
       tag:
-        description: 'The stable release tag to roll back to (e.g., v1.2.0)'
+        description: 'Release tag to roll back to (e.g., v1.1.6)'
         required: true
         type: string
 
 jobs:
-  rollback-and-deploy:
-    name: 'Roll Back to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
+  rollback:
+    name: 'Rollback to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
     runs-on: ubuntu-latest
     env:
       ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
-      app-name: 'launchpad'
-      IS_ROLLBACK: 'true'
-      ROLLBACK_TAG: ${{ github.event.inputs.tag }}
+      APP_DIR: launchpad
 
     steps:
-      - name: '📥 Checkout code from release tag'
+      - name: '📥 Checkout Code from Release Tag'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag }}
 
-      - name: '📦 Download Build Artifact from Release'
-        run: |
-          gh release download ${{ github.event.inputs.tag }} \
-            --repo centrifuge/apps-invest-v3 \
-            --pattern "$ARTIFACT_NAME" \
-            --dir ./${{ env.app-name }}
-          cd ./${{ env.app-name }}
-          unzip "$ARTIFACT_NAME" -d dist
+      - name: '📦 Download Release Artifact'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p $APP_DIR
+          echo "⬇️  Downloading $ARTIFACT_NAME from release ${{ github.event.inputs.tag }}"
+          gh release download ${{ github.event.inputs.tag }} \
+            --repo ${{ github.repository }} \
+            --pattern "$ARTIFACT_NAME" \
+            --dir "$APP_DIR"
 
-      - name: '🚀 Deploy App'
+          cd "$APP_DIR"
+          unzip -q "$ARTIFACT_NAME" -d dist
+          echo "✅ Artifact extracted to $APP_DIR/dist"
+
+      - name: '🚀 Deploy Rollback to Cloudflare'
         uses: ./.github/actions/deploy-app
         with:
           environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || 'staging' }}
