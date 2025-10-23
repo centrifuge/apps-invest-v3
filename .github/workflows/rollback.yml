@@ -22,6 +22,8 @@ jobs:
     env:
       ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
       app-name: 'launchpad'
+      IS_ROLLBACK: 'true'
+      ROLLBACK_TAG: ${{ github.event.inputs.tag }}
 
     steps:
       - name: '📥 Checkout code from release tag'
