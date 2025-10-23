@@ -21,9 +21,8 @@ jobs:
     environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || null }}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: invest-v3-${{ github.event.inputs.tag }}.zip
-      app-name: 'apps-invest-v3'
-
+      ARTIFACT_NAME: launchpad-bundle*.zip
+      app-name: 'launchpad'
     steps:
       - name: '📥 Checkout code from release tag'
         uses: actions/checkout@v4
@@ -36,8 +35,6 @@ jobs:
             --repo centrifuge/apps-invest-v3 \
             --pattern "$ARTIFACT_NAME" \
             --dir ./${{ env.app-name }}
-
-          # Extract the zip file
           cd ./${{ env.app-name }}
           unzip "$ARTIFACT_NAME" -d dist
         env:
