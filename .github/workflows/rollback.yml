@@ -21,7 +21,7 @@ jobs:
     environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || null }}
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: launchpad-bundle*.zip
+      ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
       app-name: 'launchpad'
     steps:
       - name: '📥 Checkout code from release tag'
