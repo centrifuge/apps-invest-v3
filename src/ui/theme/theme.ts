@@ -15,6 +15,7 @@ const theme = defineConfig({
     body: {
       color: charcoalScale[500],
       backgroundColor: grayScale[300],
+      fontWeight: 400,
     },
   },
   theme: {
