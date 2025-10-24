@@ -17,7 +17,7 @@ export const paginationRecipe = defineSlotRecipe({
       borderTopRightRadius: '0',
       borderBottomRightRadius: '0',
       backgroundColor: 'bg.panel',
-      _disabled: { bg: 'bg.disabled', opacity: 1 },
+      _disabled: { bg: 'bg.disabled', color: 'fg.disabled', opacity: 1 },
     },
     nextTrigger: {
       borderTopLeftRadius: '0',
@@ -25,7 +25,7 @@ export const paginationRecipe = defineSlotRecipe({
       borderTopRightRadius: '8px',
       borderBottomRightRadius: '8px',
       backgroundColor: 'bg.panel',
-      _disabled: { bg: 'bg.disabled', opacity: 1 },
+      _disabled: { bg: 'bg.disabled', color: 'fg.disabled', opacity: 1 },
     },
   },
 })
