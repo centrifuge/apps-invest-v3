@@ -127,9 +127,6 @@ const meta: Meta<typeof DataTable> = {
     pageSize: {
       control: { type: 'number', min: 1, max: 100 },
     },
-    page: {
-      control: { type: 'number', min: 1 },
-    },
     hideActions: {
       control: { type: 'boolean' },
     },
@@ -194,7 +191,6 @@ export const Pagination: Story = {
     columns: basicColumns as any, // eslint-disable-line
     data: sampleData,
     pageSize: 3,
-    page: 1,
   },
   parameters: {
     docs: {

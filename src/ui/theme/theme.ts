@@ -1,14 +1,15 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 import { charcoalScale, grayScale, colors, colorTokens } from './baseStyles/colors'
-import { buttonRecipe } from './recipes/buttonRecipe'
-import { inputRecipe } from './recipes/inputRecipe'
-import { checkboxRecipe } from './recipes/checkboxRecipe'
-import { badgeRecipe } from './recipes/badgeRecipe'
+import { fonts } from './baseStyles/text'
 import { accordionRecipe } from './recipes/accordionRecipe'
-import { fonts } from 'src/ui/theme/baseStyles/text'
-import { textRecipe } from 'src/ui/theme/recipes/textRecipe'
-import { headingRecipe } from 'src/ui/theme/recipes/headingRecipe'
-import { cardRecipe } from 'src/ui/theme/recipes/cardRecipe'
+import { badgeRecipe } from './recipes/badgeRecipe'
+import { buttonRecipe } from './recipes/buttonRecipe'
+import { cardRecipe } from './recipes/cardRecipe'
+import { checkboxRecipe } from './recipes/checkboxRecipe'
+import { headingRecipe } from './recipes/headingRecipe'
+import { inputRecipe } from './recipes/inputRecipe'
+import { paginationRecipe } from './recipes/paginationRecipe'
+import { textRecipe } from './recipes/textRecipe'
 
 const theme = defineConfig({
   globalCss: {
@@ -37,6 +38,7 @@ const theme = defineConfig({
       accordion: accordionRecipe,
       card: cardRecipe,
       checkbox: checkboxRecipe,
+      pagination: paginationRecipe,
     },
   },
 })
