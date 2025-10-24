@@ -1,6 +1,6 @@
 export const fonts = {
-  heading: { value: 'Inter, ui-sans-serif' },
-  body: { value: 'Inter, ui-sans-serif' },
+  heading: { value: 'Inter, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  body: { value: 'Inter, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
 }
 
 export const textStylesValues = {
