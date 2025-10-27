@@ -43,13 +43,6 @@ const CHRONICLE_POOLS: Record<string, { name: string; ipfsUri: string }> = {
     ipfsUri:
       'ipfs://QmPgCBS2mUzYoGd5Zx5DRRU8tyHqunEGVjHKvgDf29TnwK?checksum=0x39f63929f6e561825ddb6f8a1b84fdced7e30f879f40b03771d2119f9ee61d04',
   },
-  // test accounts
-  '281474976710657': {
-    name: 'Sepolia Janus Henderson Anemoy Treasury Fund',
-    // ipfsUri: 'ipfs://QmZDmnQmcbC7wjMqr3pxusK1Dv67aHBjTDQTj8a7Hwb6eR',
-    ipfsUri:
-      'ipfs://QmPgCBS2mUzYoGd5Zx5DRRU8tyHqunEGVjHKvgDf29TnwK?checksum=0x39f63929f6e561825ddb6f8a1b84fdced7e30f879f40b03771d2119f9ee61d04',
-  },
 }
 
 export function useGetPoolsByIds() {

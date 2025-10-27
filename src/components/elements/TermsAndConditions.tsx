@@ -15,12 +15,12 @@ export function TermsAndConditions() {
       </Heading>
 
       <Box
-        bg="bg-primary"
+        bg="bg.solid"
         width="100%"
         padding={6}
         borderRadius={10}
         border="1px solid"
-        borderColor="border-primary"
+        borderColor="border.solid"
         shadow="xs"
       >
         <Text color="fg.muted" fontSize="sm">

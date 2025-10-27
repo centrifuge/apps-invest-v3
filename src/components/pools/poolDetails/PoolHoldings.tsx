@@ -1,36 +1,22 @@
 import { Heading, Text } from '@chakra-ui/react'
-import { type ColumnDefinition, Card, DataTable, formatHeaderLabel, normalizeCell } from '@ui'
+import { type ColumnDefinition, DataTable, formatHeaderLabel, normalizeCell } from '@ui'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
-import { useIpfsQuery } from '@cfg'
-import { type Positions, getChronicleHoldings } from '@utils/getChronicleHoldings'
 
 export function PoolHoldings() {
-  const { poolDetails, poolId } = usePoolContext()
-  const { isRestrictedPool, getChroniclePoolIpfsUri, getIsChroniclePool } = useGetPoolsByIds()
+  const { poolDetails } = usePoolContext()
+  const { isRestrictedPool } = useGetPoolsByIds()
 
-  // Try to fetch Chronicle holdings
-  const isChronicleVerified = getIsChroniclePool(poolId)
-  const chronicleIpfsUri = poolId && isChronicleVerified ? getChroniclePoolIpfsUri(poolId) : ''
-  const { data: chronicleData, isError, error } = useIpfsQuery(chronicleIpfsUri)
-  const {
-    hasChronicleHoldings,
-    headers: chronicleHeaders,
-    holdings: chronicleHoldings,
-  } = getChronicleHoldings(chronicleData)
-  // Try to fetch cfg metadata holdings
-  const cfgMetadataHoldings = poolDetails?.metadata?.holdings ?? { headers: [], data: [] }
-  const cfgMetadataHeaders = cfgMetadataHoldings?.headers ?? []
-  // Use Chronicle holdings else use cfg holdings
-  const holdings = hasChronicleHoldings ? chronicleHoldings : cfgMetadataHoldings?.data
-  const headers = hasChronicleHoldings ? chronicleHeaders : cfgMetadataHeaders
+  const holdings = poolDetails?.metadata?.holdings ?? { headers: [], data: [] }
+  holdings.data.forEach((h) => delete h.ISIN)
+  const headers = holdings?.headers.filter((h) => h !== 'ISIN') ?? []
 
   const holdingsData =
-    holdings?.map((row: Record<string, unknown> | Positions, i: number) => {
+    holdings?.data.map((row: Record<string, unknown>, i: number) => {
       const out: Record<string, unknown> = { id: i + 1 }
       headers.forEach((h) => {
-        const { display, sortVal } = normalizeCell(h, (row as Record<string, unknown>)[h])
+        const { display, sortVal } = normalizeCell(h, row[h])
         out[h] = display
         // we add this so we can keep the original data displayed nicely
         out[`__sort__${h}`] = sortVal
@@ -43,19 +29,10 @@ export function PoolHoldings() {
     header: formatHeaderLabel(h),
     accessor: h,
     sortKey: `__sort__${h}`,
-    justifyContent: i === 0 ? 'flex-start' : 'center',
-    textAlign: i === 0 ? 'left' : 'center',
+    textAlign: i === 0 ? 'start' : 'center',
   }))
 
-  const displayError = (error: Error) => (
-    <Card>
-      <Text color="fg.error" fontSize="sm">
-        Error: {error.message}
-      </Text>
-    </Card>
-  )
-
-  if (!isError && (!holdingsData || holdingsData.length === 0)) return null
+  if (!holdingsData || holdingsData.length === 0) return null
 
   return (
     <>
@@ -67,13 +44,7 @@ export function PoolHoldings() {
           Holdings shown are the approximate market value of invested assets only and do not reflect the total NAV of
           the pool.
         </Text>
-        {isError ? (
-          displayError(error)
-        ) : isRestrictedPool ? (
-          <InvestorsOnlyValueBlock />
-        ) : (
-          <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
-        )}
+        {isRestrictedPool ? <InvestorsOnlyValueBlock /> : <DataTable columns={holdingsColumns} data={holdingsData} />}
       </>
     </>
   )
