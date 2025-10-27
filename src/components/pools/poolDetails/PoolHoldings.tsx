@@ -29,8 +29,7 @@ export function PoolHoldings() {
     header: formatHeaderLabel(h),
     accessor: h,
     sortKey: `__sort__${h}`,
-    justifyContent: i === 0 ? 'flex-start' : 'center',
-    textAlign: i === 0 ? 'left' : 'center',
+    textAlign: i === 0 ? 'start' : 'center',
   }))
 
   if (!holdingsData || holdingsData.length === 0) return null
@@ -45,11 +44,7 @@ export function PoolHoldings() {
           Holdings shown are the approximate market value of invested assets only and do not reflect the total NAV of
           the pool.
         </Text>
-        {isRestrictedPool ? (
-          <InvestorsOnlyValueBlock />
-        ) : (
-          <DataTable columns={holdingsColumns} data={holdingsData} hideActions />
-        )}
+        {isRestrictedPool ? <InvestorsOnlyValueBlock /> : <DataTable columns={holdingsColumns} data={holdingsData} />}
       </>
     </>
   )
