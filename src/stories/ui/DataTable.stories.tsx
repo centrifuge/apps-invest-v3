@@ -37,10 +37,10 @@ const sampleData: SampleUser[] = [
 ]
 
 const basicColumns: ColumnDefinition<SampleUser>[] = [
-  { header: 'Name', accessor: 'name', sortKey: 'name', justifyContent: 'flex-start' },
-  { header: 'Email', accessor: 'email', sortKey: 'email', justifyContent: 'flex-start' },
-  { header: 'Age', accessor: 'age', textAlign: 'center', sortKey: 'age', justifyContent: 'center' },
-  { header: 'Role', accessor: 'role', sortKey: 'role', justifyContent: 'flex-start', textAlign: 'left' },
+  { header: 'Name', accessor: 'name', sortKey: 'name', textAlign: 'start' },
+  { header: 'Email', accessor: 'email', sortKey: 'email', textAlign: 'start' },
+  { header: 'Age', accessor: 'age', textAlign: 'center', sortKey: 'age' },
+  { header: 'Role', accessor: 'role', sortKey: 'role', textAlign: 'start' },
 ]
 
 const advancedColumns: ColumnDefinition<SampleUser>[] = [
@@ -49,7 +49,7 @@ const advancedColumns: ColumnDefinition<SampleUser>[] = [
     accessor: 'name',
     sortKey: 'name',
     width: '200px',
-    justifyContent: 'flex-start',
+    textAlign: 'start',
     render: (row) => (
       <Box className="test">
         <Text fontWeight="bold">{row.name}</Text>
@@ -65,20 +65,18 @@ const advancedColumns: ColumnDefinition<SampleUser>[] = [
     textAlign: 'center',
     sortKey: 'age',
     width: '80px',
-    justifyContent: 'center',
   },
   {
     header: 'Role',
     accessor: 'role',
     sortKey: 'role',
     width: '120px',
-    justifyContent: 'flex-start',
+    textAlign: 'start',
   },
   {
     header: 'Status',
     sortKey: 'status',
     textAlign: 'center',
-    justifyContent: 'center',
     width: '100px',
     render: (row) => (
       <Badge colorPalette={row.status === 'active' ? 'green' : 'red'} variant="solid" size="sm">
@@ -89,9 +87,8 @@ const advancedColumns: ColumnDefinition<SampleUser>[] = [
   {
     header: 'Salary',
     accessor: 'salary',
-    textAlign: 'right',
+    textAlign: 'end',
     sortKey: 'salary',
-    justifyContent: 'flex-end',
     width: '120px',
     render: (row) => (row.salary ? `$${row.salary.toLocaleString()}` : 'N/A'),
   },
@@ -126,9 +123,6 @@ const meta: Meta<typeof DataTable> = {
     },
     pageSize: {
       control: { type: 'number', min: 1, max: 100 },
-    },
-    hideActions: {
-      control: { type: 'boolean' },
     },
   },
 }
@@ -166,21 +160,6 @@ export const WithActions: Story = {
     docs: {
       description: {
         story: 'Table with action buttons in the last column.',
-      },
-    },
-  },
-}
-
-export const HiddenActions: Story = {
-  args: {
-    columns: basicColumns as any, // eslint-disable-line
-    data: dataWithActions,
-    hideActions: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Table with actions hidden, even when data has actions defined.',
       },
     },
   },
@@ -262,9 +241,9 @@ export const SingleColumn: Story = {
 export const NoSorting: Story = {
   args: {
     columns: [
-      { header: 'Name', accessor: 'name', textAlign: 'left', justifyContent: 'flex-start' },
-      { header: 'Email', accessor: 'email', textAlign: 'center', justifyContent: 'center' },
-      { header: 'Role', accessor: 'role', textAlign: 'right', justifyContent: 'flex-end' },
+      { header: 'Name', accessor: 'name', textAlign: 'left' },
+      { header: 'Email', accessor: 'email', textAlign: 'center' },
+      { header: 'Role', accessor: 'role', textAlign: 'right' },
     ] as any, // eslint-disable-line
     data: sampleData,
   },
