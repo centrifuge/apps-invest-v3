@@ -33,6 +33,9 @@ jobs:
           npm install -g wrangler@4.33.1          
       - name: version id setup
         id: wrangler-command
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
+          CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}        
         run: |
           WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
           WRANGLER_ENV="prod"
