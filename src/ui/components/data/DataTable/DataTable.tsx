@@ -90,8 +90,6 @@ export const DataTable = <RowType extends { id?: string | number }>({
     }
   }, [data.length, pageSize, currentPage, paginationMode, setCurrentPage])
 
-  console.log({ sortedAndPaginatedData, pageSize })
-
   // Determine number of skeleton rows to show
   const skeletonRows = Array.from(Array(skeletonRowNumber ?? pageSize).keys())
   const skeletonColumns = Array.from(Array(columns.length).keys())
