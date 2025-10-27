@@ -3,13 +3,6 @@ name: '🔄 Manual Rollback'
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment to roll back'
-        required: true
-        type: choice
-        options:
-          - staging
-          - prod
       tag:
         description: 'Release tag to roll back to (e.g., v1.1.6)'
         required: true
@@ -17,10 +10,8 @@ on:
 
 jobs:
   rollback:
-    name: 'Rollback to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
+    name: 'Rollback to ${{ github.event.inputs.tag }}'
     runs-on: ubuntu-latest
-    env:
-      APP_DIR: launchpad
 
     steps:
       - name: '📥 Checkout Code from Release Tag'
