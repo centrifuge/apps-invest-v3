@@ -90,6 +90,8 @@ export const DataTable = <RowType extends { id?: string | number }>({
     }
   }, [data.length, pageSize, currentPage, paginationMode, setCurrentPage])
 
+  console.log({ sortedAndPaginatedData, pageSize })
+
   // Determine number of skeleton rows to show
   const skeletonRows = Array.from(Array(skeletonRowNumber ?? pageSize).keys())
   const skeletonColumns = Array.from(Array(columns.length).keys())
@@ -98,7 +100,7 @@ export const DataTable = <RowType extends { id?: string | number }>({
     <Stack gap={0}>
       {/* Chakra UI Table has a bug where the border is not applied to the table root
           This is a workaround to apply the border to the table root */}
-      <Box borderRadius="lg" border="1px solid" borderColor="border.solid" overflow="hidden">
+      <Box borderRadius="lg" border="1px solid" borderColor="border.solid" overflow="auto">
         <Table.Root size={size} overflow="hidden" border="none">
           <Table.Header>
             <Table.Row bg="bg.muted">

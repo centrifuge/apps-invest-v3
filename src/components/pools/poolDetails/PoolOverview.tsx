@@ -46,28 +46,23 @@ export function PoolOverview() {
     { label: 'Pool structure', value: poolDetails?.metadata?.pool.poolStructure || 'Unknown' },
     {
       label: ' Rating',
-      value: (
-        <>
-          {metadata?.pool.poolRatings ? (
-            <Flex alignItems="center" justifyContent="flex-end">
-              {metadata?.pool.poolRatings?.map((rating) => {
-                const agency = getAgencyNormalisedName(rating.agency)
-                const normalisedRating = {
-                  ...rating,
-                  agency,
-                }
-                return (
-                  <Box ml={2} key={rating.agency}>
-                    <RatingPill rating={normalisedRating} />
-                  </Box>
-                )
-              })}
-            </Flex>
-          ) : (
-            '-'
-          )}
-        </>
-      ),
+      value:
+        metadata?.pool.poolRatings && metadata?.pool.poolRatings[0].value ? (
+          <Flex alignItems="center" justifyContent="flex-end">
+            {metadata?.pool.poolRatings?.map((rating) => {
+              const agency = getAgencyNormalisedName(rating.agency)
+              const normalisedRating = {
+                ...rating,
+                agency,
+              }
+              return (
+                <Box ml={2} key={rating.agency}>
+                  <RatingPill rating={normalisedRating} />
+                </Box>
+              )
+            })}
+          </Flex>
+        ) : null,
     },
     // Todo: expense ratio in the future would come from onchain and not metadata
     { label: 'Expense ratio', value: (poolDetails?.metadata?.pool as any)?.expenseRatio || 'Unknown' },
