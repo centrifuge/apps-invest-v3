@@ -3,13 +3,6 @@ name: '🔄 Manual Rollback'
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment to roll back'
-        required: true
-        type: choice
-        options:
-          - staging
-          - prod
       tag:
         description: 'Release tag to roll back to (e.g., v1.1.6)'
         required: true
@@ -17,37 +10,44 @@ on:
 
 jobs:
   rollback:
-    name: 'Rollback to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
+    permissions:
+      contents: read
+    name: 'Rollback to ${{ github.event.inputs.tag }}'
     runs-on: ubuntu-latest
-    env:
-      ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
-      APP_DIR: launchpad
-
+    environment: 
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code from Release Tag'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag }}
-
-      - name: '📦 Download Release Artifact'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p $APP_DIR
-          echo "⬇️  Downloading $ARTIFACT_NAME from release ${{ github.event.inputs.tag }}"
-          gh release download ${{ github.event.inputs.tag }} \
-            --repo ${{ github.repository }} \
-            --pattern "$ARTIFACT_NAME" \
-            --dir "$APP_DIR"
-
-          cd "$APP_DIR"
-          unzip -q "$ARTIFACT_NAME" -d dist
-          echo "✅ Artifact extracted to $APP_DIR/dist"
-
-      - name: '🚀 Deploy Rollback to Cloudflare'
-        uses: ./.github/actions/deploy-app
+      - name: '📦 Setup pnpm (for Wrangler)'
+        uses: pnpm/action-setup@v3
         with:
-          environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || 'staging' }}
-          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 10
+      - name: '📦 Install Wrangler'
+        shell: sh
+        run: |
+          npm install -g wrangler@4.33.1          
+      - name: version id setup
+        id: wrangler-command
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}        
+        run: |
+          WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
+          WRANGLER_ENV="prod"
+          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ inputs.tag }}\") | .id" | head -1)
+          CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
+          echo "cmd=$CMD" >> $GITHUB_OUTPUT
+
+      - name: '🚀 Deploy to Cloudflare'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: ${{ steps.wrangler-command.outputs.cmd }}
+          wranglerVersion: "4.45.0"
+        id: deploy
