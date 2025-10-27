@@ -20,7 +20,6 @@ jobs:
     name: 'Rollback to ${{ github.event.inputs.tag }} on ${{ github.event.inputs.environment }}'
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_NAME: launchpad-bundle${{ github.event.inputs.tag }}.zip
       APP_DIR: launchpad
 
     steps:
@@ -29,25 +28,21 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag }}
 
-      - name: '📦 Download Release Artifact'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p $APP_DIR
-          echo "⬇️  Downloading $ARTIFACT_NAME from release ${{ github.event.inputs.tag }}"
-          gh release download ${{ github.event.inputs.tag }} \
-            --repo ${{ github.repository }} \
-            --pattern "$ARTIFACT_NAME" \
-            --dir "$APP_DIR"
+      - name: version id setup
+        id: wrangler-command
+        run |
+          WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
+          WRANGLER_ENV="prod"
+          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ inputs.tag }}\") | .id" | head -1)
+          CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
+          echo "cmd=$CMD" >> $GITHUB_OUTPUT
 
-          cd "$APP_DIR"
-          unzip -q "$ARTIFACT_NAME" -d dist
-          echo "✅ Artifact extracted to $APP_DIR/dist"
-
-      - name: '🚀 Deploy Rollback to Cloudflare'
-        uses: ./.github/actions/deploy-app
+      - name: '🚀 Deploy to Cloudflare'
+        uses: cloudflare/wrangler-action@v3
         with:
-          environment: ${{ github.event.inputs.environment == 'prod' && 'prod' || 'staging' }}
-          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: ${{ steps.wrangler-command.outputs.cmd }}
+          wranglerVersion: "4.33.1"
+        id: deploy
