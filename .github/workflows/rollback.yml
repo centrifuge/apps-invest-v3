@@ -8,11 +8,10 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: read
-
 jobs:
   rollback:
+    permissions:
+      contents: read
     name: 'Rollback to ${{ github.event.inputs.tag }}'
     runs-on: ubuntu-latest
     environment: 
