@@ -34,8 +34,8 @@ jobs:
       - name: version id setup
         id: wrangler-command
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
-          CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}        
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}        
         run: |
           WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
           WRANGLER_ENV="prod"
