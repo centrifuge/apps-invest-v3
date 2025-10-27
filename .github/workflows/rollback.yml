@@ -27,6 +27,10 @@ jobs:
         uses: pnpm/action-setup@v3
         with:
           version: 10
+      - name: '📦 Install Wrangler'
+        shell: sh
+        run: |
+          npm install -g wrangler@4.33.1          
       - name: version id setup
         id: wrangler-command
         run: |
@@ -43,5 +47,5 @@ jobs:
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           command: ${{ steps.wrangler-command.outputs.cmd }}
-          wranglerVersion: "4.33.1"
+          wranglerVersion: "4.45.0"
         id: deploy
