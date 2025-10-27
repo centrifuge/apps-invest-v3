@@ -21,7 +21,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag }}
-
+      - name: '📦 Setup pnpm (for Wrangler)'
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
       - name: version id setup
         id: wrangler-command
         run: |
