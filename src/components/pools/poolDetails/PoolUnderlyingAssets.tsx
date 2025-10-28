@@ -1,11 +1,15 @@
-import { usePoolDetails } from '@cfg'
+import { Link } from 'react-router-dom'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
+import { chainExplorer, usePoolDetails } from '@cfg'
 import { ChronicleBadge } from '@components/elements/ChronicleBadge'
 import { usePoolContext } from '@contexts/PoolContext'
+import { useVaultsContext } from '@contexts/VaultsContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
+import { NetworkIcon, Tooltip } from '@ui'
 
 export function PoolUnderlyingAssets() {
-  const { poolDetails, pools, poolId } = usePoolContext()
+  const { networks, poolDetails, pools, poolId } = usePoolContext()
+  const { investment } = useVaultsContext()
   const { getIsChroniclePool } = useGetPoolsByIds()
 
   // Get underlying pool metadata
@@ -17,12 +21,32 @@ export function PoolUnderlyingAssets() {
   const underlyingMetadata = underlyingPoolDetails?.metadata
   const underlyingShareClass = underlyingMetadata ? Object.values(underlyingMetadata.shareClasses)[0] : undefined
   const underlyingApy = underlyingShareClass?.apyPercentage ? `${underlyingShareClass.apyPercentage}%` : '-'
+  const underlyingAssetAddress = investment?.shareCurrency.address
 
   const items = [
     { label: 'Fund', value: underlyingMetadata?.pool.name ?? '-' },
     { label: 'Asset type', value: underlyingMetadata?.pool.asset.subClass ?? '-' },
     { label: 'APY', value: underlyingApy },
     { label: 'Investor type', value: underlyingMetadata?.pool.investorType || 'Non-US Professional' },
+    {
+      label: 'Available networks',
+      value: (
+        <Flex gap={1}>
+          {networks?.map((network, index) => (
+            <Tooltip key={network.chainId} content={<Text>View transactions</Text>}>
+              <Link
+                to={underlyingAssetAddress ? `${chainExplorer[network.chainId]}/token/${underlyingAssetAddress}` : ''}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ marginRight: '-10px' }}
+              >
+                <NetworkIcon key={index} networkId={network.chainId} />
+              </Link>
+            </Tooltip>
+          ))}
+        </Flex>
+      ),
+    },
     // Todo: expense ratio in the future would come from onchain and not metadata
     { label: 'Expense ratio', value: (underlyingMetadata?.pool as any)?.expenseRatio || 'Unknown' },
     {
