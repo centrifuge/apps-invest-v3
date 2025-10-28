@@ -19,8 +19,8 @@ export function PoolUnderlyingAssets() {
   const underlyingApy = underlyingShareClass?.apyPercentage ? `${underlyingShareClass.apyPercentage}%` : '-'
 
   const items = [
-    { label: 'Fund', value: underlyingMetadata?.pool.name ?? '-' },
-    { label: 'Asset type', value: underlyingMetadata?.pool.asset.subClass ?? '-' },
+    { label: 'Fund', value: underlyingMetadata?.pool.name ?? null },
+    { label: 'Asset type', value: underlyingMetadata?.pool.asset.subClass ?? null },
     { label: 'APY', value: underlyingApy },
     { label: 'Investor type', value: underlyingMetadata?.pool.investorType || 'Non-US Professional' },
     // Todo: expense ratio in the future would come from onchain and not metadata
