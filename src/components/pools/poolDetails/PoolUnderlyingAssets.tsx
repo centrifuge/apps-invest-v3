@@ -24,8 +24,8 @@ export function PoolUnderlyingAssets() {
   const underlyingAssetAddress = investment?.shareCurrency.address
 
   const items = [
-    { label: 'Fund', value: underlyingMetadata?.pool.name ?? '-' },
-    { label: 'Asset type', value: underlyingMetadata?.pool.asset.subClass ?? '-' },
+    { label: 'Fund', value: underlyingMetadata?.pool.name ?? null },
+    { label: 'Asset type', value: underlyingMetadata?.pool.asset.subClass ?? null },
     { label: 'APY', value: underlyingApy },
     { label: 'Investor type', value: underlyingMetadata?.pool.investorType || 'Non-US Professional' },
     {
