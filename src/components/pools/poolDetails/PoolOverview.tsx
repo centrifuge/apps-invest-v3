@@ -1,12 +1,12 @@
-import { chainExplorer, formatBalance } from '@cfg'
-import { NetworkIcon, Tooltip } from '@ui'
+import { Link } from 'react-router-dom'
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
+import { chainExplorer, formatBalance } from '@cfg'
+import { ChronicleBadge } from '@components/elements/ChronicleBadge'
 import { getAgencyNormalisedName, RatingPill } from '@components/elements/RatingPill'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
-import { Link } from 'react-router-dom'
-import { ChronicleBadge } from '@components/elements/ChronicleBadge'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
+import { NetworkIcon, Tooltip } from '@ui'
 
 export function PoolOverview() {
   const { networks, poolDetails, poolId, shareClass, shareClassId } = usePoolContext()
@@ -35,6 +35,7 @@ export function PoolOverview() {
                 to={underlyingAssetAddress ? `${chainExplorer[network.chainId]}/token/${underlyingAssetAddress}` : ''}
                 target="_blank"
                 rel="noopener noreferrer"
+                style={{ marginRight: '-10px' }}
               >
                 <NetworkIcon key={index} networkId={network.chainId} />
               </Link>
