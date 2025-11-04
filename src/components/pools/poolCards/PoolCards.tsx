@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Box, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { PoolDetails, useAllPoolDetails } from '@cfg'
+import { PoolDetails, useAllPoolDetails, useDebugFlags } from '@cfg'
 import { PoolCardsSkeleton } from '@components/skeletons/PoolCardsSkeleton'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { routePaths } from '@routes/routePaths'
@@ -22,6 +22,7 @@ interface PoolCardsProps {
 }
 
 export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
+  const { showMainnet } = useDebugFlags()
   const { data: pools, isLoading } = useAllPoolDetails(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool } = useGetPoolsByIds()
 
@@ -40,7 +41,8 @@ export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
     () => allPools?.filter((pool) => getIsProductionPool(pool.id)),
     [allPools, getIsProductionPool]
   )
-  const displayPools = import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet' ? allPools : productionPools
+  const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
+  const displayPools = isMainnet ? productionPools : allPools
   const rwaPools = displayPools?.filter((pool) => pool.isRwaPool) ?? []
   const deRwaPools = displayPools?.filter((pool) => !pool.isRwaPool) ?? []
 
