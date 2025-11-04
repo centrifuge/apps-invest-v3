@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
-import { CentrifugeProvider, DebugFlags, TransactionProvider } from '@cfg'
+import { CentrifugeProvider, DebugFlags, TransactionProvider, useDebugFlags } from '@cfg'
 import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
@@ -36,7 +36,10 @@ const TESTNET_RPC_URLS = {
   11142220: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
-export default function Root() {
+function RootProviders() {
+  const { showMainnet } = useDebugFlags()
+  const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
+
   /**
    * Initialize Centrifuge SDK with any necessary config.
    * We memoize it to ensure it is created only once.
@@ -45,43 +48,94 @@ export default function Root() {
    * Be sure to always use the same instance of Centrifuge SDK throughout the app,
    * from `useCentrifuge()` set in `CentrifugeProvider`.
    */
+  const centrifuge = useMemo(() => {
+    const indexerUrl = isMainnet ? import.meta.env.VITE_INDEXER_URL_MAINNET : import.meta.env.VITE_INDEXER_URL_TESTNET
 
-  const centrifuge = useMemo(
+    return new Centrifuge({
+      environment: isMainnet ? 'mainnet' : 'testnet',
+      indexerUrl,
+      rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
+      pollingInterval: 15000,
+    })
+  }, [showMainnet])
+
+  /**
+   * For WalletProvider networks, we need to include ALL possible networks (mainnet + testnet)
+   * because AppKit cannot dynamically update networks after initialization.
+   * The actual environment switching (mainnet vs testnet) is handled by the Centrifuge SDK above.
+   * In development with showMainnet debug flag, users can connect to any network,
+   * but the app data (pools, vaults, etc.) will be filtered based on the Centrifuge environment.
+   */
+  const mainnetCentrifuge = useMemo(
     () =>
       new Centrifuge({
-        environment: import.meta.env.VITE_CENTRIFUGE_ENV,
-        indexerUrl: import.meta.env.VITE_INDEXER_URL,
-        rpcUrls: import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet' ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
+        environment: 'mainnet',
+        indexerUrl: import.meta.env.VITE_INDEXER_URL_MAINNET,
+        rpcUrls: MAINNET_RPC_URLS,
         pollingInterval: 15000,
       }),
     []
   )
 
-  // Add bnb chain if not present in centrifuge chains
-  const bnbChainId = import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet' ? 97 : 56
-  const bnbNetwork = import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet' ? bscTestnet : bsc
-  const networks = useMemo(() => centrifuge.chains.map((cid) => centrifuge.getChainConfig(cid)), [centrifuge])
-  const providerNetworks = centrifuge.chains.includes(bnbChainId) ? networks : [bnbNetwork, ...networks]
+  const testnetCentrifuge = useMemo(
+    () =>
+      new Centrifuge({
+        environment: 'testnet',
+        indexerUrl: import.meta.env.VITE_INDEXER_URL_TESTNET,
+        rpcUrls: TESTNET_RPC_URLS,
+        pollingInterval: 15000,
+      }),
+    []
+  )
+
+  // Get networks from both mainnet and testnet Centrifuge instances
+  const mainnetNetworks = useMemo(
+    () => mainnetCentrifuge.chains.map((cid) => mainnetCentrifuge.getChainConfig(cid)),
+    [mainnetCentrifuge]
+  )
+  const testnetNetworks = useMemo(
+    () => testnetCentrifuge.chains.map((cid) => testnetCentrifuge.getChainConfig(cid)),
+    [testnetCentrifuge]
+  )
+
+  // Combine all networks for wallet provider (AppKit needs all networks upfront)
+  const allNetworks = useMemo(() => {
+    const networks = [...mainnetNetworks, ...testnetNetworks]
+    // Add BNB chains if not already present
+    const mainnetBnbId = 56
+    const testnetBnbId = 97
+    const hasMainnetBnb = networks.some((n) => n.id === mainnetBnbId)
+    const hasTestnetBnb = networks.some((n) => n.id === testnetBnbId)
+
+    if (!hasMainnetBnb) networks.push(bsc)
+    if (!hasTestnetBnb) networks.push(bscTestnet)
+
+    return networks
+  }, [mainnetNetworks, testnetNetworks])
 
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        <CentrifugeProvider client={centrifuge}>
-          <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={providerNetworks}>
-            <TransactionProvider>
-              <PoolProvider>
-                <VaultsProvider>
-                  <DebugFlags>
-                    <LoadingProvider>
-                      <Outlet />
-                    </LoadingProvider>
-                  </DebugFlags>
-                </VaultsProvider>
-              </PoolProvider>
-            </TransactionProvider>
-          </WalletProvider>
-        </CentrifugeProvider>
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <CentrifugeProvider client={centrifuge}>
+        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={allNetworks}>
+          <TransactionProvider>
+            <PoolProvider>
+              <VaultsProvider>
+                <LoadingProvider>
+                  <Outlet />
+                </LoadingProvider>
+              </VaultsProvider>
+            </PoolProvider>
+          </TransactionProvider>
+        </WalletProvider>
+      </CentrifugeProvider>
+    </QueryClientProvider>
+  )
+}
+
+export default function Root() {
+  return (
+    <DebugFlags>
+      <RootProviders />
+    </DebugFlags>
   )
 }

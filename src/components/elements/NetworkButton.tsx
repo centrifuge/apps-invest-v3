@@ -1,16 +1,44 @@
 import { NetworkIcon } from '@ui'
 import { Box, Button, ButtonProps, Icon, Portal, VStack, useDisclosure } from '@chakra-ui/react'
 import { useChains, useChainId, useSwitchChain } from 'wagmi'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
+import { useDebugFlags } from '@cfg'
+
+// Mainnet chain IDs
+const MAINNET_CHAIN_IDS = [
+  1, // Ethereum
+  8453, // Base
+  42161, // Arbitrum
+  43114, // Avalanche
+  42220, // Celo
+  56, // BSC
+]
+
+// Testnet chain IDs
+const TESTNET_CHAIN_IDS = [
+  11155111, // Sepolia
+  84532, // Base Sepolia
+  421612, // Arbitrum Sepolia
+  431142, // Avalanche Fuji
+  11142220, // Celo Alfajores
+  97, // BSC Testnet
+]
 
 export function NetworkButton(props: ButtonProps) {
-  const chains = useChains()
+  const allChains = useChains()
+  const { showMainnet } = useDebugFlags()
   const connectedChain = useChainId()
   const { switchChain } = useSwitchChain()
   const { open, onToggle, onClose } = useDisclosure()
   const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const chains = useMemo(() => {
+    const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
+    const allowedChainIds = isMainnet ? MAINNET_CHAIN_IDS : TESTNET_CHAIN_IDS
+    return allChains.filter((chain) => allowedChainIds.includes(chain.id))
+  }, [allChains, showMainnet])
 
   const handleChainSwitch = (chainId: number) => {
     switchChain({ chainId })
@@ -80,7 +108,7 @@ export function NetworkButton(props: ButtonProps) {
           >
             <VStack gap={2} align="stretch">
               {chains
-                .filter((chain) => chain.id !== connectedChain)
+                .filter((chain) => connectedChain && chain.id !== connectedChain)
                 .map((chain) => (
                   <Box
                     key={chain.id}

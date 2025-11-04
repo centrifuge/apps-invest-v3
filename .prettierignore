@@ -2,4 +2,5 @@ dist
 node_modules
 public
 wrangler.toml
-
+CLAUDE.md
+.claude
