@@ -32,7 +32,7 @@ export type DebugFlagConfig =
       alwaysShow?: boolean
     }
 
-export type Key = 'address' | 'persistDebugFlags'
+export type Key = 'address' | 'persistDebugFlags' | 'showMainnet'
 
 export const flagsConfig = {
   address: {
@@ -42,6 +42,11 @@ export const flagsConfig = {
   persistDebugFlags: {
     alwaysShow: true,
     default: !!localStorage?.getItem('debugFlags'),
+    type: 'checkbox',
+  },
+  showMainnet: {
+    alwaysShow: true,
+    default: false,
     type: 'checkbox',
   },
 } satisfies Record<Key, DebugFlagConfig>
