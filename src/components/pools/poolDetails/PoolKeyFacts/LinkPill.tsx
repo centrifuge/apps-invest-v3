@@ -13,11 +13,7 @@ function isSafeUrl(url: string): boolean {
   if (!url) return false
   const trimmedUrl = url.trim().toLowerCase()
   // Block dangerous protocols
-  if (
-    trimmedUrl.startsWith('javascript:') ||
-    trimmedUrl.startsWith('data:') ||
-    trimmedUrl.startsWith('vbscript:')
-  ) {
+  if (trimmedUrl.startsWith('javascript:') || trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('vbscript:')) {
     return false
   }
   return true
@@ -25,7 +21,7 @@ function isSafeUrl(url: string): boolean {
 
 export const LinkPill = ({ href, label, ...rest }: LinkPillProps) => {
   const safeHref = href && isSafeUrl(href) ? href : undefined
-  
+
   if (safeHref) {
     return (
       <a href={safeHref} target="_blank" rel="noopener noreferrer">
