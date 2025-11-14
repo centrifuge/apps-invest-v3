@@ -36,9 +36,28 @@ const TESTNET_RPC_URLS = {
   11142220: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
+// Solana RPC configuration
+const SOLANA_RPC_URLS = {
+  mainnet: 'https://api.mainnet-beta.solana.com',
+  testnet: 'https://api.testnet.solana.com',
+  devnet: 'https://api.devnet.solana.com',
+}
+
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
+
+  const solanaRpcUrl = useMemo(() => {
+    if (import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet') {
+      return SOLANA_RPC_URLS.mainnet
+    }
+    // TODO: decide if we want to use testnet
+    if (import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet') {
+      return SOLANA_RPC_URLS.devnet ?? SOLANA_RPC_URLS.testnet
+    }
+    // Development: use devnet
+    return SOLANA_RPC_URLS.devnet
+  }, [])
 
   /**
    * Initialize Centrifuge SDK with any necessary config.
@@ -56,8 +75,12 @@ function RootProviders() {
       indexerUrl,
       rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
       pollingInterval: 15000,
+      solana: {
+        rpcUrl: solanaRpcUrl,
+        commitment: 'confirmed',
+      },
     })
-  }, [showMainnet])
+  }, [showMainnet, solanaRpcUrl])
 
   /**
    * For WalletProvider networks, we need to include ALL possible networks (mainnet + testnet)
@@ -116,7 +139,11 @@ function RootProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={allNetworks}>
+        <WalletProvider
+          projectId={import.meta.env.VITE_REOWN_APP_ID!}
+          evmNetworks={allNetworks}
+          solanaRpcUrl={solanaRpcUrl}
+        >
           <TransactionProvider>
             <PoolProvider>
               <VaultsProvider>

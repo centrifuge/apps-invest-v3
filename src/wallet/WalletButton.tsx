@@ -1,14 +1,7 @@
 import { useAppKit } from '@reown/appkit/react'
-import type { Address } from 'viem'
 import { Button, ButtonColorPalette, ButtonVariant } from '@ui'
-import { useAddress } from '@cfg'
-
-function truncateAddress(string: Address) {
-  const first = string.slice(0, 7)
-  const last = string.slice(-7)
-
-  return `${first}...${last}`
-}
+import { useWalletConnection } from './useWalletConnection'
+import { truncateAddress } from '@wallet/addressUtils'
 
 export function WalletButton({
   colorPalette = ['black', 'black'],
@@ -21,25 +14,15 @@ export function WalletButton({
   const [connectedBtnVariant, disconnectedBtnVariant] = variant
 
   const { open } = useAppKit()
-  const { isConnected, address } = useAddress()
+  const { isConnected, address } = useWalletConnection()
 
   const handleConnect = () => {
     open()
   }
 
-  return isConnected && address ? (
-    <Button
-      onClick={handleConnect}
-      label={truncateAddress(address)}
-      colorPalette={connectedBtnColor}
-      variant={connectedBtnVariant}
-    />
-  ) : (
-    <Button
-      onClick={handleConnect}
-      label="Connect wallet"
-      colorPalette={disconnectedBtnColor}
-      variant={disconnectedBtnVariant}
-    />
-  )
+  const btnColorPalette = isConnected ? connectedBtnColor : disconnectedBtnColor
+  const btnVariant = isConnected ? connectedBtnVariant : disconnectedBtnVariant
+  const label = isConnected && address ? truncateAddress(address) : 'Connect wallet'
+
+  return <Button onClick={handleConnect} label={label} colorPalette={btnColorPalette} variant={btnVariant} />
 }
