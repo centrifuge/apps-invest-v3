@@ -53,12 +53,12 @@ This document describes the Solana wallet integration added to the Centrifuge In
 
 - Updated to use `useWalletConnection()` instead of `useAddress()`
 - Added support for displaying both EVM and Solana addresses
-- Adjusted address truncation based on wallet type (Solana addresses use shorter truncation)
+- Adjusted address truncation based on wallet type
 
 #### `src/components/elements/NetworkButton.tsx`
 
 - Added Solana network detection
-- When connected to Solana wallet, displays "Solana" (network switching not yet implemented for Solana)
+- When connected to Solana wallet, displays Solana logo
 - EVM network switching remains unchanged
 
 #### `src/cfg/hooks/useAddress.ts`
@@ -66,11 +66,6 @@ This document describes the Solana wallet integration added to the Centrifuge In
 - **BREAKING CHANGE**: Now returns extended interface with multi-chain support
 - Added `evmAddress` property for backward compatibility with Centrifuge SDK calls
 - Centrifuge SDK operations (pools, vaults, investments) **must** use `evmAddress` instead of `address`
-
-#### Files updated to use `evmAddress`:
-
-- `src/cfg/hooks/useInvestor.ts` - Changed to use `evmAddress` for SDK calls
-- `src/cfg/hooks/useVaults.ts` - Changed to use `evmAddress` for investment queries
 
 ## Architecture Notes
 
@@ -141,8 +136,8 @@ pnpm dev
 
 #### When Solana Wallet Connected:
 
-- ✅ Wallet button shows truncated Solana address (e.g., `abcd...efgh`)
-- ✅ Network button shows "Solana" (not clickable)
+- ✅ Wallet button shows truncated Solana address (e.g., `abcdef...ghij`)
+- ✅ Network button shows Solana logo (not clickable)
 - ⚠️ Pool/vault queries will not return data (Centrifuge SDK is EVM-only)
 - ⚠️ Investment operations disabled (requires EVM wallet)
 
@@ -151,21 +146,18 @@ pnpm dev
 ### Immediate Next Steps
 
 1. **Solana Transaction Support**: Implement transaction signing for Solana operations
-2. **Network Switching**: Add Solana cluster switching (mainnet/testnet/devnet)
-3. **Connection Guards**: Add UI warnings when Solana wallet is connected for EVM-only features
+2. **Connection Guards**: Add UI warnings when Solana wallet is connected for EVM-only features
 
 ### Long-term Considerations
 
 1. **Dual Wallet Support**: Allow simultaneous EVM + Solana wallet connections
-2. **Solana Pool Integration**: If Centrifuge expands to Solana, add Solana-specific pool queries
-3. **Address Validation**: Add user-facing validation when entering addresses manually
-4. **Transaction Abstraction**: Create unified transaction interface for both chains
+2. **Solana Pool Integration**: If Centrifuge expands to Solana, add Solana-specific pool queries if necessary
+3. **Transaction Abstraction**: Create unified transaction interface for both chains
 
 ## Known Limitations
 
-1. **No Solana SDK Support**: The Centrifuge SDK only supports EVM chains. Solana wallet connections are UI-only at this stage.
-2. **No Solana Network Switching**: The network button for Solana is static (doesn't allow switching between mainnet/testnet/devnet).
-3. **Type Assertion Required**: WalletProvider uses `as any` for the adapters array due to type version mismatches between packages.
+1. **No Solana SDK Support**: The Centrifuge SDK currently only supports EVM chains.
+2. **Type Assertion Required**: WalletProvider uses `as any` for the adapters array due to type version mismatches between packages.
 
 ## Troubleshooting
 
@@ -188,8 +180,3 @@ pnpm install
 If you see type errors about `address` not being assignable to `0x${string}`:
 
 - Ensure you're using `evmAddress` instead of `address` for Centrifuge SDK calls
-- Check that `useAddress()` import is from the correct path
-
-## Questions?
-
-For issues or questions about this integration, please contact the development team or create an issue in the repository.
