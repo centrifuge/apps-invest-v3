@@ -36,7 +36,6 @@ const TESTNET_RPC_URLS = {
   11142220: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
-// Solana RPC configuration
 const SOLANA_RPC_URLS = {
   mainnet: 'https://api.mainnet-beta.solana.com',
   testnet: 'https://api.testnet.solana.com',
@@ -122,7 +121,7 @@ function RootProviders() {
   )
 
   // Combine all networks for wallet provider (AppKit needs all networks upfront)
-  const allNetworks = useMemo(() => {
+  const evmNetworks = useMemo(() => {
     const networks = [...mainnetNetworks, ...testnetNetworks]
     // Add BNB chains if not already present
     const mainnetBnbId = 56
@@ -141,7 +140,7 @@ function RootProviders() {
       <CentrifugeProvider client={centrifuge}>
         <WalletProvider
           projectId={import.meta.env.VITE_REOWN_APP_ID!}
-          evmNetworks={allNetworks}
+          evmNetworks={evmNetworks}
           solanaRpcUrl={solanaRpcUrl}
         >
           <TransactionProvider>
