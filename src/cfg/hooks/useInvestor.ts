@@ -10,8 +10,8 @@ interface Options {
 
 export function useInvestor() {
   const centrifuge = useCentrifuge()
-  const { address } = useAddress()
-  const investor$ = useMemo(() => (address ? centrifuge.investor(address) : undefined), [address, centrifuge])
+  const { evmAddress } = useAddress()
+  const investor$ = useMemo(() => (evmAddress ? centrifuge.investor(evmAddress) : undefined), [evmAddress, centrifuge])
   return useObservable(investor$)
 }
 
