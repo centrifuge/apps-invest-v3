@@ -15,21 +15,21 @@ export function useGetPendingInvestments() {
   const calculatedInvestSharesEstimate = useMemo(() => {
     if (
       !investment ||
-      !investment.pendingInvestCurrency ||
-      investment.pendingInvestCurrency.isZero() ||
+      !investment.pendingDepositAssets ||
+      investment.pendingDepositAssets.isZero() ||
       !pricePerShare
     ) {
       return undefined
     }
 
-    const investAmountBigint = investment.pendingInvestCurrency.toBigInt()
+    const investAmountBigint = investment.pendingDepositAssets.toBigInt()
     const pricePerShareBigint = pricePerShare.toBigInt()
 
     return divideBigInts(investAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
-      investment.pendingInvestCurrency.decimals,
+      investment.pendingDepositAssets.decimals,
       2
     )
-  }, [investment?.pendingInvestCurrency, pricePerShare])
+  }, [investment?.pendingDepositAssets, pricePerShare])
 
   const calculatedRedeemAmountEstimate = useMemo(() => {
     if (!investment || !investment?.pendingRedeemShares || investment?.pendingRedeemShares.isZero() || !pricePerShare) {
@@ -41,17 +41,17 @@ export function useGetPendingInvestments() {
 
   return {
     investment,
-    investmentCurrency: investment?.investmentCurrency,
-    pendingInvestCurrency: investment?.pendingInvestCurrency,
-    shareCurrency: investment?.shareCurrency,
+    asset: investment?.asset,
+    pendingDepositAssets: investment?.pendingDepositAssets,
+    share: investment?.share,
     pendingRedeemShares: investment?.pendingRedeemShares,
     calculatedInvestSharesEstimate,
     calculatedRedeemAmountEstimate,
     hasPendingRedeems: !!(investment && investment.pendingRedeemShares && !investment.pendingRedeemShares.isZero()),
     hasPendingInvestments: !!(
       investment &&
-      investment.pendingInvestCurrency &&
-      !investment.pendingInvestCurrency.isZero()
+      investment.pendingDepositAssets &&
+      !investment.pendingDepositAssets.isZero()
     ),
   }
 }

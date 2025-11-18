@@ -17,7 +17,7 @@ export function PoolOverview() {
   const metadataShareClass = shareClassId ? metadata?.shareClasses[shareClassId.toString()] : undefined
   const apyPercentage = shareClass?.details.apyPercentage || metadataShareClass?.apyPercentage
   const apy = shareClass?.details.apy || metadataShareClass?.apy
-  const underlyingAssetAddress = investment?.shareCurrency.address
+  const underlyingAssetAddress = investment?.share.address
 
   const items = [
     { label: 'Asset type', value: assetType },

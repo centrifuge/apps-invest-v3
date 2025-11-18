@@ -71,8 +71,8 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
   const oneUSDC = 10n ** 6n
   const hasClaimableAssets = useMemo(
     () =>
-      (investment?.claimableInvestShares.toBigInt() ?? 0n) >= oneUSDC ||
-      (investment?.claimableRedeemCurrency.toBigInt() ?? 0n) >= oneUSDC,
+      (investment?.claimableDepositShares.toBigInt() ?? 0n) >= oneUSDC ||
+      (investment?.claimableRedeemAssets.toBigInt() ?? 0n) >= oneUSDC,
     [investment, vault, connectedChain]
   )
   const [isClaimFormDisplayed, setIsClaimFormDisplayed] = useState(hasClaimableAssets)
@@ -83,7 +83,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     [isInvestorWhiteListed, vault, isInvestableChain, isClaimFormDisplayed]
   )
   // TODO: Handle sync vs async invest and redeem transactions
-  // const isSyncInvestVault = vaultDetails?.isSyncInvest || false
+  // const isSyncInvestVault = vaultDetails?.isSyncDeposit || false
 
   if (!poolDetails) return null
 
@@ -182,12 +182,12 @@ function VaultGuard({
   if (isClaimFormDisplayed && vault) {
     return (
       <InvestRedeemClaimForm
-        claimableInvestShares={investment?.claimableInvestShares}
-        claimableRedeemCurrency={investment?.claimableRedeemCurrency}
-        claimableInvestCurrencyEquivalent={investment?.claimableInvestCurrencyEquivalent}
+        claimableDepositShares={investment?.claimableDepositShares}
+        claimableRedeemAssets={investment?.claimableRedeemAssets}
+        claimableDepositAssetEquivalent={investment?.claimableDepositAssetEquivalent}
         claimableRedeemSharesEquivalent={investment?.claimableRedeemSharesEquivalent}
-        investmentCurrency={investment?.investmentCurrency}
-        shareCurrency={investment?.shareCurrency}
+        asset={investment?.asset}
+        share={investment?.share}
         vault={vault}
         setIsClaimFormDisplayed={setIsClaimFormDisplayed}
       />
@@ -197,8 +197,8 @@ function VaultGuard({
   if (shouldRenderOnboarding) {
     return (
       <InvestorOnboardingFeedback
-        investCurrencyAddress={investment?.investmentCurrency.address}
-        shareCurrencyAddress={investment?.shareCurrency.address}
+        investCurrencyAddress={investment?.asset.address}
+        shareCurrencyAddress={investment?.share.address}
         chainId={chainId}
       />
     )

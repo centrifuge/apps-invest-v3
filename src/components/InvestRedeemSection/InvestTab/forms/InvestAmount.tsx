@@ -31,13 +31,13 @@ export function InvestAmount({
   const { poolDetails, networks } = usePoolContext()
   const { vaultDetails, vaultsDetails, vaults, setVault } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
-  const { hasPendingInvestments, investmentCurrency, pendingInvestCurrency } = useGetPendingInvestments()
+  const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const networkIds = networks?.map((network) => network.chainId)
 
   // Investment Currencies for changing asset to invest
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
-    label: vault.investmentCurrency.symbol,
+    label: vault.asset.symbol,
     value: vault.address,
   }))
 
@@ -100,11 +100,11 @@ export function InvestAmount({
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
-        {hasPendingInvestments && pendingInvestCurrency ? (
+        {hasPendingInvestments && pendingDepositAssets ? (
           <PendingInvestmentBanner
             label="Pending investments"
-            amount={pendingInvestCurrency}
-            currencySymbol={investmentCurrency?.symbol}
+            amount={pendingDepositAssets}
+            currencySymbol={asset?.symbol}
           />
         ) : null}
         <Box>
@@ -113,7 +113,7 @@ export function InvestAmount({
             {parsedInvestAmount !== 0 ? (
               <BalanceDisplay
                 balance={parsedInvestAmount}
-                currency={vaultDetails?.investmentCurrency.symbol}
+                currency={vaultDetails?.asset.symbol}
                 precision={2}
                 ml={4}
                 fontSize="xs"
@@ -123,7 +123,7 @@ export function InvestAmount({
           </Flex>
           <BalanceInput
             name="investAmount"
-            decimals={vaultDetails?.investmentCurrency.decimals}
+            decimals={vaultDetails?.asset.decimals}
             placeholder="0.00"
             selectOptions={investmentCurrencies}
             onSelectChange={changeVault}
@@ -160,7 +160,7 @@ export function InvestAmount({
                 </Text>
                 <BalanceDisplay
                   balance={parsedReceiveAmount}
-                  currency={vaultDetails?.shareCurrency.symbol}
+                  currency={vaultDetails?.share.symbol}
                   precision={2}
                   mt={6}
                   fontSize="xs"
@@ -169,10 +169,10 @@ export function InvestAmount({
               </Flex>
               <BalanceInput
                 name="receiveAmount"
-                decimals={vaultDetails?.shareCurrency.decimals}
+                decimals={vaultDetails?.share.decimals}
                 placeholder="0.00"
                 disabled
-                currency={vaultDetails?.shareCurrency.symbol}
+                currency={vaultDetails?.share.symbol}
               />
             </>
           )}
