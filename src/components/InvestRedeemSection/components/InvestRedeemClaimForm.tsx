@@ -6,31 +6,31 @@ import { Dispatch, SetStateAction, useCallback } from 'react'
 import { IoMdCheckmarkCircleOutline, IoMdInformationCircleOutline } from 'react-icons/io'
 
 interface InvestRedeemClaimFormProps {
-  claimableInvestShares?: Balance
-  claimableRedeemCurrency?: Balance
-  claimableInvestCurrencyEquivalent?: Balance
+  claimableDepositShares?: Balance
+  claimableRedeemAssets?: Balance
+  claimableDepositAssetEquivalent?: Balance
   claimableRedeemSharesEquivalent?: Balance
-  investmentCurrency?: CurrencyDetails
-  shareCurrency?: CurrencyDetails
+  asset?: CurrencyDetails
+  share?: CurrencyDetails
   vault: Vault
   setIsClaimFormDisplayed: Dispatch<SetStateAction<boolean>>
 }
 
 export function InvestRedeemClaimForm({
-  claimableInvestShares,
-  claimableRedeemCurrency,
-  claimableInvestCurrencyEquivalent,
+  claimableDepositShares,
+  claimableRedeemAssets,
+  claimableDepositAssetEquivalent,
   claimableRedeemSharesEquivalent,
-  investmentCurrency,
-  shareCurrency,
+  asset,
+  share,
   vault,
   setIsClaimFormDisplayed,
 }: InvestRedeemClaimFormProps) {
   const { execute, isPending } = useCentrifugeTransaction()
 
   const claim = useCallback(() => execute(vault.claim()).then(() => setIsClaimFormDisplayed(false)), [vault, execute])
-  const shareCurrencySymbol = shareCurrency?.symbol ?? ''
-  const investmentCurrencySymbol = investmentCurrency?.symbol ?? ''
+  const shareCurrencySymbol = share?.symbol ?? ''
+  const investmentCurrencySymbol = asset?.symbol ?? ''
 
   return (
     <Box mt={4} height="100%">
@@ -42,20 +42,20 @@ export function InvestRedeemClaimForm({
               <IoMdCheckmarkCircleOutline />
             </Icon>
           </Flex>
-          {claimableInvestShares && !claimableInvestShares.isZero() && (
+          {claimableDepositShares && !claimableDepositShares.isZero() && (
             <Box mt={6}>
               <Text fontWeight={500}>Claimable shares</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">{formatBalance(claimableInvestShares, shareCurrencySymbol, 2)}</Heading>
+                <Heading fontSize="xl">{formatBalance(claimableDepositShares, shareCurrencySymbol, 2)}</Heading>
               </Flex>
             </Box>
           )}
-          {claimableInvestCurrencyEquivalent && !claimableInvestCurrencyEquivalent.isZero() && (
+          {claimableDepositAssetEquivalent && !claimableDepositAssetEquivalent.isZero() && (
             <Box mt={3}>
               <Text fontWeight={500}>Claimable invest currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableInvestCurrencyEquivalent, investmentCurrencySymbol, 2)}
+                  {formatBalance(claimableDepositAssetEquivalent, investmentCurrencySymbol, 2)}
                 </Heading>
               </Flex>
             </Box>
@@ -70,11 +70,11 @@ export function InvestRedeemClaimForm({
               </Flex>
             </Box>
           )}
-          {claimableRedeemCurrency && !claimableRedeemCurrency.isZero() && (
+          {claimableRedeemAssets && !claimableRedeemAssets.isZero() && (
             <Box mt={3}>
               <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">{formatBalance(claimableRedeemCurrency, investmentCurrencySymbol, 2)}</Heading>
+                <Heading fontSize="xl">{formatBalance(claimableRedeemAssets, investmentCurrencySymbol, 2)}</Heading>
               </Flex>
             </Box>
           )}

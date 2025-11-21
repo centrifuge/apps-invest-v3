@@ -39,7 +39,7 @@ export default function PoolPage() {
           <Flex align={'flex-end'} justifyContent="flex-end">
             <Text fontSize="xl" fontWeight="bold" textAlign="right">
               {investment?.shareBalance
-                ? formatBalance(investment.shareBalance, investment?.shareCurrency.symbol ?? '', 2)
+                ? formatBalance(investment.shareBalance, investment?.share.symbol ?? '', 2)
                 : '0.00'}
             </Text>
           </Flex>

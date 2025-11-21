@@ -7,9 +7,9 @@ import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/
 export function PendingTab({ isLoading: isTabLoading }: TabProps) {
   const {
     investment,
-    investmentCurrency,
-    pendingInvestCurrency,
-    shareCurrency,
+    asset,
+    pendingDepositAssets,
+    share,
     pendingRedeemShares,
     calculatedInvestSharesEstimate,
     calculatedRedeemAmountEstimate,
@@ -46,13 +46,13 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
         <Box>
           <Text fontSize="sm" mt={2} fontWeight="bold">
-            {investmentCurrency?.symbol}
+            {asset?.symbol}
           </Text>
-          <BalanceDisplay balance={pendingInvestCurrency} fontSize="sm" />
+          <BalanceDisplay balance={pendingDepositAssets} fontSize="sm" />
         </Box>
         <Box textAlign={'right'}>
           <Text fontSize="sm" fontWeight="bold">
-            Est. {shareCurrency?.symbol}
+            Est. {share?.symbol}
           </Text>
           <Text fontSize="sm" mt={2}>
             {calculatedInvestSharesEstimate ?? '0.00'}
@@ -66,13 +66,13 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
         <Box>
           <Text fontSize="sm" mt={2} fontWeight="bold">
-            {shareCurrency?.symbol}
+            {share?.symbol}
           </Text>
           <BalanceDisplay balance={pendingRedeemShares} fontSize="sm" />
         </Box>
         <Box textAlign={'right'}>
           <Text fontSize="sm" fontWeight="bold">
-            Est. {investmentCurrency?.symbol}
+            Est. {asset?.symbol}
           </Text>
           <Text fontSize="sm" mt={2}>
             {calculatedRedeemAmountEstimate ?? '0.00'}

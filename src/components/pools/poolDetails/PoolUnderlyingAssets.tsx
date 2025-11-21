@@ -18,7 +18,7 @@ export function PoolUnderlyingAssets() {
   const underlyingMetadata = underlyingPoolDetails?.metadata
   const underlyingShareClass = underlyingMetadata ? Object.values(underlyingMetadata.shareClasses)[0] : undefined
   const underlyingApy = underlyingShareClass?.apyPercentage ? `${underlyingShareClass.apyPercentage}%` : '-'
-  const underlyingAssetAddress = investment?.shareCurrency.address
+  const underlyingAssetAddress = investment?.share.address
 
   const items = [
     { label: 'Fund', value: underlyingMetadata?.pool.name ?? null },

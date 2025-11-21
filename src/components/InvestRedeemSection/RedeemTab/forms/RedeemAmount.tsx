@@ -27,13 +27,13 @@ export function RedeemAmount({
 }: RedeemAmountProps) {
   const { poolDetails } = usePoolContext()
   const { investment, vaults, vaultDetails, vaultsDetails, setVault } = useVaultsContext()
-  const { hasPendingRedeems, pendingRedeemShares, shareCurrency } = useGetPendingInvestments()
+  const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
   const { setValue } = useFormContext()
 
   // Get networkIds and currencies for receiveAmount select currency list
   const networkIds = networks?.map((network) => network.chainId)
   const investmentCurrencies = vaultsDetails?.map((vault) => ({
-    label: vault.investmentCurrency.symbol,
+    label: vault.asset.symbol,
     value: vault.address,
   }))
 
@@ -42,10 +42,10 @@ export function RedeemAmount({
     (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
   )
   const pricePerShare = poolShareClass?.details.pricePerShare
-  const investCurrencySymbol = investment?.investmentCurrency.symbol ?? ''
+  const investCurrencySymbol = investment?.asset.symbol ?? ''
 
   // Get info on the users shares holdings in their wallet
-  const shareCurrencySymbol = investment?.shareCurrency.symbol ?? ''
+  const shareCurrencySymbol = investment?.share.symbol ?? ''
   const maxRedeemBalance = investment?.shareBalance ?? 0
   const hasRedeemableShares = !investment?.shareBalance.isZero()
 
@@ -124,7 +124,7 @@ export function RedeemAmount({
           <PendingInvestmentBanner
             label="Pending redemptions"
             amount={pendingRedeemShares}
-            currencySymbol={shareCurrency?.symbol}
+            currencySymbol={share?.symbol}
           />
         ) : null}
         <Box>
@@ -143,7 +143,7 @@ export function RedeemAmount({
           </Flex>
           <BalanceInput
             name="redeemAmount"
-            decimals={vaultDetails?.shareCurrency.decimals}
+            decimals={vaultDetails?.share.decimals}
             placeholder="0.00"
             onChange={debouncedCalculateReceiveAmount}
             currency={shareCurrencySymbol}
@@ -187,7 +187,7 @@ export function RedeemAmount({
               <BalanceInput
                 name="receiveAmount"
                 placeholder="0.00"
-                decimals={vaultDetails?.investmentCurrency.decimals}
+                decimals={vaultDetails?.asset.decimals}
                 onChange={debouncedCalculateRedeemAmount}
                 selectOptions={investmentCurrencies}
                 onSelectChange={changeVault}
