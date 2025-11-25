@@ -9,7 +9,6 @@ import type { AppKitNetwork } from '@reown/appkit/networks'
 import { solana, solanaTestnet, solanaDevnet } from '@reown/appkit/networks'
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase'
-import { WalletProvider as SolanaWalletProvider } from '@solana/wallet-adapter-react'
 
 export interface WalletProviderProps {
   projectId: string
@@ -120,11 +119,5 @@ export function WalletProvider({ projectId, evmNetworks, solanaRpcUrl, children 
     }
   }, [])
 
-  return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <SolanaWalletProvider wallets={solanaWallets} autoConnect>
-        {children}
-      </SolanaWalletProvider>
-    </WagmiProvider>
-  )
+  return <WagmiProvider config={wagmiAdapter.wagmiConfig}>{children}</WagmiProvider>
 }
