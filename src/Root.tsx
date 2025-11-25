@@ -46,17 +46,10 @@ function RootProviders() {
   const { showMainnet } = useDebugFlags()
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
 
-  const solanaRpcUrl = useMemo(() => {
-    if (import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet') {
-      return SOLANA_RPC_URLS.mainnet
-    }
-    // TODO: decide if we want to use testnet
-    if (import.meta.env.VITE_CENTRIFUGE_ENV === 'testnet') {
-      return SOLANA_RPC_URLS.devnet ?? SOLANA_RPC_URLS.testnet
-    }
-    // Development: use devnet
-    return SOLANA_RPC_URLS.devnet
-  }, [])
+  const solanaRpcUrl = useMemo(
+    () => (import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet' ? SOLANA_RPC_URLS.mainnet : SOLANA_RPC_URLS.devnet),
+    []
+  )
 
   /**
    * Initialize Centrifuge SDK with any necessary config.
@@ -77,6 +70,7 @@ function RootProviders() {
       solana: {
         rpcUrl: solanaRpcUrl,
         commitment: 'confirmed',
+        environment: isMainnet ? 'mainnet' : 'devnet',
       },
     })
   }, [showMainnet, solanaRpcUrl])
