@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { Form, useForm, safeParse, createBalanceSchema } from '@forms'
+import { Form, useForm, safeParse, createBalanceSchema, createBalanceValidation } from '@forms'
 import { Balance } from '@centrifuge/sdk'
-import { formatBalance, useCentrifugeTransaction, useInvestment, useVaultDetails } from '@cfg'
+import { formatBalance, formatBalanceToString, useCentrifugeTransaction, useInvestment, useVaultDetails } from '@cfg'
 import {
   type InvestActionType,
   InvestAction,
@@ -22,7 +22,8 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const maxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
-    return portfolioBalance.toFloat().toFixed(0)
+    // Don't pass precision parameter to preserve full decimal precision for validation
+    return formatBalanceToString(portfolioBalance)
   }, [portfolioBalance])
 
   const formattedMaxInvestAmount = useMemo(() => {
@@ -37,7 +38,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const schema = z.object({
     investAmount: createBalanceSchema(
       vaultDetails?.investmentCurrency.decimals ?? 18,
-      z.number().min(1).max(Number(maxInvestAmount))
+      createBalanceValidation({ min: 1, max: maxInvestAmount }, vaultDetails?.investmentCurrency.decimals ?? 18)
     ),
     receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
     // TODO: Use these when we need to add the sync invest action
