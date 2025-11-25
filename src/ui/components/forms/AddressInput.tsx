@@ -3,9 +3,10 @@ import { Field, Input, Group, IconButton, Text, Flex } from '@chakra-ui/react'
 import { isAddress } from 'viem'
 import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
-import { networkToName, truncateAddress } from '@cfg'
+import { networkToName } from '@cfg'
 import { NetworkIcon } from '../elements/NetworkIcon'
 import { HexString } from '@centrifuge/sdk'
+import { truncateAddress } from '@wallet/addressUtils'
 
 export interface AddressInputProps {
   onAdd: (address: HexString) => void

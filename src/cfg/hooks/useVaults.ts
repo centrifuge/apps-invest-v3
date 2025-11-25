@@ -36,23 +36,23 @@ export function useVaultsDetails(vaults?: Vault[], options?: Options) {
 
 export function useInvestment(vault?: Vault, options?: Options) {
   const enabled = options?.enabled ?? true
-  const { address } = useAddress()
+  const { evmAddress } = useAddress()
   const investment$ = useMemo(
-    () => (vault && address && enabled ? vault.investment(address) : undefined),
-    [vault?.address, address, enabled]
+    () => (vault && evmAddress && enabled ? vault.investment(evmAddress) : undefined),
+    [vault?.address, evmAddress, enabled]
   )
   return useObservable(investment$)
 }
 
 export function useInvestmentsPerVaults(vaults?: Vault[], options?: Options) {
   const enabled = options?.enabled ?? true
-  const { address } = useAddress()
+  const { evmAddress } = useAddress()
   const investmentsPerVaults$ = useMemo(() => {
-    if (!vaults || !vaults.length || !address || !enabled) return of([])
+    if (!vaults || !vaults.length || !evmAddress || !enabled) return of([])
 
-    const investment$ = vaults.map((vault) => vault.investment(address))
+    const investment$ = vaults.map((vault) => vault.investment(evmAddress))
     return combineLatest(investment$)
-  }, [vaults, address, enabled])
+  }, [vaults, evmAddress, enabled])
 
   return useObservable(investmentsPerVaults$)
 }

@@ -161,7 +161,7 @@ function VaultGuard({
   tab: Tab,
   setIsClaimFormDisplayed,
 }: VaultGuardProps) {
-  const { network, networks } = usePoolContext()
+  const { network, networks, poolId } = usePoolContext()
   const { investment, vault } = useVaultsContext()
   const { chainId } = useAddress()
 
@@ -207,6 +207,7 @@ function VaultGuard({
   return (
     <ConnectionGuard
       networks={chainIds}
+      poolId={poolId}
       message="This pool is only available on specific networks. Please switch to one of the supported networks to continue."
     >
       {!vault ? (
