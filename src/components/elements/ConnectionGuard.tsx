@@ -4,31 +4,50 @@ import { Button, Menu, Stack, Text } from '@chakra-ui/react'
 import { useAppKit } from '@reown/appkit/react'
 import type { ReactNode } from 'react'
 import { useChains, useSwitchChain } from 'wagmi'
+import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 
 type Props = {
   networks?: number[]
   children: ReactNode
   message?: string
+  poolId?: string
 }
 
-export function ConnectionGuard({ networks, children, message = 'Unsupported network.' }: Props) {
+export function ConnectionGuard({ networks, children, message = 'Unsupported network.', poolId }: Props) {
   const { switchChain } = useSwitchChain()
   const chains = useChains()
   const { open } = useAppKit()
-  const { isConnected, chainId } = useAddress()
+  const { isConnected, chainId, walletType } = useAddress()
+  const { getIsSolanaPool } = useGetPoolsByIds()
+
   function getName(chainId: number) {
     const chain = chains.find((c) => c.id === chainId)
     return chain?.name || chainId.toString()
   }
 
-  if (!isConnected || !chainId) {
+  const connectErrorComponent = () => (
+    <Stack gap={2}>
+      <Text>Connect to continue</Text>
+      <Button onClick={() => open()}>Connect</Button>
+    </Stack>
+  )
+
+  if (!isConnected) return connectErrorComponent()
+
+  if (walletType === 'solana') {
+    const isSolanaPool = getIsSolanaPool(poolId)
+    if (isSolanaPool) return <>{children}</>
+
     return (
       <Stack gap={2}>
-        <Text>Connect to continue</Text>
-        <Button onClick={() => open()}>Connect</Button>
+        <Text>This pool does not support Solana investments. Please connect an EVM wallet.</Text>
+        <Button onClick={() => open()}>Switch wallet</Button>
       </Stack>
     )
   }
+
+  // For EVM wallets - check chainId
+  if (!chainId) return connectErrorComponent()
 
   if (!networks || networks.includes(chainId)) {
     return <>{children}</>
