@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
-import { debounce, divideBigInts, formatBalanceToString } from '@cfg'
+import { debounce, divideBigInts, formatBalanceToString, useAddress } from '@cfg'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcons } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
@@ -30,16 +30,31 @@ export function InvestAmount({
 }: InvestAmountProps) {
   const { poolDetails, networks } = usePoolContext()
   const { vaultDetails, vaultsDetails, vaults, setVault } = useVaultsContext()
-  const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
+  const { portfolioBalance, hasInvestmentCurrency: hasEvmInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, investmentCurrency, pendingInvestCurrency } = useGetPendingInvestments()
   const { setValue } = useFormContext()
+  const { walletType } = useAddress()
   const networkIds = networks?.map((network) => network.chainId)
 
+  const hasInvestmentCurrency = walletType === 'solana' ? Number(maxInvestAmount) > 0 : hasEvmInvestmentCurrency
+
+  const investmentCurrencySymbol = walletType === 'solana' ? 'USDC' : vaultDetails?.investmentCurrency.symbol
+  const investmentCurrencyDecimals = walletType === 'solana' ? 6 : vaultDetails?.investmentCurrency.decimals
+
   // Investment Currencies for changing asset to invest
-  const investmentCurrencies = vaultsDetails?.map((vault) => ({
-    label: vault.investmentCurrency.symbol,
-    value: vault.address,
-  }))
+  // For Solana wallets, only show USDC option
+  const investmentCurrencies = useMemo(() => {
+    const allCurrencies = vaultsDetails?.map((vault) => ({
+      label: vault.investmentCurrency.symbol,
+      value: vault.address,
+    }))
+
+    if (walletType === 'solana') {
+      return allCurrencies?.filter((currency) => currency.label === 'USDC')
+    }
+
+    return allCurrencies
+  }, [vaultsDetails, walletType])
 
   // Get the share class info for calculating shares amount to receive
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -62,7 +77,7 @@ export function InvestAmount({
         2
       )
     },
-    [portfolioInvestmentCurrency?.decimals]
+    [investmentCurrencyDecimals]
   )
 
   const calculateReceiveAmount = useCallback(
@@ -74,7 +89,7 @@ export function InvestAmount({
       const calculatedReceiveAmount = calculateReceiveAmountValue(investInputAmount, pricePerShare)
       return setValue('receiveAmount', calculatedReceiveAmount)
     },
-    [pricePerShare]
+    [pricePerShare, calculateReceiveAmountValue, setValue]
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
@@ -113,7 +128,7 @@ export function InvestAmount({
             {parsedInvestAmount !== 0 ? (
               <BalanceDisplay
                 balance={parsedInvestAmount}
-                currency={vaultDetails?.investmentCurrency.symbol}
+                currency={investmentCurrencySymbol}
                 precision={2}
                 ml={4}
                 fontSize="xs"
@@ -123,9 +138,10 @@ export function InvestAmount({
           </Flex>
           <BalanceInput
             name="investAmount"
-            decimals={vaultDetails?.investmentCurrency.decimals}
+            decimals={investmentCurrencyDecimals}
             placeholder="0.00"
-            selectOptions={investmentCurrencies}
+            selectOptions={walletType === 'solana' ? undefined : investmentCurrencies}
+            currency={walletType === 'solana' ? 'USDC' : undefined}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
             disabled={!hasInvestmentCurrency}
@@ -182,10 +198,7 @@ export function InvestAmount({
             Invest
           </SubmitButton>
           {!hasInvestmentCurrency ? (
-            <InfoWrapper
-              text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
-              type="error"
-            />
+            <InfoWrapper text={infoText(investmentCurrencySymbol).portfolioMissingInvestmentCurrency} type="error" />
           ) : null}
         </Box>
       </Flex>

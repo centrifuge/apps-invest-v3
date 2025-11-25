@@ -1,9 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useState, useMemo } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@forms'
 import { Balance } from '@centrifuge/sdk'
-import { formatBalance, useCentrifugeTransaction, useInvestment, useVaultDetails } from '@cfg'
+import {
+  formatBalance,
+  useAddress,
+  useCentrifugeTransaction,
+  useSolanaTransaction,
+  useInvestment,
+  useVaultDetails,
+  useSolanaUsdcBalance,
+} from '@cfg'
 import {
   type InvestActionType,
   InvestAction,
@@ -12,33 +20,48 @@ import {
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 import { TabProps } from '@components/InvestRedeemSection'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { usePoolContext } from '@contexts/PoolContext'
+import { useSolanaWalletAdapter, walletAdapterFallback } from '@wallet/useSolanaWalletAdapter'
 
 export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
+  const { walletType } = useAddress()
+
+  // Only call useSolanaWalletAdapter for Solana wallets to avoid AppKit provider errors
+  const solanaAdapter = walletType === 'solana' ? useSolanaWalletAdapter() : walletAdapterFallback
+  const { publicKey, signTransaction } = solanaAdapter
+
+  const { shareClass } = usePoolContext()
   const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)
-  const { execute, isPending } = useCentrifugeTransaction()
+  const { data: solanaUsdcBalance, isLoading: isSolanaBalanceLoading } = useSolanaUsdcBalance()
+  const { execute: executeEvm, isPending: isPendingEvm } = useCentrifugeTransaction()
+  const { execute: executeSolana, isPending: isPendingSolana } = useSolanaTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
+  const isPending = walletType === 'solana' ? isPendingSolana : isPendingEvm
+
+  const investBalance = walletType === 'solana' ? solanaUsdcBalance : portfolioBalance
+
   const maxInvestAmount = useMemo(() => {
-    if (!portfolioBalance) return '0'
-    return portfolioBalance.toFloat().toFixed(0)
-  }, [portfolioBalance])
+    if (!investBalance) return '0'
+    return investBalance.toFloat().toFixed(0)
+  }, [investBalance])
 
   const formattedMaxInvestAmount = useMemo(() => {
-    if (!portfolioBalance) return '0'
-    return formatBalance(portfolioBalance, investment?.investmentCurrency.symbol, 0) ?? '0'
-  }, [portfolioBalance])
+    if (!investBalance) return '0'
+    const currencySymbol = walletType === 'solana' ? 'USDC' : investment?.investmentCurrency.symbol
+    return formatBalance(investBalance, currencySymbol, 0) ?? '0'
+  }, [investBalance, walletType, investment])
 
   function invest(amount: Balance) {
-    execute(vault.increaseInvestOrder(amount))
+    executeEvm(vault.increaseInvestOrder(amount))
   }
 
+  const investmentDecimals = walletType === 'solana' ? 6 : (vaultDetails?.investmentCurrency.decimals ?? 18)
+
   const schema = z.object({
-    investAmount: createBalanceSchema(
-      vaultDetails?.investmentCurrency.decimals ?? 18,
-      z.number().min(1).max(Number(maxInvestAmount))
-    ),
+    investAmount: createBalanceSchema(investmentDecimals, z.number().min(1).max(Number(maxInvestAmount))),
     receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
     // TODO: Use these when we need to add the sync invest action
     // requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
@@ -57,14 +80,31 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     schema,
     defaultValues: InvestFormDefaultValues,
     mode: 'onChange',
-    onSubmit: (values) => {
-      invest(values.investAmount)
+    onSubmit: async (values) => {
+      if (walletType === 'solana' && signTransaction !== undefined && publicKey) {
+        const solanaShareClass = shareClass?.shareClass.solana()
+
+        if (!solanaShareClass?.isAvailable()) {
+          throw new Error('Solana investments are not available for this pool')
+        }
+
+        try {
+          const investObservable = solanaShareClass.invest(values.investAmount, { publicKey, signTransaction })
+          if (investObservable) {
+            await executeSolana(investObservable)
+          }
+        } catch (error) {
+          throw new Error(`Solana investment error: ${error}`)
+        }
+      } else {
+        invest(values.investAmount)
+      }
       setActionType(InvestAction.CONFIRM)
     },
     onSubmitError: (error) => console.error('Invest form submission error:', error),
   })
 
-  const { watch } = form
+  const { watch, formState } = form
   const [investAmount, receiveAmount] = watch(['investAmount', 'receiveAmount'])
 
   const parsedInvestAmount = useMemo(
@@ -77,8 +117,18 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     [receiveAmount, schema.shape.receiveAmount]
   )
 
-  const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading || isPortfolioLoading
-  const isDisabled = isPending || !investment || !vaultDetails
+  const isLoading =
+    isTabLoading ||
+    isVaultDetailsLoading ||
+    isInvestmentLoading ||
+    (walletType === 'solana' ? isSolanaBalanceLoading : isPortfolioLoading)
+
+  const isDisabled =
+    isPending ||
+    !vaultDetails ||
+    !formState.isValid ||
+    (walletType === 'evm' && !investment) ||
+    (walletType === 'solana' && (!publicKey || !signTransaction))
 
   if (isLoading) {
     return (
