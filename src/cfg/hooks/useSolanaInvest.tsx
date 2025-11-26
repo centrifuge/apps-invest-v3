@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { Balance, SolanaInvestment, ShareClassId } from '@centrifuge/sdk'
+import { Balance, ShareClassId } from '@centrifuge/sdk'
 import { useCentrifuge } from './CentrifugeContext'
 import { useSolanaTransaction } from './useSolanaTransaction'
 import { type SolanaWalletAdapter } from '@centrifuge/sdk'
@@ -8,29 +8,29 @@ export function useSolanaInvest(shareClassId?: ShareClassId) {
   const centrifuge = useCentrifuge()
   const { execute: executeSolanaTx, isPending } = useSolanaTransaction()
 
-  const solanaInvestment = useMemo(() => {
-    if (!shareClassId) return undefined
-    return new SolanaInvestment(centrifuge, shareClassId)
-  }, [centrifuge, shareClassId])
-
-  const isAvailable = useMemo(() => {
-    return solanaInvestment?.isAvailable() ?? false
-  }, [solanaInvestment])
+  const isSolanaPool = useMemo(() => {
+    if (!centrifuge.solana || !shareClassId) return false
+    return centrifuge.solana.isSolanaPool(shareClassId)
+  }, [centrifuge.solana, shareClassId])
 
   /**
    * Execute a Solana USDC investment transaction
    *
-   * @param amount - The USDC amount to invest
+   * @param amount - The USDC amount to invest (must have 6 decimals)
    * @param wallet - The Solana wallet adapter containing publicKey and signTransaction
-   * @throws Error if Solana investments are not available or wallet is incomplete
+   * @throws Error if Solana is not configured, investments are not available, or wallet is incomplete
    */
   const invest = useCallback(
     async (amount: Balance, wallet: SolanaWalletAdapter) => {
-      if (!solanaInvestment) {
+      if (!centrifuge.solana) {
+        throw new Error('Solana is not configured in the Centrifuge SDK')
+      }
+
+      if (!shareClassId) {
         throw new Error('Share class ID is required for Solana investment')
       }
 
-      if (!isAvailable) {
+      if (!isSolanaPool) {
         throw new Error('Solana investments are not available for this pool')
       }
 
@@ -38,16 +38,16 @@ export function useSolanaInvest(shareClassId?: ShareClassId) {
         throw new Error('Wallet adapter must provide both publicKey and signTransaction')
       }
 
-      const investObservable = solanaInvestment.invest(amount, wallet)
+      // Use the new centrifuge.solana.invest() method
+      const investObservable = centrifuge.solana.invest(amount, shareClassId, wallet)
       return await executeSolanaTx(investObservable)
     },
-    [solanaInvestment, isAvailable, executeSolanaTx]
+    [centrifuge.solana, shareClassId, isSolanaPool, executeSolanaTx]
   )
 
   return {
     invest,
-    isAvailable,
+    isSolanaPool,
     isPending,
-    solanaInvestment,
   }
 }
