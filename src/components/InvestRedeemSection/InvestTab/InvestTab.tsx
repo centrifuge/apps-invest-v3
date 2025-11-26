@@ -7,7 +7,7 @@ import {
   formatBalance,
   useAddress,
   useCentrifugeTransaction,
-  useSolanaTransaction,
+  useSolanaInvest,
   useInvestment,
   useVaultDetails,
   useSolanaUsdcBalance,
@@ -35,11 +35,11 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
   const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)
   const { data: solanaUsdcBalance, isLoading: isSolanaBalanceLoading } = useSolanaUsdcBalance()
-  const { execute: executeEvm, isPending: isPendingEvm } = useCentrifugeTransaction()
-  const { execute: executeSolana, isPending: isPendingSolana } = useSolanaTransaction()
+  const { execute: executeEvm, isPending: isEvmPending } = useCentrifugeTransaction()
+  const { invest: investSolanaUsdc, isPending: isSolanaPending } = useSolanaInvest(shareClass?.shareClass.id)
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
-  const isPending = walletType === 'solana' ? isPendingSolana : isPendingEvm
+  const isPending = walletType === 'solana' ? isSolanaPending : isEvmPending
 
   const investBalance = walletType === 'solana' ? solanaUsdcBalance : portfolioBalance
 
@@ -81,18 +81,13 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     defaultValues: InvestFormDefaultValues,
     mode: 'onChange',
     onSubmit: async (values) => {
-      if (walletType === 'solana' && signTransaction !== undefined && publicKey) {
-        const solanaShareClass = shareClass?.shareClass.solana()
-
-        if (!solanaShareClass?.isAvailable()) {
-          throw new Error('Solana investments are not available for this pool')
+      if (walletType === 'solana') {
+        if (signTransaction === undefined || !publicKey) {
+          throw new Error('Solana wallet missing publicKey or signTransaction')
         }
 
         try {
-          const investObservable = solanaShareClass.invest(values.investAmount, { publicKey, signTransaction })
-          if (investObservable) {
-            await executeSolana(investObservable)
-          }
+          await investSolanaUsdc(values.investAmount, { publicKey, signTransaction })
         } catch (error) {
           throw new Error(`Solana investment error: ${error}`)
         }
