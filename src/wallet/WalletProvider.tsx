@@ -9,6 +9,7 @@ import type { AppKitNetwork } from '@reown/appkit/networks'
 import { solana, solanaTestnet, solanaDevnet } from '@reown/appkit/networks'
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase'
+import { FEATURED_WALLET_IDS } from './walletIds'
 
 export interface WalletProviderProps {
   projectId: string
@@ -104,16 +105,7 @@ export function WalletProvider({ projectId, evmNetworks, solanaRpcUrl, children 
         projectId,
         features: { email: false, socials: false, swaps: false, send: false },
         themeMode: 'light',
-        featuredWalletIds: [
-          // metamask
-          'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
-          // rabby
-          '18388be9ac2d02726dbac9777c96efaac06d744b2f6d580fccdd4127a6d01fd1',
-          // bitget
-          '38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662',
-          // okx
-          '5d9f1395b3a8e848684848dc4147cbd05c8d54bb737eac78fe103901fe6b01a1',
-        ],
+        featuredWalletIds: FEATURED_WALLET_IDS as unknown as string[],
       })
       appKitInitialized = true
     }
