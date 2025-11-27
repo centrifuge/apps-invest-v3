@@ -1,7 +1,7 @@
 import { useAppKit } from '@reown/appkit/react'
+import { truncateAddress } from '@cfg'
 import { Button, ButtonColorPalette, ButtonVariant } from '@ui'
 import { useWalletConnection } from './useWalletConnection'
-import { truncateAddress } from '@wallet/addressUtils'
 
 export function WalletButton({
   colorPalette = ['black', 'black'],

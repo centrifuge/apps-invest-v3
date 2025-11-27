@@ -15,7 +15,6 @@ export function useSolanaInvest(shareClassId?: ShareClassId) {
 
   /**
    * Execute a Solana USDC investment transaction
-   *
    * @param amount - The USDC amount to invest (must have 6 decimals)
    * @param wallet - The Solana wallet adapter containing publicKey and signTransaction
    * @throws Error if Solana is not configured, investments are not available, or wallet is incomplete
@@ -38,7 +37,6 @@ export function useSolanaInvest(shareClassId?: ShareClassId) {
         throw new Error('Wallet adapter must provide both publicKey and signTransaction')
       }
 
-      // Use the new centrifuge.solana.invest() method
       const investObservable = centrifuge.solana.invest(amount, shareClassId, wallet)
       return await executeSolanaTx(investObservable)
     },
