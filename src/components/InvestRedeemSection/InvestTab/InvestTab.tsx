@@ -85,12 +85,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
         if (signTransaction === undefined || !publicKey) {
           throw new Error('Solana wallet missing publicKey or signTransaction')
         }
-
-        try {
-          await investSolanaUsdc(values.investAmount, { publicKey, signTransaction })
-        } catch (error) {
-          throw new Error(`Solana investment error: ${error}`)
-        }
+        investSolanaUsdc(values.investAmount, { publicKey, signTransaction })
       } else {
         invest(values.investAmount)
       }
