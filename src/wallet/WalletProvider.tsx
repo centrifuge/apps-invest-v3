@@ -27,9 +27,7 @@ export function WalletProvider({ projectId, evmNetworks, solanaRpcUrl, children 
 
   if (!projectId) {
     console.error('WalletProvider: No Reown project ID provided.')
-    throw new Error(
-      'Reown project ID is required. Get one at https://dashboard.reown.com or check your .env configuration.'
-    )
+    throw new Error('Reown project ID is required.')
   }
 
   const wagmiAdapter = useMemo(() => {
