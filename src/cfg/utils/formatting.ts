@@ -2,6 +2,14 @@ import { Balance } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
 import { formatUnits } from 'viem'
 
+export function truncateAddress(address: string): string {
+  if (!address) return ''
+
+  const first = address.slice(0, 6)
+  const last = address.slice(-4)
+  return `${first}...${last}`
+}
+
 export function formatPercentage(amount: number, includeSymbol = true, locale = 'en', decimals = 2) {
   const formattedAmount = amount.toLocaleString(locale, {
     minimumFractionDigits: decimals,
