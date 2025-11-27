@@ -1,8 +1,8 @@
 import { Balance } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
-import { formatUnits } from 'viem'
+import { formatUnits, type Address } from 'viem'
 
-export function truncateAddress(address: string, start = 6, end = 4): string {
+export function truncateAddress(address: Address | string, start = 6, end = 4): string {
   if (!address) return ''
 
   const first = address.slice(0, start)
