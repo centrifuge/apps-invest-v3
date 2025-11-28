@@ -23,8 +23,8 @@ export function InvestTxFeedback({ setActionType, parsedInvestAmount, parsedRece
   const { vaultDetails } = useVaultsContext()
   const { reset } = useFormContext()
   const { txState, resetTxState, isTxInProgress } = useTxStateFeedback({ type: 'invest' })
-  const { walletType } = useAddress()
-  const investCurrencySymbol = walletType === 'solana' ? 'USDC' : (vaultDetails?.investmentCurrency.symbol ?? '')
+  const { isSolanaWallet } = useAddress()
+  const investCurrencySymbol = isSolanaWallet ? 'USDC' : (vaultDetails?.investmentCurrency.symbol ?? '')
   const receiveCurrencySymbol = vaultDetails?.shareCurrency.symbol ?? ''
 
   const handleClose = () => {

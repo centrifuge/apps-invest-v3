@@ -15,13 +15,15 @@ import { useWalletConnection } from '@wallet/useWalletConnection'
  * @property {number | undefined} chainId - EVM chain ID (undefined for Solana)
  * @property {'evm' | 'solana' | null} walletType - Type of connected wallet
  * @property {string | undefined} publicKey - Solana public key (undefined for EVM)
+ * @property {boolean} isSolanaWallet - Whether the connected wallet is a Solana wallet
+ * @property {boolean} isEvmWallet - Whether the connected wallet is an EVM wallet
  */
 const useAddress = () => {
   const connection = useWalletConnection()
 
   return {
     ...connection,
-    evmAddress: connection.walletType === 'evm' ? (connection.address as `0x${string}`) : undefined,
+    evmAddress: connection.isEvmWallet ? (connection.address as `0x${string}`) : undefined,
   }
 }
 

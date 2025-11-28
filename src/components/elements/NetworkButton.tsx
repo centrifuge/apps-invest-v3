@@ -30,7 +30,7 @@ const TESTNET_CHAIN_IDS = [
 export function NetworkButton(props: ButtonProps) {
   const allChains = useChains()
   const { showMainnet } = useDebugFlags()
-  const { walletType } = useWalletConnection()
+  const { isEvmWallet, isSolanaWallet } = useWalletConnection()
   const connectedChain = useChainId()
   const { switchChain } = useSwitchChain()
   const { open, onToggle, onClose } = useDisclosure()
@@ -90,7 +90,7 @@ export function NetworkButton(props: ButtonProps) {
         _active={{ backgroundColor: 'bg.subtle' }}
         {...props}
       >
-        {walletType === 'solana' ? (
+        {isSolanaWallet ? (
           <Image src={SolanaSVG} boxSize="24px" objectFit="contain" alt="Solana logo" />
         ) : (
           <>
@@ -102,7 +102,7 @@ export function NetworkButton(props: ButtonProps) {
         )}
       </Button>
 
-      {open && walletType !== 'solana' && (
+      {open && isEvmWallet && (
         <Portal>
           <Box
             ref={dropdownRef}

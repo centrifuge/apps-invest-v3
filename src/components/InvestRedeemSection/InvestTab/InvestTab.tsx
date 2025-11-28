@@ -24,10 +24,10 @@ import { usePoolContext } from '@contexts/PoolContext'
 import { useSolanaWalletAdapter, walletAdapterFallback } from '@wallet/useSolanaWalletAdapter'
 
 export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
-  const { walletType } = useAddress()
+  const { isEvmWallet, isSolanaWallet } = useAddress()
 
   // Only call useSolanaWalletAdapter for Solana wallets to avoid AppKit provider errors
-  const solanaAdapter = walletType === 'solana' ? useSolanaWalletAdapter() : walletAdapterFallback
+  const solanaAdapter = isSolanaWallet ? useSolanaWalletAdapter() : walletAdapterFallback
   const { publicKey, signTransaction } = solanaAdapter
 
   const { shareClass } = usePoolContext()
@@ -39,9 +39,9 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { invest: investSolanaUsdc, isPending: isSolanaPending } = useSolanaInvest(shareClass?.shareClass.id)
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
-  const isPending = walletType === 'solana' ? isSolanaPending : isEvmPending
+  const isPending = isSolanaWallet ? isSolanaPending : isEvmPending
 
-  const investBalance = walletType === 'solana' ? solanaUsdcBalance : portfolioBalance
+  const investBalance = isSolanaWallet ? solanaUsdcBalance : portfolioBalance
 
   const maxInvestAmount = useMemo(() => {
     if (!investBalance) return '0'
@@ -50,30 +50,19 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const formattedMaxInvestAmount = useMemo(() => {
     if (!investBalance) return '0'
-    const currencySymbol = walletType === 'solana' ? 'USDC' : investment?.investmentCurrency.symbol
+    const currencySymbol = isSolanaWallet ? 'USDC' : investment?.investmentCurrency.symbol
     return formatBalance(investBalance, currencySymbol, 0) ?? '0'
-  }, [investBalance, walletType, investment])
+  }, [investBalance, isSolanaWallet, investment])
 
   function invest(amount: Balance) {
     executeEvm(vault.increaseInvestOrder(amount))
   }
 
-  const investmentDecimals = walletType === 'solana' ? 6 : (vaultDetails?.investmentCurrency.decimals ?? 18)
+  const investmentDecimals = isSolanaWallet ? 6 : (vaultDetails?.investmentCurrency.decimals ?? 18)
 
   const schema = z.object({
     investAmount: createBalanceSchema(investmentDecimals, z.number().min(1).max(Number(maxInvestAmount))),
     receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
-    // TODO: Use these when we need to add the sync invest action
-    // requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
-    //   message: 'Non-US citizen requirement must be confirmed',
-    // }),
-    // requirement_nonSanctionedList: z.boolean().refine((val) => val === true, {
-    //   message: 'Non-sanctioned list requirement must be confirmed',
-    // }),
-    // requirement_redeemLater: z.boolean().refine((val) => val === true, {
-    //   message: 'Redeem later requirement must be confirmed',
-    // }),
-    // investorRequirements: z.array(z.boolean()).length(3, 'Array must contain exactly 3 requirements'),
   })
 
   const form = useForm({
@@ -81,7 +70,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     defaultValues: InvestFormDefaultValues,
     mode: 'onChange',
     onSubmit: async (values) => {
-      if (walletType === 'solana') {
+      if (isSolanaWallet) {
         if (signTransaction === undefined || !publicKey) {
           throw new Error('Solana wallet missing publicKey or signTransaction')
         }
@@ -111,14 +100,14 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     isTabLoading ||
     isVaultDetailsLoading ||
     isInvestmentLoading ||
-    (walletType === 'solana' ? isSolanaBalanceLoading : isPortfolioLoading)
+    (isSolanaWallet ? isSolanaBalanceLoading : isPortfolioLoading)
 
   const isDisabled =
     isPending ||
     !vaultDetails ||
     !formState.isValid ||
-    (walletType === 'evm' && !investment) ||
-    (walletType === 'solana' && (!publicKey || !signTransaction))
+    (isEvmWallet && !investment) ||
+    (isSolanaWallet && (!publicKey || !signTransaction))
 
   if (isLoading) {
     return (

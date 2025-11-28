@@ -17,7 +17,7 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
   const { switchChain } = useSwitchChain()
   const chains = useChains()
   const { open } = useAppKit()
-  const { isConnected, chainId, walletType } = useAddress()
+  const { isConnected, chainId, isSolanaWallet } = useAddress()
   const { getIsSolanaPool } = useGetPoolsByIds()
 
   function getName(chainId: number) {
@@ -34,7 +34,7 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
 
   if (!isConnected) return connectErrorComponent()
 
-  if (walletType === 'solana') {
+  if (isSolanaWallet) {
     const isSolanaPool = getIsSolanaPool(poolId)
     if (isSolanaPool) return <>{children}</>
 

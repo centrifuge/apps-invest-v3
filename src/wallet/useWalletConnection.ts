@@ -10,6 +10,8 @@ export interface WalletConnection {
   walletType: WalletType
   chainId: number | undefined
   publicKey: string | undefined
+  isSolanaWallet: boolean
+  isEvmWallet: boolean
 }
 
 // Unified hook for both EVM and Solana wallet connections.
@@ -27,6 +29,8 @@ export function useWalletConnection(): WalletConnection {
       walletType: null,
       chainId: undefined,
       publicKey: undefined,
+      isSolanaWallet: false,
+      isEvmWallet: false,
     }
   }
 
@@ -44,6 +48,8 @@ export function useWalletConnection(): WalletConnection {
       walletType: 'solana',
       chainId: undefined,
       publicKey: appKitAddress,
+      isSolanaWallet: true,
+      isEvmWallet: false,
     }
   }
 
@@ -53,5 +59,7 @@ export function useWalletConnection(): WalletConnection {
     walletType: 'evm',
     chainId,
     publicKey: undefined,
+    isSolanaWallet: false,
+    isEvmWallet: true,
   }
 }

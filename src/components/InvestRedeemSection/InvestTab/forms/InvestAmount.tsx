@@ -33,13 +33,13 @@ export function InvestAmount({
   const { portfolioBalance, hasInvestmentCurrency: hasEvmInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, investmentCurrency, pendingInvestCurrency } = useGetPendingInvestments()
   const { setValue } = useFormContext()
-  const { walletType } = useAddress()
+  const { isSolanaWallet } = useAddress()
   const networkIds = networks?.map((network) => network.chainId)
 
-  const hasInvestmentCurrency = walletType === 'solana' ? Number(maxInvestAmount) > 0 : hasEvmInvestmentCurrency
+  const hasInvestmentCurrency = isSolanaWallet ? Number(maxInvestAmount) > 0 : hasEvmInvestmentCurrency
 
-  const investmentCurrencySymbol = walletType === 'solana' ? 'USDC' : vaultDetails?.investmentCurrency.symbol
-  const investmentCurrencyDecimals = walletType === 'solana' ? 6 : vaultDetails?.investmentCurrency.decimals
+  const investmentCurrencySymbol = isSolanaWallet ? 'USDC' : vaultDetails?.investmentCurrency.symbol
+  const investmentCurrencyDecimals = isSolanaWallet ? 6 : vaultDetails?.investmentCurrency.decimals
 
   // Investment Currencies for changing asset to invest
   // For Solana wallets, only show USDC option
@@ -49,12 +49,12 @@ export function InvestAmount({
       value: vault.address,
     }))
 
-    if (walletType === 'solana') {
+    if (isSolanaWallet) {
       return allCurrencies?.filter((currency) => currency.label === 'USDC')
     }
 
     return allCurrencies
-  }, [vaultsDetails, walletType])
+  }, [vaultsDetails, isSolanaWallet])
 
   // Get the share class info for calculating shares amount to receive
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -140,8 +140,8 @@ export function InvestAmount({
             name="investAmount"
             decimals={investmentCurrencyDecimals}
             placeholder="0.00"
-            selectOptions={walletType === 'solana' ? undefined : investmentCurrencies}
-            currency={walletType === 'solana' ? 'USDC' : undefined}
+            selectOptions={isSolanaWallet ? undefined : investmentCurrencies}
+            currency={isSolanaWallet ? 'USDC' : undefined}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
             disabled={!hasInvestmentCurrency}

@@ -12,10 +12,10 @@ export function useSolanaBalance() {
 
 export function useSolanaUsdcBalance() {
   const centrifuge = useCentrifuge()
-  const { address, walletType } = useAddress()
+  const { address, isSolanaWallet } = useAddress()
   const balance$ = useMemo(
-    () => (address && walletType === 'solana' ? centrifuge.solana?.usdcBalance(address) : undefined),
-    [address, walletType, centrifuge]
+    () => (address && isSolanaWallet ? centrifuge.solana?.usdcBalance(address) : undefined),
+    [address, isSolanaWallet, centrifuge]
   )
   return useObservable(balance$)
 }
