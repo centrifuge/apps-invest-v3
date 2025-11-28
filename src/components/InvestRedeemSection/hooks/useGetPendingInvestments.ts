@@ -13,12 +13,7 @@ export function useGetPendingInvestments() {
   const pricePerShare = poolShareClass?.details.pricePerShare
 
   const calculatedInvestSharesEstimate = useMemo(() => {
-    if (
-      !investment ||
-      !investment.pendingDepositAssets ||
-      investment.pendingDepositAssets.isZero() ||
-      !pricePerShare
-    ) {
+    if (!investment || !investment.pendingDepositAssets || investment.pendingDepositAssets.isZero() || !pricePerShare) {
       return undefined
     }
 
