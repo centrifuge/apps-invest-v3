@@ -28,19 +28,19 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const formattedMaxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
-    return formatBalance(portfolioBalance, investment?.investmentCurrency.symbol, 0) ?? '0'
+    return formatBalance(portfolioBalance, investment?.asset.symbol, 0) ?? '0'
   }, [portfolioBalance])
 
   function invest(amount: Balance) {
-    execute(vault.increaseInvestOrder(amount))
+    execute(vault.asyncDeposit(amount))
   }
 
   const schema = z.object({
     investAmount: createBalanceSchema(
-      vaultDetails?.investmentCurrency.decimals ?? 18,
-      createBalanceValidation({ min: 1, max: maxInvestAmount }, vaultDetails?.investmentCurrency.decimals ?? 18)
+      vaultDetails?.asset.decimals ?? 18,
+      createBalanceValidation({ min: 1, max: maxInvestAmount }, vaultDetails?.asset.decimals ?? 18)
     ),
-    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
+    receiveAmount: createBalanceSchema(vaultDetails?.share.decimals ?? 18).optional(),
     // TODO: Use these when we need to add the sync invest action
     // requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
     //   message: 'Non-US citizen requirement must be confirmed',

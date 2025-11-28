@@ -22,8 +22,8 @@ export function InvestTxFeedback({ setActionType, parsedInvestAmount, parsedRece
   const { vaultDetails } = useVaultsContext()
   const { reset } = useFormContext()
   const { txState, resetTxState, isTxInProgress } = useTxStateFeedback({ type: 'invest' })
-  const investCurrencySymbol = vaultDetails?.investmentCurrency.symbol ?? ''
-  const receiveCurrencySymbol = vaultDetails?.shareCurrency.symbol ?? ''
+  const investCurrencySymbol = vaultDetails?.asset.symbol ?? ''
+  const receiveCurrencySymbol = vaultDetails?.share.symbol ?? ''
 
   const handleClose = () => {
     reset()

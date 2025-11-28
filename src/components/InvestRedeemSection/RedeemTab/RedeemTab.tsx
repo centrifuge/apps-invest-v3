@@ -26,7 +26,7 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   }, [maxRedeemBalance])
 
   function redeem(amount: Balance) {
-    execute(vault.increaseRedeemOrder(amount))
+    execute(vault.asyncRedeem(amount))
   }
 
   const schema = z.object({
@@ -34,7 +34,7 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
       investment?.shareBalance.decimals ?? 18,
       createBalanceValidation({ min: 1, max: maxRedeemAmount }, investment?.shareBalance.decimals ?? 18)
     ),
-    receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6).optional(),
+    receiveAmount: createBalanceSchema(vaultDetails?.asset.decimals ?? 6).optional(),
   })
 
   const form = useForm({
