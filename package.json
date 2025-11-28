@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "pnpm dlx eslint .",
     "lint:fix": "pnpm dlx eslint --fix .",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "theme:typings": "npx @chakra-ui/cli typegen ./src/ui/theme/theme.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
