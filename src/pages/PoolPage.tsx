@@ -18,13 +18,13 @@ export default function PoolPage() {
   const { investment, isLoading: isVaultsLoading } = useVaultsContext()
   const { getIsRwaPool } = useGetPoolsByIds()
   const isRwaPool = getIsRwaPool(poolId)
-  const poolName = poolDetails?.metadata?.pool.name
+  const poolName = poolDetails?.metadata?.pool?.name ?? ''
 
   if (isPoolLoading || isVaultsLoading) {
     return <PoolPageSkeleton />
   }
 
-  if (!poolDetails || !networks || !shareClass) {
+  if (!poolDetails || !poolDetails?.metadata?.pool || !networks || !shareClass) {
     return <BackLink heading="Sorry, no pool data available at this time." />
   }
 

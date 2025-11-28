@@ -1,6 +1,7 @@
 import { z, type ZodTypeAny, type ZodEffects } from 'zod'
 import { Balance, Price } from '@centrifuge/sdk'
 import { parseUnits } from 'viem'
+import Decimal from 'decimal.js'
 
 /** -------- Base Schemas -------- **/
 
@@ -25,36 +26,6 @@ export function numberInput<T extends ZodTypeAny>(schema: T): ZodEffects<T, z.in
 }
 
 /**
- * Base schema for validating Balance inputs.
- * It preprocesses the input to handle different types (string, number, or Balance).
- * If the input is a string or number, it converts it to a float.
- * If the input is already a Balance instance, it extracts the float value for validation.
- * If the input is not valid, it returns undefined.
- */
-export function balanceInput<T extends ZodTypeAny>(schema: T): ZodEffects<T, z.infer<T>, string | number | Balance> {
-  return z.preprocess((value) => {
-    // If it's already a Balance, extract the float value for validation
-    if (value instanceof Balance) {
-      return value.toFloat()
-    }
-
-    // Handle string input
-    if (typeof value === 'string' && value !== '' && !Number.isNaN(Number(value))) {
-      return Number(value)
-    }
-
-    // Handle number input
-    if (typeof value === 'number') {
-      return value
-    }
-
-    return undefined
-  }, schema) as ZodEffects<T, z.infer<T>, string | number | Balance>
-}
-
-/** -------- Utility Schemas -------- **/
-
-/**
  * Uses the numberInput schema to validate that the number equals at least the min value.
  * It ensures that the input is a valid number, string, or bigint, and returns a number.
  */
@@ -62,29 +33,82 @@ export function numberInputMin(min: number, message?: string) {
   return numberInput(z.number().min(min, message ?? `Amount must be at least ${min}`))
 }
 
-/**
- * Uses the balanceInput schema to validate a Balance type with the specified number of decimals.
- * It transforms the input into a Balance instance using the provided decimals.
- * If a validation schema is provided, it will be used to validate the input before transformation.
- *
- * Example usage:
- * amount: createBalanceSchema(decimalsValue, z.number().min(0.01))
- */
-export function createBalanceSchema(decimals: number, validation?: z.ZodNumber) {
-  const numberSchema = validation || z.number().min(0)
+/** -------- Balance Schemas -------- **/
 
-  return balanceInput(numberSchema).transform((value) => Balance.fromFloat(value, decimals))
+/**
+ * Parse a string or number into a BigInt value, accounting for decimals.
+ * For example: "123.456" with decimals=18 → 123456000000000000000n
+ */
+function parseDecimalToBigInt(value: string | number, decimals: number): bigint {
+  const strValue = typeof value === 'number' ? value.toString() : value
+  const [intPart, fracPart] = strValue.split('.')
+  const integer = intPart || '0'
+  const fractional = (fracPart || '').padEnd(decimals, '0').slice(0, decimals)
+
+  return BigInt(integer + fractional)
+}
+
+interface BalanceValidation {
+  min?: bigint
+  max?: bigint
+}
+
+export function createBalanceSchema(
+  decimals: number,
+  validation?: BalanceValidation | { min?: Balance; max?: Balance }
+) {
+  // Normalize Balance objects to BigInt
+  let normalizedValidation: BalanceValidation | undefined
+  if (validation) {
+    const isBalance = (v: unknown): v is Balance => typeof v === 'object' && v !== null && 'toBigInt' in (v as any)
+
+    normalizedValidation = {
+      min: isBalance(validation.min) ? validation.min.toBigInt() : (validation.min as bigint | undefined),
+      max: isBalance(validation.max) ? validation.max.toBigInt() : (validation.max as bigint | undefined),
+    }
+  }
+  return z.preprocess(
+    (value) => {
+      if (value instanceof Balance) {
+        return value.toDecimal().toString()
+      }
+
+      if (typeof value === 'string' && value !== '') {
+        return value
+      }
+
+      if (typeof value === 'number') {
+        return value.toString()
+      }
+
+      return undefined
+    },
+    z
+      .string()
+      .refine((val) => !Number.isNaN(Number(val)), 'Must be a valid number')
+      .transform((strValue) => parseDecimalToBigInt(strValue, decimals))
+      .refine((bigIntValue) => normalizedValidation?.min === undefined || bigIntValue >= normalizedValidation.min, {
+        message: `Must be at least ${normalizedValidation?.min ? new Decimal(normalizedValidation.min.toString()).dividedBy(10 ** decimals).toString() : '0'}`,
+      })
+      .refine((bigIntValue) => normalizedValidation?.max === undefined || bigIntValue <= normalizedValidation.max, {
+        message: `Must be at most ${normalizedValidation?.max ? new Decimal(normalizedValidation.max.toString()).dividedBy(10 ** decimals).toString() : '0'}`,
+      })
+      .transform((bigIntValue) => new Balance(bigIntValue, decimals))
+  ) as unknown as z.ZodEffects<z.ZodString, Balance, string | number | Balance>
 }
 
 /**
- * Uses the balanceInput schema to validate a Balance type with a minimum value.
- * Validates as number, can transform later into a Balance instance if needed.
- *
- * Example usage:
- * minAmount: balanceMin(0.01, 18),
+ * Helper to create validation bounds from decimal numbers
+ * For example: createBalanceValidation({ min: "1", max: "1000" }, 18)
  */
-export function balanceMin(min: number, message?: string) {
-  return balanceInput(z.number().min(min, message))
+export function createBalanceValidation(
+  limits: { min?: string | number; max?: string | number },
+  decimals: number
+): BalanceValidation {
+  return {
+    min: limits.min !== undefined ? parseDecimalToBigInt(limits.min, decimals) : undefined,
+    max: limits.max !== undefined ? parseDecimalToBigInt(limits.max, decimals) : undefined,
+  }
 }
 
 /** -------- Custom Schema (precision safe) -------- **/

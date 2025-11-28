@@ -1,9 +1,9 @@
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 import { useDebugFlags } from '../components/DebugFlags'
 
 const useAddress = () => {
   const { address: debugAddress } = useDebugFlags()
-  const { address, isConnected, chainId } = useAccount()
+  const { address, isConnected, chainId } = useConnection()
 
   return {
     address: (debugAddress as `0x${string}`) || address,

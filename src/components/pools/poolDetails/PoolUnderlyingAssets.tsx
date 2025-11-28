@@ -1,16 +1,13 @@
 import { Link } from 'react-router-dom'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
 import { chainExplorer, usePoolDetails } from '@cfg'
-import { ChronicleBadge } from '@components/elements/ChronicleBadge'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
-import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { NetworkIcon, Tooltip } from '@ui'
 
 export function PoolUnderlyingAssets() {
-  const { networks, poolDetails, pools, poolId } = usePoolContext()
+  const { networks, poolDetails, pools } = usePoolContext()
   const { investment } = useVaultsContext()
-  const { getIsChroniclePool } = useGetPoolsByIds()
 
   // Get underlying pool metadata
   const underlyingPoolIdNumber = poolDetails?.metadata?.pool.underlying?.poolId ?? 0
@@ -49,10 +46,11 @@ export function PoolUnderlyingAssets() {
     },
     // Todo: expense ratio in the future would come from onchain and not metadata
     { label: 'Expense ratio', value: (underlyingMetadata?.pool as any)?.expenseRatio || 'Unknown' },
-    {
-      label: 'Verified by',
-      value: getIsChroniclePool(poolId) ? <ChronicleBadge /> : null,
-    },
+    // TODO: add back when chronicle integration is working
+    // {
+    //   label: 'Verified by',
+    //   value: getIsChroniclePool(poolId) ? <ChronicleBadge /> : null,
+    // },
   ]
 
   return (
