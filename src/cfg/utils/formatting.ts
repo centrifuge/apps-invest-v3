@@ -101,9 +101,24 @@ export function formatBigintToString(bigInt: bigint, bigintDecimals: number, for
   return Number(formatUnits(bigInt, bigintDecimals)).toFixed(decimals)
 }
 
-export function formatBalanceToString(amount: Balance, precision = 0) {
+export function formatBalanceToString(amount: Balance, precision?: number) {
   if (!(typeof amount === 'object' && 'decimals' in amount)) return ''
-  const decimalValue = new Decimal(amount.toFloat())
+
+  const bigIntValue = amount.toBigInt()
+  const decimals = amount.decimals
+  const valueStr = bigIntValue.toString().padStart(decimals + 1, '0')
+  const decimalIndex = valueStr.length - decimals
+  const integerPart = valueStr.slice(0, decimalIndex)
+  const fractionalPart = valueStr.slice(decimalIndex)
+  const fullDecimalString = `${integerPart}.${fractionalPart}`
+
+  // If no precision specified, return full precision string
+  // You'll need this for setting max values in createBalanceValidation schemas
+  if (precision === undefined) {
+    return fullDecimalString
+  }
+
+  const decimalValue = new Decimal(fullDecimalString)
   const truncatedValue = decimalValue.toDecimalPlaces(precision, Decimal.ROUND_DOWN)
 
   return truncatedValue.toString()

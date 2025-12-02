@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { Form, useForm, safeParse, createBalanceSchema } from '@forms'
+import { Form, useForm, safeParse, createBalanceSchema, createBalanceValidation } from '@forms'
 import { Balance } from '@centrifuge/sdk'
 import {
   formatBalance,
@@ -11,6 +11,7 @@ import {
   useInvestment,
   useVaultDetails,
   useSolanaUsdcBalance,
+  formatBalanceToString,
 } from '@cfg'
 import {
   type InvestActionType,
@@ -45,24 +46,38 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const maxInvestAmount = useMemo(() => {
     if (!investBalance) return '0'
-    return investBalance.toFloat().toFixed(0)
+    return formatBalanceToString(investBalance)
   }, [investBalance])
 
   const formattedMaxInvestAmount = useMemo(() => {
     if (!investBalance) return '0'
-    const currencySymbol = isSolanaWallet ? 'USDC' : investment?.investmentCurrency.symbol
+    const currencySymbol = isSolanaWallet ? 'USDC' : investment?.asset.symbol
     return formatBalance(investBalance, currencySymbol, 0) ?? '0'
   }, [investBalance, isSolanaWallet, investment])
 
   function invest(amount: Balance) {
-    executeEvm(vault.increaseInvestOrder(amount))
+    executeEvm(vault.asyncDeposit(amount))
   }
 
-  const investmentDecimals = isSolanaWallet ? 6 : (vaultDetails?.investmentCurrency.decimals ?? 18)
+  const investmentDecimals = isSolanaWallet ? 6 : (vaultDetails?.asset.decimals ?? 18)
 
   const schema = z.object({
-    investAmount: createBalanceSchema(investmentDecimals, z.number().min(1).max(Number(maxInvestAmount))),
-    receiveAmount: createBalanceSchema(vaultDetails?.shareCurrency.decimals ?? 18).optional(),
+    investAmount: createBalanceSchema(
+      investmentDecimals,
+      createBalanceValidation({ min: 1, max: maxInvestAmount }, investmentDecimals)
+    ),
+    receiveAmount: createBalanceSchema(vaultDetails?.share.decimals ?? 18).optional(),
+    // TODO: Use these when we need to add the sync invest action
+    // requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
+    //   message: 'Non-US citizen requirement must be confirmed',
+    // }),
+    // requirement_nonSanctionedList: z.boolean().refine((val) => val === true, {
+    //   message: 'Non-sanctioned list requirement must be confirmed',
+    // }),
+    // requirement_redeemLater: z.boolean().refine((val) => val === true, {
+    //   message: 'Redeem later requirement must be confirmed',
+    // }),
+    // investorRequirements: z.array(z.boolean()).length(3, 'Array must contain exactly 3 requirements'),
   })
 
   const form = useForm({

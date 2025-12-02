@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { createBalanceSchema, Form, safeParse, useForm } from '@forms'
+import { createBalanceSchema, createBalanceValidation, Form, safeParse, useForm } from '@forms'
 import { Balance } from '@centrifuge/sdk'
 import { formatBalanceToString, useCentrifugeTransaction } from '@cfg'
 import {
@@ -21,20 +21,20 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const maxRedeemAmount = useMemo(() => {
     if (maxRedeemBalance === 0) return ''
-
-    return formatBalanceToString(maxRedeemBalance, maxRedeemBalance.decimals) ?? ''
+    // Don't pass precision parameter to preserve full decimal precision for validation
+    return formatBalanceToString(maxRedeemBalance) ?? ''
   }, [maxRedeemBalance])
 
   function redeem(amount: Balance) {
-    execute(vault.increaseRedeemOrder(amount))
+    execute(vault.asyncRedeem(amount))
   }
 
   const schema = z.object({
     redeemAmount: createBalanceSchema(
       investment?.shareBalance.decimals ?? 18,
-      z.number().min(1).max(Number(maxRedeemAmount))
+      createBalanceValidation({ min: 1, max: maxRedeemAmount }, investment?.shareBalance.decimals ?? 18)
     ),
-    receiveAmount: createBalanceSchema(vaultDetails?.investmentCurrency.decimals ?? 6).optional(),
+    receiveAmount: createBalanceSchema(vaultDetails?.asset.decimals ?? 6).optional(),
   })
 
   const form = useForm({

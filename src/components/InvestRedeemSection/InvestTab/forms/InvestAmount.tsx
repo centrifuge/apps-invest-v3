@@ -31,21 +31,21 @@ export function InvestAmount({
   const { poolDetails, networks } = usePoolContext()
   const { vaultDetails, vaultsDetails, vaults, setVault } = useVaultsContext()
   const { portfolioBalance, hasInvestmentCurrency: hasEvmInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
-  const { hasPendingInvestments, investmentCurrency, pendingInvestCurrency } = useGetPendingInvestments()
+  const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const { isSolanaWallet } = useAddress()
   const networkIds = networks?.map((network) => network.chainId)
 
   const hasInvestmentCurrency = isSolanaWallet ? Number(maxInvestAmount) > 0 : hasEvmInvestmentCurrency
 
-  const investmentCurrencySymbol = isSolanaWallet ? 'USDC' : vaultDetails?.investmentCurrency.symbol
-  const investmentCurrencyDecimals = isSolanaWallet ? 6 : vaultDetails?.investmentCurrency.decimals
+  const investmentCurrencySymbol = isSolanaWallet ? 'USDC' : vaultDetails?.asset.symbol
+  const investmentCurrencyDecimals = isSolanaWallet ? 6 : vaultDetails?.asset.decimals
 
   // Investment Currencies for changing asset to invest
   // For Solana wallets, only show USDC option
   const investmentCurrencies = useMemo(() => {
     const allCurrencies = vaultsDetails?.map((vault) => ({
-      label: vault.investmentCurrency.symbol,
+      label: vault.asset.symbol,
       value: vault.address,
     }))
 
@@ -115,11 +115,11 @@ export function InvestAmount({
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
-        {hasPendingInvestments && pendingInvestCurrency ? (
+        {hasPendingInvestments && pendingDepositAssets ? (
           <PendingInvestmentBanner
             label="Pending investments"
-            amount={pendingInvestCurrency}
-            currencySymbol={investmentCurrency?.symbol}
+            amount={pendingDepositAssets}
+            currencySymbol={asset?.symbol}
           />
         ) : null}
         <Box>
@@ -176,7 +176,7 @@ export function InvestAmount({
                 </Text>
                 <BalanceDisplay
                   balance={parsedReceiveAmount}
-                  currency={vaultDetails?.shareCurrency.symbol}
+                  currency={vaultDetails?.share.symbol}
                   precision={2}
                   mt={6}
                   fontSize="xs"
@@ -185,10 +185,10 @@ export function InvestAmount({
               </Flex>
               <BalanceInput
                 name="receiveAmount"
-                decimals={vaultDetails?.shareCurrency.decimals}
+                decimals={vaultDetails?.share.decimals}
                 placeholder="0.00"
                 disabled
-                currency={vaultDetails?.shareCurrency.symbol}
+                currency={vaultDetails?.share.symbol}
               />
             </>
           )}

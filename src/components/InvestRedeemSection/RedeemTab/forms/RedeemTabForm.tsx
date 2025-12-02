@@ -26,8 +26,8 @@ export function RedeemTabForm({
 }: RedeemTabFormProps) {
   const { networks } = usePoolContext()
   const { investment } = useVaultsContext()
-  const redeemCurrencySymbol = investment?.shareCurrency.symbol ?? ''
-  const receiveCurrencySymbol = investment?.investmentCurrency.symbol ?? ''
+  const redeemCurrencySymbol = investment?.share.symbol ?? ''
+  const receiveCurrencySymbol = investment?.asset.symbol ?? ''
 
   const currencies = useMemo(
     () => ({
