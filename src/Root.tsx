@@ -36,9 +36,20 @@ const TESTNET_RPC_URLS = {
   11142220: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
+const SOLANA_RPC_URLS = {
+  mainnet: 'https://api.mainnet-beta.solana.com',
+  testnet: 'https://api.testnet.solana.com',
+  devnet: 'https://api.devnet.solana.com',
+}
+
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
+
+  const solanaRpcUrl = useMemo(
+    () => (import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet' ? SOLANA_RPC_URLS.mainnet : SOLANA_RPC_URLS.devnet),
+    []
+  )
 
   /**
    * Initialize Centrifuge SDK with any necessary config.
@@ -56,8 +67,13 @@ function RootProviders() {
       indexerUrl,
       rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
       pollingInterval: 15000,
+      solana: {
+        rpcUrl: solanaRpcUrl,
+        commitment: 'confirmed',
+        environment: isMainnet ? 'mainnet' : 'devnet',
+      },
     })
-  }, [showMainnet])
+  }, [showMainnet, solanaRpcUrl])
 
   /**
    * For WalletProvider networks, we need to include ALL possible networks (mainnet + testnet)
@@ -99,7 +115,7 @@ function RootProviders() {
   )
 
   // Combine all networks for wallet provider (AppKit needs all networks upfront)
-  const allNetworks = useMemo(() => {
+  const evmNetworks = useMemo(() => {
     const networks = [...mainnetNetworks, ...testnetNetworks]
     // Add BNB chains if not already present
     const mainnetBnbId = 56
@@ -116,7 +132,11 @@ function RootProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={allNetworks}>
+        <WalletProvider
+          projectId={import.meta.env.VITE_REOWN_APP_ID!}
+          evmNetworks={evmNetworks}
+          solanaRpcUrl={solanaRpcUrl}
+        >
           <TransactionProvider>
             <PoolProvider>
               <VaultsProvider>

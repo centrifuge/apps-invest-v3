@@ -11,6 +11,7 @@ import { StepIndicator } from '@components/elements/StepIndicator'
 import { useTxStateFeedback } from '@components/InvestRedeemSection/hooks/useTxStateFeedback'
 import { Balance } from '@centrifuge/sdk'
 import { BalanceDisplay, Tooltip } from '@ui'
+import { useAddress } from '@cfg'
 
 interface InvestTxFeedbackProps {
   parsedInvestAmount: Balance | 0
@@ -22,7 +23,8 @@ export function InvestTxFeedback({ setActionType, parsedInvestAmount, parsedRece
   const { vaultDetails } = useVaultsContext()
   const { reset } = useFormContext()
   const { txState, resetTxState, isTxInProgress } = useTxStateFeedback({ type: 'invest' })
-  const investCurrencySymbol = vaultDetails?.asset.symbol ?? ''
+  const { isSolanaWallet } = useAddress()
+  const investCurrencySymbol = isSolanaWallet ? 'USDC' : (vaultDetails?.asset.symbol ?? '')
   const receiveCurrencySymbol = vaultDetails?.share.symbol ?? ''
 
   const handleClose = () => {

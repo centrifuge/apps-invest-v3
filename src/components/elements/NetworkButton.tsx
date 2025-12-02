@@ -1,9 +1,11 @@
-import { NetworkIcon } from '@ui'
-import { Box, Button, ButtonProps, Icon, Portal, VStack, useDisclosure } from '@chakra-ui/react'
-import { useChains, useChainId, useSwitchChain } from 'wagmi'
 import { useEffect, useRef, useMemo } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
+import { useChains, useChainId, useSwitchChain } from 'wagmi'
+import { Box, Button, ButtonProps, Icon, Image, Portal, VStack, useDisclosure } from '@chakra-ui/react'
 import { useDebugFlags } from '@cfg'
+import { useWalletConnection } from '@wallet/useWalletConnection'
+import { NetworkIcon } from '@ui'
+import SolanaSVG from '../../assets/logos/solana.svg'
 
 // Mainnet chain IDs
 const MAINNET_CHAIN_IDS = [
@@ -28,6 +30,7 @@ const TESTNET_CHAIN_IDS = [
 export function NetworkButton(props: ButtonProps) {
   const allChains = useChains()
   const { showMainnet } = useDebugFlags()
+  const { isEvmWallet, isSolanaWallet } = useWalletConnection()
   const connectedChain = useChainId()
   const { switchChain } = useSwitchChain()
   const { open, onToggle, onClose } = useDisclosure()
@@ -87,13 +90,19 @@ export function NetworkButton(props: ButtonProps) {
         _active={{ backgroundColor: 'bg.subtle' }}
         {...props}
       >
-        <NetworkIcon networkId={connectedChain} />
-        <Icon size="xs" textAlign="right">
-          <FaChevronDown fill="#91969B" />
-        </Icon>
+        {isSolanaWallet ? (
+          <Image src={SolanaSVG} boxSize="24px" objectFit="contain" alt="Solana logo" />
+        ) : (
+          <>
+            <NetworkIcon networkId={connectedChain} />
+            <Icon size="xs" textAlign="right">
+              <FaChevronDown fill="#91969B" />
+            </Icon>
+          </>
+        )}
       </Button>
 
-      {open && (
+      {open && isEvmWallet && (
         <Portal>
           <Box
             ref={dropdownRef}
