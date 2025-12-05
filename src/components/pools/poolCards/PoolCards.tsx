@@ -14,6 +14,7 @@ interface DisplayPool {
   setId: () => void
   pool: PoolDetails
   isRwaPool: boolean
+  isDeRwaPool: boolean
 }
 
 interface PoolCardsProps {
@@ -24,7 +25,7 @@ interface PoolCardsProps {
 export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
   const { showMainnet } = useDebugFlags()
   const { data: pools, isLoading } = useAllPoolDetails(poolIds)
-  const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool } = useGetPoolsByIds()
+  const { getIsProductionPool, getIsRestrictedPool, getIsDeRwaPool, getIsRwaPool } = useGetPoolsByIds()
 
   const allPools: DisplayPool[] | undefined = useMemo(
     () =>
@@ -33,6 +34,7 @@ export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
         setId: () => setSelectedPoolId(pool.id),
         pool,
         isRwaPool: getIsRwaPool(pool.id.toString()),
+        isDeRwaPool: getIsDeRwaPool(pool.id.toString()),
       })),
     [pools]
   )
@@ -44,7 +46,7 @@ export const PoolCards = ({ poolIds, setSelectedPoolId }: PoolCardsProps) => {
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
   const displayPools = isMainnet ? productionPools : allPools
   const rwaPools = displayPools?.filter((pool) => pool.isRwaPool) ?? []
-  const deRwaPools = displayPools?.filter((pool) => !pool.isRwaPool) ?? []
+  const deRwaPools = displayPools?.filter((pool) => pool.isDeRwaPool) ?? []
 
   if (isLoading) return <PoolCardsSkeleton />
 

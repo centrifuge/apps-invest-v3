@@ -9,6 +9,7 @@ import { PendingInvestmentBanner } from '@components/InvestRedeemSection/compone
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
+import { useGetVaultCurrencyOptions } from '@hooks/useGetVaultCurrencyOptions'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -26,16 +27,13 @@ export function RedeemAmount({
   parsedReceiveAmount,
 }: RedeemAmountProps) {
   const { poolDetails } = usePoolContext()
-  const { investment, vaults, vaultDetails, vaultsDetails, setVault } = useVaultsContext()
+  const { investment, vaults, vaultDetails, setVault } = useVaultsContext()
   const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
   const { setValue } = useFormContext()
+  const redemptionCurrencies = useGetVaultCurrencyOptions({ isRedeem: true })
 
   // Get networkIds and currencies for receiveAmount select currency list
   const networkIds = networks?.map((network) => network.chainId)
-  const investmentCurrencies = vaultsDetails?.map((vault) => ({
-    label: vault.asset.symbol,
-    value: vault.address,
-  }))
 
   // Get the pricePerShare
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -189,7 +187,7 @@ export function RedeemAmount({
                 placeholder="0.00"
                 decimals={vaultDetails?.asset.decimals}
                 onChange={debouncedCalculateRedeemAmount}
-                selectOptions={investmentCurrencies}
+                selectOptions={redemptionCurrencies}
                 onSelectChange={changeVault}
               />
             </>
