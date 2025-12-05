@@ -4,7 +4,6 @@ import { Box, Flex, Separator } from '@chakra-ui/react'
 import { ErrorBoundary, LogoCentrifugeText } from '@ui'
 import { WalletButton } from '@wallet/WalletButton'
 import { NetworkButton } from '@components/elements/NetworkButton'
-import { MigrationBanner } from '@components/elements/MigrationBanner'
 import { routePaths } from '@routes/routePaths'
 import mainBg from '../assets/main_bg.jpg'
 
@@ -25,7 +24,6 @@ const MainLayout = memo(() => {
                 <LogoCentrifugeText fill="fg.solid" />
               </Link>
             </Box>
-            <MigrationBanner />
             <Box>
               <NetworkButton mr={4} size="sm" height="40px" />
               <WalletButton />

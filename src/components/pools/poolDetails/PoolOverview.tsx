@@ -45,7 +45,7 @@ export function PoolOverview() {
     {
       label: ' Rating',
       value:
-        metadata?.pool.poolRatings && metadata?.pool.poolRatings[0].value ? (
+        metadata?.pool?.poolRatings && metadata?.pool?.poolRatings[0]?.value ? (
           <Flex alignItems="center" justifyContent="flex-end">
             {metadata?.pool.poolRatings?.map((rating) => {
               const agency = getAgencyNormalisedName(rating.agency)
