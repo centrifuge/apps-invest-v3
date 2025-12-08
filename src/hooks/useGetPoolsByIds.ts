@@ -1,15 +1,6 @@
 import { useMemo } from 'react'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useIsUserWhitelisted } from '@hooks/useIsUserWhitelisted'
-
-/**
- * Each pool has flags indicating its characteristics:
- * - isProduction: Pool is available on mainnet
- * - isRwa: Pool is an RWA (Real World Asset) pool
- * - isDeRwa: Pool is a deRWA (decentralized RWA) pool
- * - isRestricted: Pool requires whitelist access to view certain data
- * - chronicleIpfsUri: If set, pool has Chronicle oracle integration
- */
 interface PoolConfig {
   name: string
   isProduction: boolean

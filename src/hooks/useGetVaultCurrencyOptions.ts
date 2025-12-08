@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 
-// isRedeem: true for redeem currency options, false for invest currency options
 export function useGetVaultCurrencyOptions({ isRedeem }: { isRedeem: boolean }) {
   const { vaultsDetails } = useVaultsContext()
   const { getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
