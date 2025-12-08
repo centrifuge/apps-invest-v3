@@ -26,7 +26,7 @@ export function WalletProvider({ projectId, networks, children }: WalletProvider
         injected(),
       ],
       transports: Object.fromEntries(networks.map((chain) => [chain.id, http()])),
-      pollingInterval: 15000,
+      pollingInterval: 60000,
     })
   }, [projectId, networks])
 

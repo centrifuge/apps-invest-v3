@@ -7,7 +7,23 @@ import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
 import { VaultsProvider } from '@contexts/VaultsContext'
-import { bscTestnet, bsc } from 'wagmi/chains'
+import {
+  mainnet,
+  sepolia,
+  base,
+  baseSepolia,
+  arbitrum,
+  arbitrumSepolia,
+  avalanche,
+  bsc,
+  bscTestnet,
+  plumeMainnet,
+  plumeTestnet,
+} from 'wagmi/chains'
+
+const MAINNET_CHAINS = [mainnet, base, arbitrum, avalanche, bsc, plumeMainnet]
+const TESTNET_CHAINS = [sepolia, baseSepolia, arbitrumSepolia, bscTestnet, plumeTestnet]
+const ALL_CHAINS = [...MAINNET_CHAINS, ...TESTNET_CHAINS]
 
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
 // TODO: Use after updating new app keys
@@ -55,68 +71,25 @@ function RootProviders() {
       environment: isMainnet ? 'mainnet' : 'testnet',
       indexerUrl,
       rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
-      pollingInterval: 15000,
+      pollingInterval: 60000,
     })
   }, [showMainnet])
 
   /**
-   * For WalletProvider networks, we need to include ALL possible networks (mainnet + testnet)
+   * For WalletProvider networks, we include ALL possible networks (mainnet + testnet)
    * because AppKit cannot dynamically update networks after initialization.
    * The actual environment switching (mainnet vs testnet) is handled by the Centrifuge SDK above.
-   * In development with showMainnet debug flag, users can connect to any network,
-   * but the app data (pools, vaults, etc.) will be filtered based on the Centrifuge environment.
+   *
+   * IMPORTANT: We use static chain imports from wagmi/chains (ALL_CHAINS) instead of
+   * creating and importing from extra Centrifuge SDK instances (getChainConfig()), as each
+   * instance creates its own viem publicClient per chain with independent event watchers and polling,
+   * which would multiply RPC requests unnecessarily.
    */
-  const mainnetCentrifuge = useMemo(
-    () =>
-      new Centrifuge({
-        environment: 'mainnet',
-        indexerUrl: import.meta.env.VITE_INDEXER_URL_MAINNET,
-        rpcUrls: MAINNET_RPC_URLS,
-        pollingInterval: 15000,
-      }),
-    []
-  )
-
-  const testnetCentrifuge = useMemo(
-    () =>
-      new Centrifuge({
-        environment: 'testnet',
-        indexerUrl: import.meta.env.VITE_INDEXER_URL_TESTNET,
-        rpcUrls: TESTNET_RPC_URLS,
-        pollingInterval: 15000,
-      }),
-    []
-  )
-
-  // Get networks from both mainnet and testnet Centrifuge instances
-  const mainnetNetworks = useMemo(
-    () => mainnetCentrifuge.chains.map((cid) => mainnetCentrifuge.getChainConfig(cid)),
-    [mainnetCentrifuge]
-  )
-  const testnetNetworks = useMemo(
-    () => testnetCentrifuge.chains.map((cid) => testnetCentrifuge.getChainConfig(cid)),
-    [testnetCentrifuge]
-  )
-
-  // Combine all networks for wallet provider (AppKit needs all networks upfront)
-  const allNetworks = useMemo(() => {
-    const networks = [...mainnetNetworks, ...testnetNetworks]
-    // Add BNB chains if not already present
-    const mainnetBnbId = 56
-    const testnetBnbId = 97
-    const hasMainnetBnb = networks.some((n) => n.id === mainnetBnbId)
-    const hasTestnetBnb = networks.some((n) => n.id === testnetBnbId)
-
-    if (!hasMainnetBnb) networks.push(bsc)
-    if (!hasTestnetBnb) networks.push(bscTestnet)
-
-    return networks
-  }, [mainnetNetworks, testnetNetworks])
 
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={allNetworks}>
+        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={ALL_CHAINS}>
           <TransactionProvider>
             <PoolProvider>
               <VaultsProvider>
