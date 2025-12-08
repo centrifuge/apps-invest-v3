@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 
+// isRedeem: true for redeem currency options, false for invest currency options
 export function useGetVaultCurrencyOptions({ isRedeem }: { isRedeem: boolean }) {
   const { vaultsDetails } = useVaultsContext()
   const { getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
@@ -15,6 +16,10 @@ export function useGetVaultCurrencyOptions({ isRedeem }: { isRedeem: boolean }) 
       .filter((vault) => {
         const isRwaPool = getIsRwaPool(vault.pool.id.toString())
         const isDeRwaPool = getIsDeRwaPool(vault.pool.id.toString())
+        /*
+         * For RWA pools, any invest or redeem tx must be async, so we filter out sync vaults
+         * For deRWA pools, invest or redeem tx must be sync, so we filter for sync only vaults
+         */
         if (isRwaPool) {
           return isRedeem ? !vault.isSyncRedeem : !vault.isSyncDeposit
         }

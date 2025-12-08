@@ -3,7 +3,6 @@ import { usePoolContext } from '@contexts/PoolContext'
 import { useIsUserWhitelisted } from '@hooks/useIsUserWhitelisted'
 
 /**
- * Pool configuration registry
  * Each pool has flags indicating its characteristics:
  * - isProduction: Pool is available on mainnet
  * - isRwa: Pool is an RWA (Real World Asset) pool
