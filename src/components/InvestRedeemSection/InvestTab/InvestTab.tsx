@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema, createBalanceValidation } from '@forms'
 import { Balance } from '@centrifuge/sdk'
-import { formatBalance, formatBalanceToString, useCentrifugeTransaction, useInvestment, useVaultDetails } from '@cfg'
+import { formatBalance, formatBalanceToString, useCentrifugeTransaction } from '@cfg'
 import {
   type InvestActionType,
   InvestAction,
@@ -12,10 +12,10 @@ import {
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 import { TabProps } from '@components/InvestRedeemSection'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { useVaultsContext } from '@contexts/VaultsContext'
 
 export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
-  const { data: vaultDetails, isLoading: isVaultDetailsLoading } = useVaultDetails(vault)
-  const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault)
+  const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
   const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
@@ -41,17 +41,6 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
       createBalanceValidation({ min: 1, max: maxInvestAmount }, vaultDetails?.asset.decimals ?? 18)
     ),
     receiveAmount: createBalanceSchema(vaultDetails?.share.decimals ?? 18).optional(),
-    // TODO: Use these when we need to add the sync invest action
-    // requirement_nonUsCitizen: z.boolean().refine((val) => val === true, {
-    //   message: 'Non-US citizen requirement must be confirmed',
-    // }),
-    // requirement_nonSanctionedList: z.boolean().refine((val) => val === true, {
-    //   message: 'Non-sanctioned list requirement must be confirmed',
-    // }),
-    // requirement_redeemLater: z.boolean().refine((val) => val === true, {
-    //   message: 'Redeem later requirement must be confirmed',
-    // }),
-    // investorRequirements: z.array(z.boolean()).length(3, 'Array must contain exactly 3 requirements'),
   })
 
   const form = useForm({
