@@ -76,7 +76,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
         setNetwork(currentNetwork)
       }
     }
-  })
+  }, [networks, connectedChainId, network])
 
   // Use a ref to track if we've already set the initial pool ID
   const hasSetInitialPoolRef = useRef(false)
