@@ -11,6 +11,7 @@ import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { infoText } from '@utils/infoText'
+import { useGetVaultCurrencyOptions } from '@hooks/useGetVaultCurrencyOptions'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -29,17 +30,12 @@ export function InvestAmount({
   parsedReceiveAmount,
 }: InvestAmountProps) {
   const { poolDetails, networks } = usePoolContext()
-  const { vaultDetails, vaultsDetails, vaults, setVault } = useVaultsContext()
+  const { vaultDetails, vaults, setVault } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const networkIds = networks?.map((network) => network.chainId)
-
-  // Investment Currencies for changing asset to invest
-  const investmentCurrencies = vaultsDetails?.map((vault) => ({
-    label: vault.asset.symbol,
-    value: vault.address,
-  }))
+  const depositCurrencies = useGetVaultCurrencyOptions({ isRedeem: false })
 
   // Get the share class info for calculating shares amount to receive
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -125,7 +121,7 @@ export function InvestAmount({
             name="investAmount"
             decimals={vaultDetails?.asset.decimals}
             placeholder="0.00"
-            selectOptions={investmentCurrencies}
+            selectOptions={depositCurrencies}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
             disabled={!hasInvestmentCurrency}
