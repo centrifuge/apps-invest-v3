@@ -95,7 +95,7 @@ export function RedeemTxFeedback({
             </Flex>
           </Tooltip>
           <Text fontSize="md" whiteSpace="normal" wordWrap="break-word" textAlign="right">
-            <BalanceDisplay balance={parsedReceiveAmount} currency={receiveCurrency} />
+            <BalanceDisplay as="span" balance={parsedReceiveAmount} currency={receiveCurrency} />
           </Text>
         </Flex>
       </Box>

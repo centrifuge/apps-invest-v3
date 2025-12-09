@@ -30,12 +30,13 @@ export function InvestAmount({
   parsedReceiveAmount,
 }: InvestAmountProps) {
   const { poolDetails, networks } = usePoolContext()
-  const { vaultDetails, vaults, setVault } = useVaultsContext()
+  const { investment, vaultDetails, vaults, setVault } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const networkIds = networks?.map((network) => network.chainId)
   const depositCurrencies = useGetVaultCurrencyOptions({ isRedeem: false })
+  const isDepositAllowed = investment?.isAllowedToDeposit ?? false
 
   // Get the share class info for calculating shares amount to receive
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -124,7 +125,7 @@ export function InvestAmount({
             selectOptions={depositCurrencies}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
-            disabled={!hasInvestmentCurrency}
+            disabled={!hasInvestmentCurrency || !isDepositAllowed}
           />
           <Flex mt={2} justify="space-between">
             <Flex>
@@ -174,15 +175,21 @@ export function InvestAmount({
           )}
         </Box>
         <Box>
-          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled} mt={6}>
+          <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled || !isDepositAllowed} mt={6}>
             Invest
           </SubmitButton>
-          {!hasInvestmentCurrency ? (
+          {!hasInvestmentCurrency && (
             <InfoWrapper
               text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
               type="error"
             />
-          ) : null}
+          )}
+          {!isDepositAllowed && (
+            <InfoWrapper
+              text="You are currently not allowed to deposit in this vault. Please contact a pool manager."
+              type="info"
+            />
+          )}
         </Box>
       </Flex>
     </Box>

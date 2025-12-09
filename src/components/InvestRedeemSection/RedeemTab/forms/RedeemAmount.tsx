@@ -31,6 +31,7 @@ export function RedeemAmount({
   const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const redemptionCurrencies = useGetVaultCurrencyOptions({ isRedeem: true })
+  const isAllowedToRedeem = investment?.isAllowedToRedeem ?? false
 
   // Get networkIds and currencies for receiveAmount select currency list
   const networkIds = networks?.map((network) => network.chainId)
@@ -118,17 +119,17 @@ export function RedeemAmount({
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
-        {hasPendingRedeems && pendingRedeemShares ? (
+        {hasPendingRedeems && pendingRedeemShares && (
           <PendingInvestmentBanner
             label="Pending redemptions"
             amount={pendingRedeemShares}
             currencySymbol={share?.symbol}
           />
-        ) : null}
+        )}
         <Box>
           <Flex alignItems="center" justifyContent="space-between">
             <Text fontWeight={500}>Redeem</Text>
-            {parsedRedeemAmount !== 0 ? (
+            {parsedRedeemAmount !== 0 && (
               <BalanceDisplay
                 balance={parsedRedeemAmount}
                 currency={shareCurrencySymbol}
@@ -137,7 +138,7 @@ export function RedeemAmount({
                 fontSize="xs"
                 color="fg.muted"
               />
-            ) : null}
+            )}
           </Flex>
           <BalanceInput
             name="redeemAmount"
@@ -145,7 +146,7 @@ export function RedeemAmount({
             placeholder="0.00"
             onChange={debouncedCalculateReceiveAmount}
             currency={shareCurrencySymbol}
-            disabled={!hasRedeemableShares}
+            disabled={!hasRedeemableShares || !isAllowedToRedeem}
           />
           <Flex mt={2} justify="space-between">
             <Flex>
@@ -194,12 +195,16 @@ export function RedeemAmount({
           )}
         </Box>
         <Box>
-          <SubmitButton colorPalette="yellow" disabled={isDisabled} width="100%" mt={6}>
+          <SubmitButton colorPalette="yellow" disabled={isDisabled || !isAllowedToRedeem} width="100%" mt={6}>
             Redeem
           </SubmitButton>
-          {!hasRedeemableShares ? (
-            <InfoWrapper text="You do not have any tokens available to redeem" type="info" />
-          ) : null}
+          {!hasRedeemableShares && <InfoWrapper text="You do not have any tokens available to redeem" type="info" />}
+          {!isAllowedToRedeem && (
+            <InfoWrapper
+              text="Redeeming is currently not allowed for your investment. Please contact a pool manager."
+              type="info"
+            />
+          )}
         </Box>
       </Flex>
     </Box>
