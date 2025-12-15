@@ -32,7 +32,11 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   }, [portfolioBalance])
 
   function invest(amount: Balance) {
-    execute(vault.asyncDeposit(amount))
+    if (investment?.isSyncDeposit) {
+      execute(vault.syncDeposit(amount))
+    } else {
+      execute(vault.asyncDeposit(amount))
+    }
   }
 
   const schema = z.object({
