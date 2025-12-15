@@ -82,8 +82,6 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     () => !isInvestorWhiteListed || !vault || !isInvestableChain || isClaimFormDisplayed,
     [isInvestorWhiteListed, vault, isInvestableChain, isClaimFormDisplayed]
   )
-  // TODO: Handle sync vs async invest and redeem transactions
-  // const isSyncInvestVault = vaultDetails?.isSyncDeposit || false
 
   if (!poolDetails) return null
 
