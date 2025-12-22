@@ -38,7 +38,7 @@ pnpm dev
 
 | Application | URL                   | Description            |
 | ----------- | --------------------- | ---------------------- |
-| Invest App  | http://localhost:5173 | Investment Application |
+| Invest App  | http://localhost:3003 | Investment Application |
 
 ## 🛠️ Available Scripts
 
@@ -81,6 +81,7 @@ Tenderly integration allows you to mock blockchain transactions locally for deve
 ### Setup
 
 1. **Environment Variables**: Copy `.env.example` to `.env.local` and configure:
+
    ```bash
    # Get these from your Tenderly dashboard
    VITE_TENDERLY_ACCESS_KEY=your_access_key
@@ -106,14 +107,9 @@ Tenderly integration allows you to mock blockchain transactions locally for deve
 import { useTenderly } from '@contexts/TenderlyContext'
 
 function MyComponent() {
-  const { 
-    transactionMode,
-    setTransactionMode,
-    impersonateAccount,
-    fundAccountEth,
-    isTransactionModeAvailable
-  } = useTenderly()
-  
+  const { transactionMode, setTransactionMode, impersonateAccount, fundAccountEth, isTransactionModeAvailable } =
+    useTenderly()
+
   // Switch to Tenderly mode
   if (isTransactionModeAvailable) {
     setTransactionMode('tenderly')
@@ -146,7 +142,7 @@ pnpm add -D <dev-dependency>
 
 Default ports are configured but will automatically use the next available port if occupied:
 
-- **Invest App**: 5173
+- **Invest App**: 3003
 
 ## 🚀 Deployment
 
