@@ -181,7 +181,7 @@ export function InvestAmount({
           <TransactionModeSelector onInvest={onSubmit} disabled={isDisabled}>
             Invest
           </TransactionModeSelector>
-          {!hasInvestmentCurrency ? (
+          {!hasInvestmentCurrency && (
             <InfoWrapper
               text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
               type="error"
