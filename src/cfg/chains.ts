@@ -6,6 +6,9 @@ import {
   arbitrum,
   arbitrumSepolia,
   avalanche,
+  avalancheFuji,
+  celo,
+  celoSepolia,
   bsc,
   bscTestnet,
   plumeMainnet,
@@ -33,10 +36,13 @@ export const MAINNET_RPC_URLS: Record<number, string[]> = {
   [base.id]: [`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [arbitrum.id]: [`https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [avalanche.id]: [`https://avax-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  [celo.id]: [`https://celo-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
 
 export const TESTNET_RPC_URLS: Record<number, string[]> = {
   [sepolia.id]: [`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [baseSepolia.id]: [`https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [arbitrumSepolia.id]: [`https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  [avalancheFuji.id]: [`https://avax-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  [celoSepolia.id]: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
 }
