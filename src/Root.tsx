@@ -2,55 +2,21 @@ import { useMemo } from 'react'
 import { Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
-import { CentrifugeProvider, DebugFlags, TransactionProvider, useDebugFlags } from '@cfg'
+import {
+  CentrifugeProvider,
+  DebugFlags,
+  TransactionProvider,
+  useDebugFlags,
+  ALL_CHAINS,
+  MAINNET_RPC_URLS,
+  TESTNET_RPC_URLS,
+} from '@cfg'
 import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
 import { VaultsProvider } from '@contexts/VaultsContext'
-import {
-  mainnet,
-  sepolia,
-  base,
-  baseSepolia,
-  arbitrum,
-  arbitrumSepolia,
-  avalanche,
-  bsc,
-  bscTestnet,
-  plumeMainnet,
-  plumeTestnet,
-} from 'wagmi/chains'
-
-const MAINNET_CHAINS = [mainnet, base, arbitrum, avalanche, bsc, plumeMainnet]
-const TESTNET_CHAINS = [sepolia, baseSepolia, arbitrumSepolia, bscTestnet, plumeTestnet]
-const ALL_CHAINS = [...MAINNET_CHAINS, ...TESTNET_CHAINS]
-
-const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
-// TODO: Use after updating new app keys
-// const INFURA_KEY = import.meta.env.VITE_INFURA_KEY
-// const ONFINALITY_KEY = import.meta.env.VITE_ONFINALITY_KEY
 
 const queryClient = new QueryClient()
-
-const MAINNET_RPC_URLS = {
-  1: [
-    `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
-    // `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-    // `https://eth.api.onfinality.io/rpc?apikey=${ONFINALITY_KEY}`,
-  ],
-  8453: [`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  42161: [`https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  43114: [`https://avax-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  42220: [`https://celo-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-}
-
-const TESTNET_RPC_URLS = {
-  11155111: [`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  84532: [`https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  421612: [`https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  431142: [`https://avax-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-  11142220: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
-}
 
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
