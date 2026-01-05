@@ -3,27 +3,7 @@ import { Box, Button, ButtonProps, Icon, Portal, VStack, useDisclosure } from '@
 import { useChains, useChainId, useSwitchChain } from 'wagmi'
 import { useEffect, useRef, useMemo } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
-import { useDebugFlags } from '@cfg'
-
-// Mainnet chain IDs
-const MAINNET_CHAIN_IDS = [
-  1, // Ethereum
-  8453, // Base
-  42161, // Arbitrum
-  43114, // Avalanche
-  42220, // Celo
-  56, // BSC
-]
-
-// Testnet chain IDs
-const TESTNET_CHAIN_IDS = [
-  11155111, // Sepolia
-  84532, // Base Sepolia
-  421612, // Arbitrum Sepolia
-  431142, // Avalanche Fuji
-  11142220, // Celo Alfajores
-  97, // BSC Testnet
-]
+import { useDebugFlags, MAINNET_CHAIN_IDS, TESTNET_CHAIN_IDS } from '@cfg'
 
 export function NetworkButton(props: ButtonProps) {
   const allChains = useChains()
