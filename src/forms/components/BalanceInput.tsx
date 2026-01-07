@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js-light'
 import { useState, useEffect } from 'react'
 import type {
   ChangeEvent as ReactChangeEvent,
@@ -22,7 +23,7 @@ import {
 } from '@chakra-ui/react'
 import { useGetFormError } from '../hooks/useGetFormError'
 import { Balance } from '@centrifuge/sdk'
-import Decimal from 'decimal.js-light'
+import { decimalToBalance } from '@utils/balance'
 
 const inputSizes = ['sm', 'md', 'lg', 'xl', '2xl', '2xs', 'xs'] as const
 export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValues>
@@ -138,9 +139,9 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       setDisplayValue(formatWithThousandSeparators(value))
       if (onChange) {
         try {
-          const numValue = parseFloat(value)
-          if (!isNaN(numValue) && value !== '' && value !== '.') {
-            const balance = Balance.fromFloat(numValue, decimals)
+          const numValue = new Decimal(value ?? '0')
+          if (!isNaN(parseFloat(numValue.toString())) && value !== '' && value !== '.') {
+            const balance = decimalToBalance(numValue, decimals)
             onChange(value, balance)
           } else {
             onChange(value)

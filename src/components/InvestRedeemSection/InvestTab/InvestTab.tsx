@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { Form, useForm, safeParse, createBalanceSchema, createBalanceValidation } from '@forms'
+import { Form, useForm, safeParse, createBalanceSchema } from '@forms'
 import { Balance } from '@centrifuge/sdk'
 import { formatBalance, formatBalanceToString, useCentrifugeTransaction } from '@cfg'
 import {
@@ -39,11 +39,13 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     }
   }
 
+  const investCurrencyDecimals = vaultDetails?.asset.decimals ?? 18
+
   const schema = z.object({
-    investAmount: createBalanceSchema(
-      vaultDetails?.asset.decimals ?? 18,
-      createBalanceValidation({ min: 1, max: maxInvestAmount }, vaultDetails?.asset.decimals ?? 18)
-    ),
+    investAmount: createBalanceSchema(investCurrencyDecimals, {
+      min: new Balance(1n, investCurrencyDecimals),
+      max: portfolioBalance,
+    }),
     receiveAmount: createBalanceSchema(vaultDetails?.share.decimals ?? 18).optional(),
   })
 
