@@ -9,6 +9,12 @@ export default defineConfig(() => {
   return {
     envDir,
     plugins: [react(), tsconfigPaths(), nodePolyfills()],
+    resolve: {
+      dedupe: ['react', 'react-dom'],
+    },
+    optimizeDeps: {
+      include: ['@centrifuge/sdk'],
+    },
     server: {
       port: 3003,
       headers: {
