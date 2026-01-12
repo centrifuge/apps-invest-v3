@@ -13,7 +13,7 @@ export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId, option
   const vaults$ = useMemo(() => {
     if (!poolNetwork || !scId || !enabled) return undefined
     return poolNetwork.vaults(scId)
-  }, [poolNetwork?.chainId, scId?.toString(), enabled])
+  }, [poolNetwork?.centrifugeId, scId?.toString(), enabled])
   return useObservable(vaults$)
 }
 

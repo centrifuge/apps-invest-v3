@@ -21,12 +21,12 @@ export function usePortfolio() {
   return useObservable(portfolio$)
 }
 
-export function useIsMember(shareClassId?: ShareClassId, chainId?: number, options?: Options) {
+export function useIsMember(shareClassId?: ShareClassId, centrifugeId?: number, options?: Options) {
   const enabled = options?.enabled ?? true
   const { data: account } = useInvestor()
   const isMember$ = useMemo(() => {
-    if (!account || !shareClassId || !chainId || !enabled) return undefined
-    return account.isMember(shareClassId, chainId)
-  }, [account?.address, chainId, shareClassId?.toString()])
+    if (!account || !shareClassId || !centrifugeId || !enabled) return undefined
+    return account.isMember(shareClassId, centrifugeId)
+  }, [account?.address, centrifugeId, shareClassId?.toString()])
   return useObservable(isMember$)
 }
