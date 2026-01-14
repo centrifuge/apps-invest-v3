@@ -2,7 +2,14 @@ import { useMemo } from 'react'
 import { MdBrokenImage } from 'react-icons/md'
 import { Box, Center, Flex, Icon, Image, Separator, Spinner, Text } from '@chakra-ui/react'
 import { useChainId } from 'wagmi'
-import { formatBalanceAbbreviated, ipfsToHttp, PoolDetails, useIsMember, usePoolActiveNetworks } from '@cfg'
+import {
+  formatBalanceAbbreviated,
+  ipfsToHttp,
+  PoolDetails,
+  useBlockchainsMapByChainId,
+  useIsMember,
+  usePoolActiveNetworks,
+} from '@cfg'
 import { Card, ValueText } from '@ui'
 import { getPoolTVL } from '@utils/getPoolTVL'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
@@ -19,18 +26,20 @@ export function PoolCard({
   isRwaPool: boolean
 }) {
   const connectedChainId = useChainId()
+  const { data: blockchainsMap } = useBlockchainsMapByChainId()
   const { data: networks, isLoading: isNetworksLoading } = usePoolActiveNetworks(poolDetails?.id, {
     enabled: !!poolDetails,
   })
 
   // We need to find the pool network and check if the current wallet is whitelisted
-  const currentNetwork = networks?.find((n) => n.chainId === connectedChainId)
-  const currentNetworkChainId = currentNetwork ? currentNetwork.chainId : undefined
+  const connectedCentrifugeId = blockchainsMap?.get(connectedChainId)?.centrifugeId
+  const currentNetwork = networks?.find((n) => n.centrifugeId === connectedCentrifugeId)
+  const currentNetworkCentrifugeId = currentNetwork?.centrifugeId
   const { data: isMember, isLoading: isMemberLoading } = useIsMember(
     poolDetails?.shareClasses[0]?.shareClass.id,
-    currentNetworkChainId,
+    currentNetworkCentrifugeId,
     {
-      enabled: !!poolDetails?.shareClasses[0]?.shareClass.id.toString() && !!currentNetworkChainId,
+      enabled: !!poolDetails?.shareClasses[0]?.shareClass.id.toString() && !!currentNetworkCentrifugeId,
     }
   )
   const isWhitelisted = isMember ?? false

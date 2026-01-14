@@ -3,33 +3,31 @@ import { Field, Input, Group, IconButton, Text, Flex } from '@chakra-ui/react'
 import { isAddress } from 'viem'
 import { IoAddOutline } from 'react-icons/io5'
 import { FaRegTrashAlt } from 'react-icons/fa'
-import { networkToName, truncateAddress } from '@cfg'
+import { truncateAddress } from '@cfg'
 import { NetworkIcon } from '../elements/NetworkIcon'
 import { HexString } from '@centrifuge/sdk'
 
 export interface AddressInputProps {
   onAdd: (address: HexString) => void
   withSelection?: boolean
-  addresses?: { address: HexString; chainId?: number }[]
-  onDelete?: ({ address, chainId }: { address: HexString; chainId?: number }) => void
-  chainId?: number
+  addresses?: { address: HexString; centrifugeId?: number }[]
+  onDelete?: ({ address, centrifugeId }: { address: HexString; centrifugeId?: number }) => void
+  centrifugeId?: number
   label?: string
 }
 
 export const AddressInputLabel = ({
   address,
-  chainId,
+  centrifugeId,
   onDelete,
   disabled = false,
 }: {
   address: HexString
-  chainId?: number
+  centrifugeId?: number
   disabled?: boolean
-  onDelete: ({ address, chainId }: { address: HexString; chainId?: number }) => void
+  onDelete: ({ address, centrifugeId }: { address: HexString; centrifugeId?: number }) => void
 }) => {
   if (!isAddress(address)) return null
-  const networkId = chainId || 1 // Default to Ethereum Mainnet if no chainId is provided
-  const networkName = networkToName(networkId)
 
   return (
     <Flex
@@ -43,16 +41,13 @@ export const AddressInputLabel = ({
       w="full"
     >
       <Text fontSize="sm">{truncateAddress(address)}</Text>
-      <Flex alignItems="center" gap={2}>
-        <NetworkIcon networkId={networkId} />
-        <Text fontSize="sm">{networkName}</Text>
-      </Flex>
+      <NetworkIcon centrifugeId={centrifugeId} withLabel fontSize="sm" />
       <IconButton
         disabled={disabled}
         size="sm"
         backgroundColor="white"
         color="fg.disabled"
-        onClick={() => onDelete({ address, chainId })}
+        onClick={() => onDelete({ address, centrifugeId })}
       >
         <FaRegTrashAlt />
       </IconButton>
@@ -74,9 +69,9 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
     }
   }
 
-  const handleDelete = ({ address, chainId }: { address: HexString; chainId?: number }) => {
+  const handleDelete = ({ address, centrifugeId }: { address: HexString; centrifugeId?: number }) => {
     if (typeof onDelete === 'function') {
-      onDelete({ address, chainId })
+      onDelete({ address, centrifugeId })
     }
   }
 
@@ -120,10 +115,11 @@ export const AddressInput = ({ onAdd, onDelete, addresses, label = 'Wallet Addre
         {addresses?.length
           ? addresses.map((address) => (
               <AddressInputLabel
+                key={address.address}
                 disabled={addresses.length <= 1}
                 address={address.address}
                 onDelete={handleDelete}
-                chainId={address.chainId}
+                centrifugeId={address.centrifugeId}
               />
             ))
           : null}

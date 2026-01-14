@@ -1,70 +1,115 @@
 import React from 'react'
-import { Image, type ImageProps, Flex, Box } from '@chakra-ui/react'
-import { Network, NETWORK_IDS } from '@cfg'
-
-import EthereumSvg from '../../assets/logos/ethereum.svg'
-import ArbitrumSvg from '../../assets/logos/arbitrum.svg'
-import CeloSvg from '../../assets/logos/celo.svg'
-import BaseSvg from '../../assets/logos/base.svg'
-import PlumeSvg from '../../assets/logos/plume.svg'
-import AvalancheSvg from '../../assets/logos/avalanche.svg'
-import BnBSVG from '../../assets/logos/bnb.svg'
-
-export const capitalizeNetworkName = (networkId: number): string => {
-  return NETWORK_IDS[networkId].charAt(0).toUpperCase() + NETWORK_IDS[networkId].slice(1)
-}
+import { Image, type ImageProps, Flex, Box, Text } from '@chakra-ui/react'
+import { useBlockchainByCentrifugeId } from '@cfg'
 
 interface NetworkIconProps extends Omit<ImageProps, 'src'> {
-  networkId?: number
+  centrifugeId?: number
   srcOverride?: string
   alt?: string
+  withLabel?: boolean
+  labelGap?: number
 }
 
 export const NetworkIcon: React.FC<NetworkIconProps> = ({
-  networkId = 1,
+  centrifugeId,
   srcOverride,
   boxSize = '24px',
   alt,
+  withLabel = false,
+  labelGap = 2,
   ...rest
 }) => {
-  const localMap: Record<Network, string> = {
-    ethereum: EthereumSvg,
-    arbitrum: ArbitrumSvg,
-    celo: CeloSvg,
-    base: BaseSvg,
-    plume: PlumeSvg,
-    avalanche: AvalancheSvg,
-    bnb: BnBSVG,
+  const { data: blockchain } = useBlockchainByCentrifugeId(centrifugeId)
+
+  const networkName = blockchain?.name
+  const networkIcon = blockchain?.icon
+  const src = srcOverride || networkIcon || undefined
+
+  if (!withLabel) {
+    return src ? (
+      <Image
+        src={src}
+        boxSize={boxSize}
+        objectFit="contain"
+        alt={alt ?? `${networkName} logo`}
+        {...rest}
+        display="inline-block"
+      />
+    ) : (
+      <Box
+        as="span"
+        borderRadius={8}
+        border="1px solid"
+        borderColor="border.solid"
+        height={boxSize}
+        width={boxSize}
+        backgroundColor="bg.muted"
+        display="inline-block"
+      />
+    )
   }
 
-  const resolvedNetwork = NETWORK_IDS[networkId] || 'ethereum'
-  const src = srcOverride || localMap[resolvedNetwork]
-
-  return <Image src={src} boxSize={boxSize} objectFit="contain" alt={alt ?? `${resolvedNetwork} logo`} {...rest} />
+  return (
+    <Flex alignItems="center" gap={labelGap} display="inline-flex">
+      {src ? (
+        <Image
+          src={src}
+          boxSize={boxSize}
+          objectFit="contain"
+          alt={alt ?? `${networkName} logo`}
+          {...rest}
+          display="inline-block"
+        />
+      ) : (
+        <Box
+          as="span"
+          borderRadius={8}
+          border="1px solid"
+          borderColor="border.solid"
+          height={boxSize}
+          width={boxSize}
+          backgroundColor="bg.muted"
+          display="inline-block"
+        />
+      )}
+      {withLabel && centrifugeId && (
+        <Text fontSize={rest.fontSize ?? 'inherit'} fontWeight={rest.fontWeight ?? 'inherit'} as="span">
+          {networkName}
+        </Text>
+      )}
+    </Flex>
+  )
 }
 
 interface NetworkIconsProps {
-  networkIds?: number[]
+  centrifugeIds?: number[]
   boxSize?: string
 }
 
-export const NetworkIcons: React.FC<NetworkIconsProps> = ({ networkIds, boxSize = '24px' }) => {
-  const resolvedNetworks = networkIds?.map((id) => NETWORK_IDS[id]).filter(Boolean) as Network[]
-
-  if (!networkIds) return null
+export const NetworkIcons: React.FC<NetworkIconsProps> = ({ centrifugeIds, boxSize = '24px' }) => {
+  if (!centrifugeIds || centrifugeIds.length === 0) return null
 
   return (
     <Flex role="group" align="center" className="group">
-      {resolvedNetworks.map((network, i) => (
+      {centrifugeIds.map((centrifugeId, i) => (
         <Box
-          key={network}
+          key={centrifugeId}
           ml={i === 0 ? 0 : '-6px'}
           transition="margin-left 200ms ease"
           _groupHover={{ marginLeft: i === 0 ? 0 : '1px' }}
         >
-          <NetworkIcon networkId={networkIds[i]} boxSize={boxSize} />
+          <NetworkIcon centrifugeId={centrifugeId} boxSize={boxSize} />
         </Box>
       ))}
     </Flex>
   )
+}
+
+interface NetworkNameProps {
+  centrifugeId?: number
+}
+
+export const NetworkName: React.FC<NetworkNameProps> = ({ centrifugeId }) => {
+  const { data: blockchain } = useBlockchainByCentrifugeId(centrifugeId)
+  return <>{blockchain?.name ?? '-'}</>
 }

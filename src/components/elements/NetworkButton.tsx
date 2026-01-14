@@ -3,7 +3,7 @@ import { Box, Button, ButtonProps, Icon, Portal, VStack, useDisclosure } from '@
 import { useChains, useChainId, useSwitchChain } from 'wagmi'
 import { useEffect, useRef, useMemo } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
-import { useDebugFlags, MAINNET_CHAIN_IDS, TESTNET_CHAIN_IDS } from '@cfg'
+import { useDebugFlags, MAINNET_CHAIN_IDS, TESTNET_CHAIN_IDS, useBlockchainsMapByChainId } from '@cfg'
 
 export function NetworkButton(props: ButtonProps) {
   const allChains = useChains()
@@ -13,12 +13,15 @@ export function NetworkButton(props: ButtonProps) {
   const { open, onToggle, onClose } = useDisclosure()
   const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const { data: blockchainsMap } = useBlockchainsMapByChainId()
 
   const chains = useMemo(() => {
     const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
     const allowedChainIds = isMainnet ? MAINNET_CHAIN_IDS : TESTNET_CHAIN_IDS
     return allChains.filter((chain) => allowedChainIds.includes(chain.id))
   }, [allChains, showMainnet])
+
+  const getCentrifugeId = (chainId: number) => blockchainsMap?.get(chainId)?.centrifugeId
 
   const handleChainSwitch = (chainId: number) => {
     switchChain({ chainId })
@@ -67,7 +70,7 @@ export function NetworkButton(props: ButtonProps) {
         _active={{ backgroundColor: 'bg.subtle' }}
         {...props}
       >
-        <NetworkIcon networkId={connectedChain} />
+        <NetworkIcon centrifugeId={getCentrifugeId(connectedChain)} />
         <Icon size="xs" textAlign="right">
           <FaChevronDown fill="#91969B" />
         </Icon>
@@ -101,8 +104,7 @@ export function NetworkButton(props: ButtonProps) {
                     alignItems="center"
                     gap={2}
                   >
-                    <NetworkIcon networkId={chain.id} />
-                    <Box fontSize="sm">{chain.name}</Box>
+                    <NetworkIcon centrifugeId={getCentrifugeId(chain.id)} withLabel fontSize="sm" />
                   </Box>
                 ))}
             </VStack>
