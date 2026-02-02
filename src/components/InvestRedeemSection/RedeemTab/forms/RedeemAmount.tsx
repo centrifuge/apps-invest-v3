@@ -32,9 +32,7 @@ export function RedeemAmount({
   const { setValue } = useFormContext()
   const redemptionCurrencies = useGetVaultCurrencyOptions({ isRedeem: true })
   const isAllowedToRedeem = investment?.isAllowedToRedeem ?? false
-
-  // Get networkIds and currencies for receiveAmount select currency list
-  const networkIds = networks?.map((network) => network.chainId)
+  const centrifugeIds = networks?.map((network) => network.centrifugeId)
 
   // Get the pricePerShare
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -168,7 +166,7 @@ export function RedeemAmount({
                 {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)} available
               </Text>
             </Flex>
-            <NetworkIcons networkIds={networkIds} />
+            <NetworkIcons centrifugeIds={centrifugeIds} />
           </Flex>
           {parsedRedeemAmount !== 0 && (
             <>

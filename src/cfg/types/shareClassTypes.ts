@@ -9,4 +9,4 @@ export type ShareClassDetails = Awaited<ReturnType<typeof ShareClass.prototype.d
 
 export type Holdings = Awaited<ReturnType<typeof ShareClass.prototype.balances>>
 
-export type Asset = { decimals: number; address: HexString; name: string; symbol: string; chainId: number }
+export type Asset = { decimals: number; address: HexString; name: string; symbol: string; centrifugeId: number }

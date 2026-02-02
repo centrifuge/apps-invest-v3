@@ -34,7 +34,7 @@ export function InvestAmount({
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
-  const networkIds = networks?.map((network) => network.chainId)
+  const centrifugeIds = networks?.map((network) => network.centrifugeId)
   const depositCurrencies = useGetVaultCurrencyOptions({ isRedeem: false })
   const isDepositAllowed = investment?.isAllowedToDeposit ?? false
 
@@ -147,7 +147,7 @@ export function InvestAmount({
                 {formattedMaxInvestAmount} available
               </Text>
             </Flex>
-            <NetworkIcons networkIds={networkIds} />
+            <NetworkIcons centrifugeIds={centrifugeIds} />
           </Flex>
           {parsedInvestAmount !== 0 && (
             <>

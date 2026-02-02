@@ -1,4 +1,4 @@
-import { useAddress } from '@cfg'
+import { useAddress, useBlockchainsMapByChainId } from '@cfg'
 import { NetworkIcon } from '@ui'
 import { Button, Menu, Stack, Text } from '@chakra-ui/react'
 import { useAppKit } from '@reown/appkit/react'
@@ -16,9 +16,15 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
   const chains = useChains()
   const { open } = useAppKit()
   const { isConnected, chainId } = useAddress()
+  const { data: blockchainsMap } = useBlockchainsMapByChainId()
+
   function getName(chainId: number) {
     const chain = chains.find((c) => c.id === chainId)
     return chain?.name || chainId.toString()
+  }
+
+  function getCentrifugeId(chainId: number) {
+    return blockchainsMap?.get(chainId)?.centrifugeId
   }
 
   if (!isConnected || !chainId) {
@@ -54,7 +60,7 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
                     switchChain({ chainId: network })
                   }}
                 >
-                  <NetworkIcon networkId={network} />
+                  <NetworkIcon centrifugeId={getCentrifugeId(network)} />
                   {getName(network)}
                 </Menu.Item>
               ))}

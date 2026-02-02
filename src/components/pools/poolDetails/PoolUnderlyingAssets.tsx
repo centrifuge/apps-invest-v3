@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
-import { chainExplorer, usePoolDetails } from '@cfg'
+import { chainExplorer, useBlockchainsMapByCentrifugeId, usePoolDetails } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { NetworkIcon, Tooltip } from '@ui'
@@ -8,6 +8,7 @@ import { NetworkIcon, Tooltip } from '@ui'
 export function PoolUnderlyingAssets() {
   const { networks, poolDetails, pools } = usePoolContext()
   const { investment } = useVaultsContext()
+  const { data: blockchainsMap } = useBlockchainsMapByCentrifugeId()
 
   // Get underlying pool metadata
   const underlyingPoolIdNumber = poolDetails?.metadata?.pool.underlying?.poolId ?? 0
@@ -20,6 +21,11 @@ export function PoolUnderlyingAssets() {
   const underlyingApy = underlyingShareClass?.apyPercentage ? `${underlyingShareClass.apyPercentage}%` : '-'
   const underlyingAssetAddress = investment?.share.address
 
+  const getExplorerUrl = (centrifugeId: number) => {
+    const chainId = blockchainsMap?.get(centrifugeId)?.chainId
+    return chainId ? chainExplorer[chainId] : undefined
+  }
+
   const items = [
     { label: 'Fund', value: underlyingMetadata?.pool.name ?? null },
     { label: 'Asset type', value: underlyingMetadata?.pool.asset.subClass ?? null },
@@ -29,18 +35,21 @@ export function PoolUnderlyingAssets() {
       label: 'Available networks',
       value: (
         <Flex gap={1}>
-          {networks?.map((network, index) => (
-            <Tooltip key={network.chainId} content={<Text>View transactions</Text>}>
-              <Link
-                to={underlyingAssetAddress ? `${chainExplorer[network.chainId]}/token/${underlyingAssetAddress}` : ''}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ marginRight: '-10px' }}
-              >
-                <NetworkIcon key={index} networkId={network.chainId} />
-              </Link>
-            </Tooltip>
-          ))}
+          {networks?.map((network, index) => {
+            const explorerUrl = getExplorerUrl(network.centrifugeId)
+            return (
+              <Tooltip key={network.centrifugeId} content={<Text>View transactions</Text>}>
+                <Link
+                  to={underlyingAssetAddress && explorerUrl ? `${explorerUrl}/token/${underlyingAssetAddress}` : ''}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ marginRight: '-10px' }}
+                >
+                  <NetworkIcon key={index} centrifugeId={network.centrifugeId} />
+                </Link>
+              </Tooltip>
+            )
+          })}
         </Flex>
       ),
     },

@@ -74,6 +74,34 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isDeRwa: false,
     isRestricted: false,
   },
+  '281474976710668': {
+    name: 'gSavings',
+    isProduction: false,
+    isRwa: true,
+    isDeRwa: false,
+    isRestricted: false,
+  },
+  '562949953511312': {
+    name: 'Adapter Axelar Async',
+    isProduction: false,
+    isRwa: true,
+    isDeRwa: false,
+    isRestricted: false,
+  },
+  '281474976710999': {
+    name: 'MIGRATION TEST POOL',
+    isProduction: false,
+    isRwa: true,
+    isDeRwa: false,
+    isRestricted: false,
+  },
+  '281474976711656': {
+    name: 'Katty test pool',
+    isProduction: false,
+    isRwa: true,
+    isDeRwa: false,
+    isRestricted: false,
+  },
 
   // ===== Test deRWA Pools =====
   '562949953421313': {

@@ -4,6 +4,7 @@ import {
   Holdings,
   PoolDetails,
   ShareClassWithDetails,
+  useBlockchainsMapByChainId,
   useHoldings,
   usePool,
   usePoolActiveNetworks,
@@ -41,6 +42,7 @@ const PoolContext = createContext<
 
 export const PoolProvider = ({ children }: { children: ReactNode }) => {
   const { data: pools, isLoading: isPoolsLoading } = usePoolsQuery()
+  const { data: blockchainsMap } = useBlockchainsMapByChainId()
   const connectedChainId = useChainId()
   const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
@@ -70,13 +72,14 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   const poolTVL = getPoolTVL(poolDetails as PoolDetails | undefined)
 
   useEffect(() => {
-    if (networks?.length && connectedChainId) {
-      const currentNetwork = networks.find((n) => n.chainId === connectedChainId)
+    if (networks?.length && connectedChainId && blockchainsMap) {
+      const connectedCentrifugeId = blockchainsMap.get(connectedChainId)?.centrifugeId
+      const currentNetwork = networks.find((n) => n.centrifugeId === connectedCentrifugeId)
       if (currentNetwork && currentNetwork !== network) {
         setNetwork(currentNetwork)
       }
     }
-  }, [networks, connectedChainId, network])
+  }, [networks, connectedChainId, blockchainsMap, network])
 
   // Use a ref to track if we've already set the initial pool ID
   const hasSetInitialPoolRef = useRef(false)
