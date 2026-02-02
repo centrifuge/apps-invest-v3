@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useMemo, useState, type ComponentType } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState, type ComponentType } from 'react'
 import { Box, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react'
 import type { Vault } from '@centrifuge/sdk'
 import { ConnectionGuard } from '@components/elements/ConnectionGuard'
@@ -81,9 +81,13 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     () =>
       (investment?.claimableDepositShares.toBigInt() ?? 0n) >= oneUSDC ||
       (investment?.claimableRedeemAssets.toBigInt() ?? 0n) >= oneUSDC,
-    [investment, vault, connectedChain]
+    [investment?.claimableDepositShares, investment?.claimableRedeemAssets, vault, connectedChain]
   )
-  const [isClaimFormDisplayed, setIsClaimFormDisplayed] = useState(hasClaimableAssets)
+  const [isClaimFormDisplayed, setIsClaimFormDisplayed] = useState(false)
+
+  useEffect(() => {
+    setIsClaimFormDisplayed(hasClaimableAssets)
+  }, [hasClaimableAssets])
 
   const isTabLoading = isVaultsContextLoading || isPoolContextLoading || isMemberLoading
   const isTabDisabled = useMemo(
