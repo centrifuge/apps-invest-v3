@@ -9,7 +9,7 @@ import {
   VaultDetails,
 } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useRef, useState } from 'react'
 
 export interface VaultsContextValues {
   investment?: Investment
@@ -62,17 +62,54 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
     enabled: isPoolDataReady,
   })
 
-  useEffect(() => {
-    if (poolNetworkVaults?.length && (!vault || !poolNetworkVaults.includes(vault))) {
-      setVault(poolNetworkVaults[0])
-    }
+  const hasAutoSelectedRef = useRef(false)
+  const lastPoolIdRef = useRef<string | undefined>(undefined)
 
-    if (vault && !poolNetworkVaults?.length) {
-      setVault(undefined)
+  useEffect(() => {
+    if (selectedPoolId !== lastPoolIdRef.current) {
+      hasAutoSelectedRef.current = false
+      lastPoolIdRef.current = selectedPoolId?.toString()
     }
+  }, [selectedPoolId])
+
+  useEffect(() => {
+    if (!poolNetworkVaults) return
 
     setVaults(poolNetworkVaults)
-  }, [poolNetworkVaults, selectedPoolId, vault, setVault, setVaults])
+
+    if (!poolNetworkVaults.length) {
+      setVault(undefined)
+      return
+    }
+
+    setVault((currentVault) => {
+      if (currentVault && poolNetworkVaults.some((v) => v.address === currentVault.address)) {
+        return currentVault
+      }
+      return poolNetworkVaults[0]
+    })
+  }, [poolNetworkVaults])
+
+  // Auto select and set any vault with claimable assets
+  useEffect(() => {
+    if (
+      hasAutoSelectedRef.current ||
+      !poolNetworkVaults?.length ||
+      !investmentsPerVaults?.length ||
+      investmentsPerVaults.length !== poolNetworkVaults.length
+    ) {
+      return
+    }
+
+    const vaultIndex = investmentsPerVaults.findIndex(
+      (inv) => inv && (!inv.claimableDepositShares.isZero() || !inv.pendingDepositAssets.isZero())
+    )
+
+    if (vaultIndex !== -1) {
+      setVault(poolNetworkVaults[vaultIndex])
+      hasAutoSelectedRef.current = true
+    }
+  }, [poolNetworkVaults, investmentsPerVaults])
 
   const isLoading =
     isPoolVaultsLoading ||
