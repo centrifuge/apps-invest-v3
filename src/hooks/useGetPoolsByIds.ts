@@ -120,6 +120,19 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
   },
 } as const
 
+const isTestnet = import.meta.env.VITE_CENTRIFUGE_ENV !== 'mainnet'
+
+const DEFAULT_TESTNET_POOL_CONFIG: PoolConfig = {
+  name: '',
+  isProduction: false,
+  isRwa: true,
+  isDeRwa: false,
+  isRestricted: false,
+}
+
+const getPoolConfig = (poolId: string): PoolConfig | undefined =>
+  POOL_REGISTRY[poolId] ?? (isTestnet ? DEFAULT_TESTNET_POOL_CONFIG : undefined)
+
 const poolIds = Object.keys(POOL_REGISTRY)
 const productionPoolIds = poolIds.filter((id) => POOL_REGISTRY[id].isProduction)
 const rwaPoolIds = poolIds.filter((id) => POOL_REGISTRY[id].isRwa)
@@ -136,11 +149,11 @@ export function useGetPoolsByIds() {
     [poolId, isWhitelisted]
   )
 
-  const getIsProductionPool = (poolId?: string) => (poolId ? productionPoolIds.includes(poolId) : false)
+  const getIsProductionPool = (poolId?: string) => (poolId ? (getPoolConfig(poolId)?.isProduction ?? false) : false)
   const getIsRestrictedPool = (poolId?: string) =>
-    poolId ? restrictedPoolIds.includes(poolId) && !isWhitelisted : false
-  const getIsRwaPool = (poolId?: string) => (poolId ? rwaPoolIds.includes(poolId) : false)
-  const getIsDeRwaPool = (poolId?: string) => (poolId ? deRwaPoolIds.includes(poolId) : false)
+    poolId ? (getPoolConfig(poolId)?.isRestricted ?? false) && !isWhitelisted : false
+  const getIsRwaPool = (poolId?: string) => (poolId ? (getPoolConfig(poolId)?.isRwa ?? false) : false)
+  const getIsDeRwaPool = (poolId?: string) => (poolId ? (getPoolConfig(poolId)?.isDeRwa ?? false) : false)
   const getIsChroniclePool = (poolId?: string) => (poolId ? chroniclePoolIds.includes(poolId) : false)
   const getChroniclePoolIpfsUri = (poolId: string) => POOL_REGISTRY[poolId]?.chronicleIpfsUri
 
