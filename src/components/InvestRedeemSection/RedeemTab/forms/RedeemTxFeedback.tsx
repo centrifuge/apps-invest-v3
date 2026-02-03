@@ -61,7 +61,7 @@ export function RedeemTxFeedback({
             Redeeming
           </Text>
           <Text fontSize="md" whiteSpace="normal" wordWrap="break-word" textAlign="right">
-            <BalanceDisplay balance={parsedRedeemAmount} currency={redeemCurrency} />
+            <BalanceDisplay as="span" balance={parsedRedeemAmount} currency={redeemCurrency} />
           </Text>
         </Flex>
         <Flex mt={4} justify="space-between">
