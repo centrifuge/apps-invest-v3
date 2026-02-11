@@ -58,6 +58,13 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isDeRwa: true,
     isRestricted: false,
   },
+  '281474976710667': {
+    name: 'deCRDX',
+    isProduction: true,
+    isRwa: false,
+    isDeRwa: true,
+    isRestricted: false,
+  },
 
   // ===== Test RWA Pools =====
   '281474976710657': {
