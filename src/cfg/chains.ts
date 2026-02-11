@@ -9,15 +9,9 @@ import {
   avalancheFuji,
   celo,
   celoSepolia,
-  bsc,
-  bscTestnet,
-  hyperEvm,
-  hyperliquidEvmTestnet,
-  monad,
-  optimism,
-  plumeMainnet,
-  plumeTestnet,
-} from 'wagmi/chains'
+} from 'viem/chains'
+import { chains } from '@centrifuge/sdk'
+import { AppKitNetwork } from '@reown/appkit/networks'
 
 /**
  * Chain configuration module - single source of truth for all chain-related config.
@@ -26,12 +20,17 @@ import {
  * and NetworkButton.tsx (for UI selection) stay in sync automatically.
  */
 
-export const MAINNET_CHAINS = [mainnet, base, arbitrum, avalanche, bsc, plumeMainnet, hyperEvm, monad, optimism]
-export const TESTNET_CHAINS = [sepolia, baseSepolia, arbitrumSepolia, bscTestnet, plumeTestnet, hyperliquidEvmTestnet]
+const MAINNET_CHAINS = chains
+  .filter((chain) => !chain.testnet)
+  .sort((a, b) => a.name.localeCompare(b.name)) as AppKitNetwork[]
+const TESTNET_CHAINS = chains
+  .filter((chain) => chain.testnet)
+  .sort((a, b) => a.name.localeCompare(b.name)) as AppKitNetwork[]
+
 export const ALL_CHAINS = [...MAINNET_CHAINS, ...TESTNET_CHAINS]
 
-export const MAINNET_CHAIN_IDS: number[] = MAINNET_CHAINS.map((c) => c.id)
-export const TESTNET_CHAIN_IDS: number[] = TESTNET_CHAINS.map((c) => c.id)
+export const MAINNET_CHAIN_IDS: number[] = MAINNET_CHAINS.map((c) => Number(c.id))
+export const TESTNET_CHAIN_IDS: number[] = TESTNET_CHAINS.map((c) => Number(c.id))
 
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
 
