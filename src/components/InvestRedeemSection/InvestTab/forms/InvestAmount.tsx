@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js-light'
 import { useCallback, useMemo } from 'react'
 import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
@@ -94,6 +95,10 @@ export function InvestAmount({
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxInvestAmount])
 
+  const maxDepositAmountDecimal = useMemo(() => new Decimal(maxInvestAmount?.toString() ?? '0'), [maxInvestAmount])
+  const isDepositDisabled =
+    !hasInvestmentCurrency || !isDepositAllowed || maxDepositAmountDecimal.isZero() || isDisabled
+
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
@@ -125,7 +130,7 @@ export function InvestAmount({
             selectOptions={depositCurrencies}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
-            disabled={!hasInvestmentCurrency || !isDepositAllowed}
+            disabled={isDepositDisabled}
           />
           <Flex mt={2} justify="space-between">
             <Flex>
