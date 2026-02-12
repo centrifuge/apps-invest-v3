@@ -70,7 +70,7 @@ export function NetworkButton(props: ButtonProps) {
         _active={{ backgroundColor: 'bg.subtle' }}
         {...props}
       >
-        <NetworkIcon centrifugeId={getCentrifugeId(connectedChain)} />
+        <NetworkIcon centrifugeId={getCentrifugeId(connectedChain)} chainId={connectedChain} />
         <Icon size="xs" textAlign="right">
           <FaChevronDown fill="#91969B" />
         </Icon>
@@ -104,7 +104,7 @@ export function NetworkButton(props: ButtonProps) {
                     alignItems="center"
                     gap={2}
                   >
-                    <NetworkIcon centrifugeId={getCentrifugeId(chain.id)} withLabel fontSize="sm" />
+                    <NetworkIcon centrifugeId={getCentrifugeId(chain.id)} chainId={chain.id} withLabel fontSize="sm" />
                   </Box>
                 ))}
             </VStack>
