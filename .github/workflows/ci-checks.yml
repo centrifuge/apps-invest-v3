@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         shell: sh
-        run: pnpm install --frozen-lockfile --store-dir ./pnpm-store
+        run: pnpm install --frozen-lockfile
 
       - name: Check code formatting
         shell: sh
