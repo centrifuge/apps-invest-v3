@@ -17,12 +17,10 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '24'
-        cache: 'pnpm'
 
-    - name: '📦 Setup pnpm'
-      uses: pnpm/action-setup@v3
-      with:
-        version: 10
+    - name: '📦 Enable Corepack'
+      shell: sh
+      run: corepack enable
 
     - name: '🔍 Check if Build Artifact Already Exists'
       if: github.event_name == 'release'
