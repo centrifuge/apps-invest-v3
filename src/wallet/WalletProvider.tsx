@@ -54,15 +54,15 @@ function getOrCreateAdapter(projectId: string, networks: AppKitNetwork[]): Wagmi
       features: { email: false, socials: false, swaps: false, send: false },
       themeMode: 'light',
       chainImages: {
-        1: 'https://coin-images.coingecko.com/coins/images/279/large/logo.png', // Ethereum mainnet
-        10: 'https://coin-images.coingecko.com/coins/images/13442/large/logo.png', // OP Mainnet
+        1: 'https://coin-images.coingecko.com/coins/images/279/large/ethereum.png', // Ethereum mainnet
+        10: 'https://coin-images.coingecko.com/coins/images/25244/large/Optimism.png', // OP Mainnet
         42161: ArbitrumLogo,
-        8453: 'https://coin-images.coingecko.com/coins/images/279/large/logo.png', // Base mainnet
+        8453: 'https://coin-images.coingecko.com/asset_platforms/images/131/large/base.png', // Base mainnet
         56: BnbLogo,
-        43114: 'https://coin-images.coingecko.com/coins/images/12559/large/logo.png', // Avalanche
+        43114: 'https://coin-images.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png', // Avalanche
         143: 'https://coin-images.coingecko.com/coins/images/38927/large/mon.png', // Monad
         421614: 'https://coin-images.coingecko.com/coins/images/16547/large/arb.jpg', // Arbitrum Sepolia
-        84532: 'https://coin-images.coingecko.com/coins/images/279/large/logo.png', // Base Sepolia
+        84532: 'https://coin-images.coingecko.com/asset_platforms/images/131/large/base.png', // Base Sepolia
         97: 'https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png', // BNB Testnet
         98866: PlumeLogo,
         999: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg', // HyperEVM Mainnet

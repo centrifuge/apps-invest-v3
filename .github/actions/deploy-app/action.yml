@@ -21,7 +21,7 @@ runs:
     - name: '🟢 Setup Node.js'
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '24'
 
     - name: '📦 Download Build Artifact'
       if: inputs.environment != 'prod'
@@ -29,7 +29,7 @@ runs:
       with:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
-    
+
     - name: '📦 Setup pnpm (for Wrangler)'
       uses: pnpm/action-setup@v3
       with:
@@ -55,7 +55,7 @@ runs:
         else
           WRANGLER_ENV="${{ inputs.environment }}"
         fi
-        
+
         if [ "${{ inputs.environment }}" = "staging" ]; then
           # Staging: Upload with tag and preview-alias
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
@@ -93,7 +93,7 @@ runs:
         accountId: ${{ inputs.cloudflare-account-id }}
         gitHubToken: ${{ inputs.github-token }}
         command: ${{ steps.wrangler-command.outputs.cmd }}
-        wranglerVersion: "4.33.1"
+        wranglerVersion: '4.33.1'
       id: deploy
 
     - name: '🔗 Handle Missing Preview URLs'
