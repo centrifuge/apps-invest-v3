@@ -13,16 +13,16 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: '🟢 Setup Node.js'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'pnpm'
+
     - name: '📦 Setup pnpm'
       uses: pnpm/action-setup@v3
       with:
         version: 10
-
-    - name: '🟢 Setup Node.js'
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'pnpm'
 
     - name: '🔍 Check if Build Artifact Already Exists'
       if: github.event_name == 'release'
