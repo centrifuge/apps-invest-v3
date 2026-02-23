@@ -1,4 +1,5 @@
-import { divideBigInts, formatBalance } from '@cfg'
+import { formatBalance } from '@cfg'
+import { divideBalanceByPrice } from '@utils/balance'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { useMemo } from 'react'
@@ -17,13 +18,8 @@ export function useGetPendingInvestments() {
       return undefined
     }
 
-    const investAmountBigint = investment.pendingDepositAssets.toBigInt()
-    const pricePerShareBigint = pricePerShare.toBigInt()
-
-    return divideBigInts(investAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
-      investment.pendingDepositAssets.decimals,
-      2
-    )
+    const sharesBalance = divideBalanceByPrice(investment.pendingDepositAssets, pricePerShare)
+    return formatBalance(sharesBalance, '', 2)
   }, [investment?.pendingDepositAssets, pricePerShare])
 
   const calculatedRedeemAmountEstimate = useMemo(() => {
