@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { createBalanceSchema, createBalanceValidation, Form, safeParse, useForm } from '@forms'
-import { Balance } from '@centrifuge/sdk'
-import { formatBalanceToString, useCentrifugeTransaction } from '@cfg'
+import { createBalanceSchema, Form, safeParse, useForm } from '@forms'
+import type { Balance } from '@centrifuge/sdk'
+import { useCentrifugeTransaction } from '@cfg'
 import {
   RedeemAction,
   RedeemFormDefaultValues,
@@ -12,6 +12,7 @@ import {
 import { TabProps } from '@components/InvestRedeemSection'
 import { RedeemTabForm } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTabForm'
 import { useVaultsContext } from '@contexts/VaultsContext'
+import { balanceToString } from '@utils/balance'
 
 export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { isInvestmentLoading, isVaultDetailsLoading, investment, vaultDetails } = useVaultsContext()
@@ -21,8 +22,7 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const maxRedeemAmount = useMemo(() => {
     if (maxRedeemBalance === 0) return ''
-    // Don't pass precision parameter to preserve full decimal precision for validation
-    return formatBalanceToString(maxRedeemBalance) ?? ''
+    return balanceToString(maxRedeemBalance) ?? ''
   }, [maxRedeemBalance])
 
   function redeem(amount: Balance) {
@@ -30,10 +30,10 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   }
 
   const schema = z.object({
-    redeemAmount: createBalanceSchema(
-      investment?.shareBalance.decimals ?? 18,
-      createBalanceValidation({ min: 1, max: maxRedeemAmount }, investment?.shareBalance.decimals ?? 18)
-    ),
+    redeemAmount: createBalanceSchema(investment?.shareBalance.decimals ?? 18, {
+      min: 0.01,
+      max: maxRedeemAmount,
+    }),
     receiveAmount: createBalanceSchema(vaultDetails?.asset.decimals ?? 6).optional(),
   })
 

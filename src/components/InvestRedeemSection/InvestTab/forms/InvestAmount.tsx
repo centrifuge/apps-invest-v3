@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react'
-import { Balance, PoolNetwork, Price } from '@centrifuge/sdk'
+import { Balance, PoolNetwork } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
-import { debounce, divideBigInts, formatBalanceToString } from '@cfg'
+import { debounce } from '@cfg'
+import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcons } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
@@ -44,34 +45,16 @@ export function InvestAmount({
   )
   const pricePerShare = poolShareClass?.details.pricePerShare
 
-  const calculateReceiveAmountValue = useCallback(
-    (investBalance: Balance, pricePerShare?: Price) => {
-      if (!investBalance || !pricePerShare) {
-        return ''
-      }
-
-      const investAmountDecimals = investBalance.decimals
-      const investAmountBigint = investBalance.toBigInt()
-      const pricePerShareBigint = pricePerShare.toBigInt()
-
-      return divideBigInts(investAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
-        investAmountDecimals,
-        2
-      )
-    },
-    [portfolioInvestmentCurrency?.decimals]
-  )
-
   const calculateReceiveAmount = useCallback(
     (inputStringValue: string, investInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !investInputAmount || !pricePerShare) {
         return setValue('receiveAmount', '')
       }
 
-      const calculatedReceiveAmount = calculateReceiveAmountValue(investInputAmount, pricePerShare)
-      return setValue('receiveAmount', calculatedReceiveAmount)
+      const receiveBalance = divideBalanceByPrice(investInputAmount, pricePerShare)
+      return setValue('receiveAmount', balanceToString(receiveBalance))
     },
-    [pricePerShare]
+    [pricePerShare, setValue]
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
@@ -87,12 +70,11 @@ export function InvestAmount({
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
     setValue('investAmount', maxInvestAmount)
-    const calculatedReceiveAmount = formatBalanceToString(
-      portfolioBalance.mul(pricePerShare),
-      portfolioBalance.decimals
-    )
+    const calculatedReceiveAmount = balanceToString(portfolioBalance.mul(pricePerShare))
     setValue('receiveAmount', calculatedReceiveAmount)
   }, [maxInvestAmount])
+
+  const isDepositDisabled = !hasInvestmentCurrency || !isDepositAllowed || isDisabled
 
   return (
     <Box height="100%">
@@ -125,7 +107,7 @@ export function InvestAmount({
             selectOptions={depositCurrencies}
             onSelectChange={changeVault}
             onChange={debouncedCalculateReceiveAmount}
-            disabled={!hasInvestmentCurrency || !isDepositAllowed}
+            disabled={isDepositDisabled}
           />
           <Flex mt={2} justify="space-between">
             <Flex>

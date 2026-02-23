@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react'
 import { Balance, PoolNetwork } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
-import { debounce, formatBalanceToString, formatBalance, divideBigInts } from '@cfg'
+import { debounce, formatBalance } from '@cfg'
+import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcons } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
@@ -50,10 +51,7 @@ export function RedeemAmount({
     (inputStringValue: string, redeemInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) return
 
-      const calculatedReceiveAmount = formatBalanceToString(
-        redeemInputAmount.mul(pricePerShare),
-        redeemInputAmount.decimals
-      )
+      const calculatedReceiveAmount = balanceToString(redeemInputAmount.mul(pricePerShare))
       setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
@@ -61,33 +59,14 @@ export function RedeemAmount({
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
 
-  const calculateRedeemAmountValue = useCallback(
-    (receiveInputAmount?: Balance) => {
-      if (!receiveInputAmount || !pricePerShare) {
-        return ''
-      }
-
-      const receiveAmountDecimals = receiveInputAmount.decimals
-      const receiveAmountBigint = receiveInputAmount.toBigInt()
-      const pricePerShareBigint = pricePerShare.toBigInt()
-
-      return divideBigInts(receiveAmountBigint, pricePerShareBigint, pricePerShare.decimals).formatToString(
-        receiveAmountDecimals,
-        pricePerShare?.decimals
-      )
-    },
-    [pricePerShare]
-  )
-
   const calculateRedeemAmount = useCallback(
     (inputStringValue: string, receiveInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !receiveInputAmount || !pricePerShare) {
         return setValue('redeemAmount', '')
       }
 
-      const calculatedRedeemAmount = calculateRedeemAmountValue(receiveInputAmount)
-
-      return setValue('redeemAmount', calculatedRedeemAmount)
+      const redeemBalance = divideBalanceByPrice(receiveInputAmount, pricePerShare)
+      return setValue('redeemAmount', balanceToString(redeemBalance))
     },
     [pricePerShare, setValue]
   )
@@ -105,10 +84,7 @@ export function RedeemAmount({
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
 
-    const calculatedReceiveAmount = formatBalanceToString(
-      maxRedeemBalance.mul(pricePerShare),
-      maxRedeemBalance.decimals
-    )
+    const calculatedReceiveAmount = balanceToString(maxRedeemBalance.mul(pricePerShare))
 
     setValue('redeemAmount', maxRedeemAmount)
     setValue('receiveAmount', calculatedReceiveAmount)

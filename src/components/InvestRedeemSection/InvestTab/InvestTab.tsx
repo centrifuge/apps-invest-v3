@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { Form, useForm, safeParse, createBalanceSchema, createBalanceValidation } from '@forms'
-import { Balance } from '@centrifuge/sdk'
-import { formatBalance, formatBalanceToString, useCentrifugeTransaction } from '@cfg'
+import { Form, useForm, safeParse, createBalanceSchema } from '@forms'
+import type { Balance } from '@centrifuge/sdk'
+import { formatBalance, useCentrifugeTransaction } from '@cfg'
 import {
   type InvestActionType,
   InvestAction,
@@ -13,6 +13,7 @@ import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/I
 import { TabProps } from '@components/InvestRedeemSection'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { useVaultsContext } from '@contexts/VaultsContext'
+import { balanceToString } from '@utils/balance'
 
 export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
@@ -22,13 +23,12 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const maxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
-    // Don't pass precision parameter to preserve full decimal precision for validation
-    return formatBalanceToString(portfolioBalance)
+    return balanceToString(portfolioBalance)
   }, [portfolioBalance])
 
   const formattedMaxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
-    return formatBalance(portfolioBalance, investment?.asset.symbol, 0) ?? '0'
+    return formatBalance(portfolioBalance, investment?.asset.symbol, 0)
   }, [portfolioBalance])
 
   function invest(amount: Balance) {
@@ -40,10 +40,10 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   }
 
   const schema = z.object({
-    investAmount: createBalanceSchema(
-      vaultDetails?.asset.decimals ?? 18,
-      createBalanceValidation({ min: 1, max: maxInvestAmount }, vaultDetails?.asset.decimals ?? 18)
-    ),
+    investAmount: createBalanceSchema(vaultDetails?.asset.decimals ?? 18, {
+      min: 1,
+      max: maxInvestAmount,
+    }),
     receiveAmount: createBalanceSchema(vaultDetails?.share.decimals ?? 18).optional(),
   })
 

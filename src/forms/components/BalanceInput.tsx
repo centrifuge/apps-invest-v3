@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js-light'
 import { useState, useEffect } from 'react'
 import type {
   ChangeEvent as ReactChangeEvent,
@@ -8,6 +9,7 @@ import type {
 } from 'react'
 import type { FieldPath, FieldValues } from 'react-hook-form'
 import { useController, useFormContext } from 'react-hook-form'
+import { Balance } from '@centrifuge/sdk'
 import {
   type InputGroupProps,
   type InputProps as ChakraInputProps,
@@ -20,9 +22,8 @@ import {
   Group,
   Button,
 } from '@chakra-ui/react'
+import { decimalToBalance } from '@utils/balance'
 import { useGetFormError } from '../hooks/useGetFormError'
-import { Balance } from '@centrifuge/sdk'
-import Decimal from 'decimal.js-light'
 
 const inputSizes = ['sm', 'md', 'lg', 'xl', '2xl', '2xs', 'xs'] as const
 export interface BalanceInputProps<TFieldValues extends FieldValues = FieldValues>
@@ -137,15 +138,15 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       field.onChange(value)
       setDisplayValue(formatWithThousandSeparators(value))
       if (onChange) {
-        try {
-          const numValue = parseFloat(value)
-          if (!isNaN(numValue) && value !== '' && value !== '.') {
-            const balance = Balance.fromFloat(numValue, decimals)
+        if (value !== '' && value !== '.') {
+          try {
+            const numValue = new Decimal(value)
+            const balance = decimalToBalance(numValue, decimals)
             onChange(value, balance)
-          } else {
+          } catch {
             onChange(value)
           }
-        } catch {
+        } else {
           onChange(value)
         }
       }
