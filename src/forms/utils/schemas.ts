@@ -1,7 +1,11 @@
-import { z, type ZodTypeAny, type ZodEffects } from 'zod'
-import { Balance, Price } from '@centrifuge/sdk'
-import { parseUnits } from 'viem'
+import { z } from 'zod'
+import { Balance, HexString, Price } from '@centrifuge/sdk'
 import Decimal from 'decimal.js'
+
+interface BalanceValidation {
+  min?: number | string | bigint | Balance | Price
+  max?: number | string | bigint | Balance | Price
+}
 
 /** -------- Base Schemas -------- **/
 
@@ -11,7 +15,7 @@ import Decimal from 'decimal.js'
  * It transforms the input into a number if it's a valid string, number, or bigint.
  * If the input is not valid, it returns undefined.
  */
-export function numberInput<T extends ZodTypeAny>(schema: T): ZodEffects<T, z.infer<T>, string | number | bigint> {
+export function numberInput<T extends z.ZodTypeAny>(schema: T): z.ZodEffects<T, z.output<T>, unknown> {
   return z.preprocess((value) => {
     if ((typeof value === 'string' && value !== '' && !Number.isNaN(Number(value))) || typeof value === 'bigint') {
       return Number(value)
@@ -22,8 +26,10 @@ export function numberInput<T extends ZodTypeAny>(schema: T): ZodEffects<T, z.in
     }
 
     return undefined
-  }, schema) as ZodEffects<T, z.infer<T>, string | number | bigint>
+  }, schema) as z.ZodEffects<T, z.output<T>, unknown>
 }
+
+/** ------- Utility Schemas ------- */
 
 /**
  * Uses the numberInput schema to validate that the number equals at least the min value.
@@ -33,7 +39,21 @@ export function numberInputMin(min: number, message?: string) {
   return numberInput(z.number().min(min, message ?? `Amount must be at least ${min}`))
 }
 
-/** -------- Balance Schemas -------- **/
+/**
+ * Schema to validate Ethereum addresses.
+ * Returns a HexString type after validation.
+ * Safe for double-parsing since HexString is a subtype of string.
+ */
+export function addressInput(message?: string) {
+  const addressRegex = /^0x[a-fA-F0-9]{40}$/
+
+  return z
+    .string()
+    .regex(addressRegex, { message: message ?? 'Invalid address' })
+    .transform((val) => val as HexString)
+}
+
+/** ------- Balance Schema -------- **/
 
 /**
  * Parse a string or number into a BigInt value, accounting for decimals.
@@ -48,33 +68,92 @@ function parseDecimalToBigInt(value: string | number, decimals: number): bigint 
   return BigInt(integer + fractional)
 }
 
-interface BalanceValidation {
-  min?: bigint
-  max?: bigint
+/**
+ * Sanitizes numeric input strings by removing common formatting characters.
+ * Handles commas, underscores, and whitespace that users might include in number inputs.
+ */
+const sanitizeNumericInput = (n: unknown) =>
+  String(n ?? '')
+    .replace(/[,_\s]/g, '')
+    .trim()
+
+/**
+ * Formats a BigInt value to a human-readable decimal string for error messages.
+ *
+ * @example
+ * formatBigIntForDisplay(1000000000000000000n, 18) // "1"
+ * formatBigIntForDisplay(1n, 18) // "0.000000000000000001"
+ * formatBigIntForDisplay(5500000000000000000n, 18) // "5.5"
+ */
+function formatBigIntForDisplay(value: bigint | undefined, decimals: number): string {
+  if (!value) return '0'
+  const decimal = new Decimal(value.toString()).dividedBy(10 ** decimals)
+  // Use toFixed to avoid scientific notation, then trim trailing zeros
+  return decimal.toFixed(decimals).replace(/0+$/, '').replace(/\.$/, '')
 }
 
-export function createBalanceSchema(
-  decimals: number,
-  validation?: BalanceValidation | { min?: Balance; max?: Balance }
-) {
-  // Normalize Balance objects to BigInt
-  let normalizedValidation: BalanceValidation | undefined
-  if (validation) {
-    const isBalance = (v: unknown): v is Balance => typeof v === 'object' && v !== null && 'toBigInt' in (v as any)
+/**
+ * Creates a Zod schema for Balance form fields with  validation.
+ *
+ * This is the unified schema for all Balance inputs in forms. It:
+ * - Accepts: string (from form inputs), Balance objects, Price objects, bigint, or numbers
+ * - Validates: numeric format, min/max bounds (optional)
+ * - Transforms: input → Balance object with exact precision (no floating point errors)
+ *
+ * @param decimals - The number of decimal places for this Balance
+ * @param validation - Optional min/max constraints (can be bigint or Balance objects)
+ *
+ * @example
+ * // Basic usage
+ * const schema = z.object({
+ *   amount: createBalanceSchema(18)
+ * })
+ *
+ * @example
+ * // With validation bounds (human-readable values)
+ * const schema = z.object({
+ *   amount: createBalanceSchema(18, {
+ *     min: 1,        // 1.0 minimum (converts to 1000000000000000000n internally)
+ *     max: '1000.5'  // string values also supported
+ *   })
+ * })
+ *
+ * @example
+ * // Parse form values during render
+ * const amount = watch('amount')
+ * const parsed = safeParse(schema.shape.amount, amount)
+ * if (parsed) {
+ *   // parsed is Balance object, ready for calculations
+ * }
+ */
+export function createBalanceSchema(decimals: number, validation?: BalanceValidation) {
+  /**
+   * Converts a validation value (number, string, bigint, Balance, or Price) to bigint.
+   * Numbers and strings are treated as human-readable values (e.g., 1 = 1 token).
+   */
+  const toBigInt = (value: number | string | bigint | Balance | Price | undefined): bigint | undefined => {
+    if (value === undefined) return undefined
+    if (value instanceof Balance || value instanceof Price) return value.toBigInt()
+    if (typeof value === 'bigint') return value
 
-    normalizedValidation = {
-      min: isBalance(validation.min) ? validation.min.toBigInt() : (validation.min as bigint | undefined),
-      max: isBalance(validation.max) ? validation.max.toBigInt() : (validation.max as bigint | undefined),
-    }
+    return parseDecimalToBigInt(value, decimals)
   }
+
+  const normalizedMin = toBigInt(validation?.min)
+  const normalizedMax = toBigInt(validation?.max)
+
   return z.preprocess(
     (value) => {
-      if (value instanceof Balance) {
+      if (value instanceof Balance || value instanceof Price) {
         return value.toDecimal().toString()
       }
 
+      if (typeof value === 'bigint') {
+        return new Balance(value, decimals).toDecimal().toString()
+      }
+
       if (typeof value === 'string' && value !== '') {
-        return value
+        return sanitizeNumericInput(value)
       }
 
       if (typeof value === 'number') {
@@ -85,67 +164,42 @@ export function createBalanceSchema(
     },
     z
       .string()
+      .refine((val) => val !== '' && val !== '.', 'Valid value required')
       .refine((val) => !Number.isNaN(Number(val)), 'Must be a valid number')
       .transform((strValue) => parseDecimalToBigInt(strValue, decimals))
-      .refine((bigIntValue) => normalizedValidation?.min === undefined || bigIntValue >= normalizedValidation.min, {
-        message: `Must be at least ${normalizedValidation?.min ? new Decimal(normalizedValidation.min.toString()).dividedBy(10 ** decimals).toString() : '0'}`,
+      .refine((bigIntValue) => normalizedMin === undefined || bigIntValue >= normalizedMin, {
+        message: `Must be at least ${formatBigIntForDisplay(normalizedMin, decimals)}`,
       })
-      .refine((bigIntValue) => normalizedValidation?.max === undefined || bigIntValue <= normalizedValidation.max, {
-        message: `Must be at most ${normalizedValidation?.max ? new Decimal(normalizedValidation.max.toString()).dividedBy(10 ** decimals).toString() : '0'}`,
+      .refine((bigIntValue) => normalizedMax === undefined || bigIntValue <= normalizedMax, {
+        message: `Must be at most ${formatBigIntForDisplay(normalizedMax, decimals)}`,
       })
       .transform((bigIntValue) => new Balance(bigIntValue, decimals))
-  ) as unknown as z.ZodEffects<z.ZodString, Balance, string | number | Balance>
+  ) as unknown as z.ZodEffects<z.ZodString, Balance, string | number | Balance | Price | bigint>
 }
 
 /**
- * Helper to create validation bounds from decimal numbers
- * For example: createBalanceValidation({ min: "1", max: "1000" }, 18)
+ * Creates a Zod schema for Price form fields (always 18 decimals).
+ *
+ * Price is a specialized Balance type used for token prices and rates.
+ * This is a convenience wrapper around createBalanceSchema that:
+ * - Always uses 18 decimals (Price standard)
+ * - Returns Price objects instead of Balance
+ * - Accepts same input types as createBalanceSchema
+ *
+ * @param validation - Optional min/max constraints
+ *
+ * @example
+ * // For NAV per share pricing
+ * const schema = z.object({
+ *   pricePerShare: createPriceSchema()
+ * })
  */
-export function createBalanceValidation(
-  limits: { min?: string | number; max?: string | number },
-  decimals: number
-): BalanceValidation {
-  return {
-    min: limits.min !== undefined ? parseDecimalToBigInt(limits.min, decimals) : undefined,
-    max: limits.max !== undefined ? parseDecimalToBigInt(limits.max, decimals) : undefined,
-  }
-}
+export function createPriceSchema(validation?: BalanceValidation) {
+  const balanceSchema = createBalanceSchema(18, validation)
 
-/** -------- Custom Schema (precision safe) -------- **/
-
-const sanitize = (x: unknown) =>
-  String(x ?? '')
-    .replace(/[,_\s]/g, '')
-    .trim()
-
-/**
- * Precision-safe schema:
- *  - When isPrice=true  -> returns Price (18 decimals)
- *  - When isPrice=false -> returns Balance(decimals)
- * Accepts: string | bigint | Balance | Price
- * (intentionally not accepting number to avoid precision loss)
- */
-export function createCustomSchema(decimals: number, isPrice: boolean) {
-  const targetDecimals = isPrice ? 18 : decimals
-
-  return z.union([z.instanceof(Balance), z.instanceof(Price), z.bigint(), z.string()]).transform((val) => {
-    if (isPrice) {
-      if (val instanceof Price) return val
-      const bi =
-        typeof val === 'bigint'
-          ? val
-          : val instanceof Balance || (val as any) instanceof Price
-            ? (val as any).toBigInt()
-            : parseUnits(sanitize(val), targetDecimals)
-      return new Price(bi)
-    }
-    if (val instanceof Balance && val.decimals === targetDecimals) return val
-    const bi =
-      typeof val === 'bigint'
-        ? val
-        : val instanceof Balance || val instanceof Price
-          ? val.toBigInt()
-          : parseUnits(sanitize(val), targetDecimals)
-    return new Balance(bi, targetDecimals)
-  })
+  return balanceSchema.transform((balance) => new Price(balance.toBigInt())) as unknown as z.ZodEffects<
+    z.ZodString,
+    Price,
+    string | number | Balance | Price | bigint
+  >
 }
