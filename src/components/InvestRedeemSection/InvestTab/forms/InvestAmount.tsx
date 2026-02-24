@@ -12,7 +12,6 @@ import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { infoText } from '@utils/infoText'
-import { useGetVaultCurrencyOptions } from '@hooks/useGetVaultCurrencyOptions'
 
 interface InvestAmountProps {
   isDisabled: boolean
@@ -31,12 +30,11 @@ export function InvestAmount({
   parsedReceiveAmount,
 }: InvestAmountProps) {
   const { poolDetails, networks } = usePoolContext()
-  const { investment, vaultDetails, vaults, setVault } = useVaultsContext()
+  const { investment, vaultDetails } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const centrifugeIds = networks?.map((network) => network.centrifugeId)
-  const depositCurrencies = useGetVaultCurrencyOptions({ isRedeem: false })
   const isDepositAllowed = investment?.isAllowedToDeposit ?? false
 
   // Get the share class info for calculating shares amount to receive
@@ -58,14 +56,6 @@ export function InvestAmount({
   )
 
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
-
-  const changeVault = useCallback(
-    (value: string | number) => {
-      const newVault = vaults?.find((vault) => vault.address === value)
-      setVault(newVault)
-    },
-    [vaults]
-  )
 
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
@@ -104,8 +94,7 @@ export function InvestAmount({
             name="investAmount"
             decimals={vaultDetails?.asset.decimals}
             placeholder="0.00"
-            selectOptions={depositCurrencies}
-            onSelectChange={changeVault}
+            currency={vaultDetails?.asset.symbol}
             onChange={debouncedCalculateReceiveAmount}
             disabled={isDepositDisabled}
           />

@@ -10,7 +10,6 @@ import { PendingInvestmentBanner } from '@components/InvestRedeemSection/compone
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
-import { useGetVaultCurrencyOptions } from '@hooks/useGetVaultCurrencyOptions'
 
 interface RedeemAmountProps {
   isDisabled: boolean
@@ -28,10 +27,9 @@ export function RedeemAmount({
   parsedReceiveAmount,
 }: RedeemAmountProps) {
   const { poolDetails } = usePoolContext()
-  const { investment, vaults, vaultDetails, setVault } = useVaultsContext()
+  const { investment, vaultDetails } = useVaultsContext()
   const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
   const { setValue } = useFormContext()
-  const redemptionCurrencies = useGetVaultCurrencyOptions({ isRedeem: true })
   const isAllowedToRedeem = investment?.isAllowedToRedeem ?? false
   const centrifugeIds = networks?.map((network) => network.centrifugeId)
 
@@ -72,14 +70,6 @@ export function RedeemAmount({
   )
 
   const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 250), [calculateRedeemAmount])
-
-  const changeVault = useCallback(
-    (value: string | number) => {
-      const newVault = vaults?.find((vault) => vault.address === value)
-      setVault(newVault)
-    },
-    [vaults]
-  )
 
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
@@ -162,8 +152,7 @@ export function RedeemAmount({
                 placeholder="0.00"
                 decimals={vaultDetails?.asset.decimals}
                 onChange={debouncedCalculateRedeemAmount}
-                selectOptions={redemptionCurrencies}
-                onSelectChange={changeVault}
+                currency={vaultDetails?.asset.symbol}
               />
             </>
           )}
