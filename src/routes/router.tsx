@@ -28,12 +28,16 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'pool/:poolId',
+            path: 'pool/:poolId/:network/:asset',
             element: (
               <LoadingBoundary>
                 <PoolRoute />
               </LoadingBoundary>
             ),
+          },
+          {
+            path: 'pool/:poolId',
+            loader: () => redirect('/'),
           },
           {
             path: 'pools/*',
