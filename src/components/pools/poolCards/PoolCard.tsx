@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { MdBrokenImage } from 'react-icons/md'
-import { Box, Center, Flex, Icon, Image, Separator, Spinner, Text } from '@chakra-ui/react'
+import { Badge, Box, Center, Flex, Icon, Image, Separator, Spinner, Text } from '@chakra-ui/react'
 import { useChainId } from 'wagmi'
 import {
   formatBalanceAbbreviated,
@@ -9,32 +9,42 @@ import {
   useBlockchainsMapByChainId,
   useIsMember,
   usePoolActiveNetworks,
+  VaultDetails,
 } from '@cfg'
-import { Card, ValueText } from '@ui'
+import { Card, NetworkIcon, ValueText } from '@ui'
 import { getPoolTVL } from '@utils/getPoolTVL'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
+interface PoolCardProps {
+  poolDetails: PoolDetails
+  getIsRestrictedPool: (poolId?: string | undefined) => boolean
+  isRwaPool: boolean
+  vaultDetails?: VaultDetails
+  networkCentrifugeId?: number
+}
+
 export function PoolCard({
   poolDetails,
   getIsRestrictedPool,
   isRwaPool,
-}: {
-  poolDetails: PoolDetails
-  getIsRestrictedPool: (poolId?: string | undefined) => boolean
-  isRwaPool: boolean
-}) {
+  vaultDetails,
+  networkCentrifugeId,
+}: PoolCardProps) {
   const connectedChainId = useChainId()
   const { data: blockchainsMap } = useBlockchainsMapByChainId()
+
+  // If networkCentrifugeId is provided (new vault card mode), use it directly
+  // Otherwise, fetch networks and find matching one (legacy pool card mode)
   const { data: networks, isLoading: isNetworksLoading } = usePoolActiveNetworks(poolDetails?.id, {
-    enabled: !!poolDetails,
+    enabled: !!poolDetails && !networkCentrifugeId,
   })
 
   // We need to find the pool network and check if the current wallet is whitelisted
   const connectedCentrifugeId = blockchainsMap?.get(connectedChainId)?.centrifugeId
   const currentNetwork = networks?.find((n) => n.centrifugeId === connectedCentrifugeId)
-  const currentNetworkCentrifugeId = currentNetwork?.centrifugeId
+  const currentNetworkCentrifugeId = networkCentrifugeId ?? currentNetwork?.centrifugeId
   const { data: isMember, isLoading: isMemberLoading } = useIsMember(
     poolDetails?.shareClasses[0]?.shareClass.id,
     currentNetworkCentrifugeId,
@@ -47,14 +57,17 @@ export function PoolCard({
   const isRestrictedPool = isRestrictedPoolId && !isWhitelisted
   const poolTVL = useMemo(() => getPoolTVL(poolDetails), [poolDetails.shareClasses])
   const poolMetadata = poolDetails.metadata?.pool
-  const iconUri = poolMetadata?.icon?.uri ?? ''
+  const iconUri = poolMetadata?.icon?.uri || null
   const shareClasses = poolDetails.metadata?.shareClasses
   const shareClassDetails = shareClasses ? Object.values(shareClasses)[0] : undefined
   const poolName = poolMetadata?.name ?? 'Pool'
   const poolIssuerName = poolMetadata?.issuer.name
   const shortDescription = poolMetadata?.issuer?.shortDescription.trim() ?? ''
-  const isPoolCardLoading = isNetworksLoading || isMemberLoading
+  const isPoolCardLoading = (!networkCentrifugeId && isNetworksLoading) || isMemberLoading
   const subClass = poolMetadata?.asset.subClass === 'S&P 500' ? 'Equities' : (poolMetadata?.asset.subClass ?? '')
+
+  // If vaultDetails is provided, show the asset symbol
+  const assetSymbol = vaultDetails?.asset.symbol
 
   return (
     <Card height="100%" position="relative" _hover={{ boxShadow: 'md' }}>
@@ -66,23 +79,33 @@ export function PoolCard({
         </Box>
       ) : null}
       <Flex alignItems="center" justifyContent="space-between">
-        <Box>
-          <Text fontSize="sm" color="fg.solid" fontWeight={600}>
-            {poolName}
-          </Text>
+        <Box flex={1}>
+          <Flex alignItems="center" gap={2}>
+            <Text fontSize="sm" color="fg.solid" fontWeight={600}>
+              {poolName}
+            </Text>
+            {assetSymbol && (
+              <Badge colorPalette="yellow" size="sm" fontWeight={700} color="yellow.emphasized">
+                {assetSymbol}
+              </Badge>
+            )}
+          </Flex>
           {!isRwaPool && poolIssuerName ? (
             <Text fontSize="x-small" color="fg.muted">
               {poolIssuerName}
             </Text>
           ) : null}
         </Box>
-        {iconUri ? (
-          <Image src={ipfsToHttp(iconUri, pinataGateway)} alt={poolMetadata?.name} height="36px" width="36px" />
-        ) : (
-          <Icon size="md">
-            <MdBrokenImage />
-          </Icon>
-        )}
+        <Flex alignItems="center" gap={2}>
+          {networkCentrifugeId && <NetworkIcon centrifugeId={networkCentrifugeId} boxSize="24px" />}
+          {iconUri ? (
+            <Image src={ipfsToHttp(iconUri, pinataGateway)} alt={poolMetadata?.name} height="36px" width="36px" />
+          ) : (
+            <Icon size="md">
+              <MdBrokenImage />
+            </Icon>
+          )}
+        </Flex>
       </Flex>
       <Separator my={4} />
       {isRestrictedPool ? (
