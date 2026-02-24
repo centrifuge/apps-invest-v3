@@ -55,7 +55,11 @@ function RootProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={ALL_CHAINS}>
+        <WalletProvider
+          projectId={import.meta.env.VITE_REOWN_APP_ID!}
+          networks={ALL_CHAINS}
+          rpcUrls={{ ...MAINNET_RPC_URLS, ...TESTNET_RPC_URLS }}
+        >
           <TransactionProvider>
             <PoolProvider>
               <VaultsProvider>

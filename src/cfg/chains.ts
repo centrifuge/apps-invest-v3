@@ -9,6 +9,12 @@ import {
   avalancheFuji,
   celo,
   celoSepolia,
+  optimism,
+  bsc,
+  bscTestnet,
+  monad,
+  hyperEvm,
+  hyperliquidEvmTestnet,
 } from 'viem/chains'
 import { chains } from '@centrifuge/sdk'
 import { AppKitNetwork } from '@reown/appkit/networks'
@@ -40,6 +46,10 @@ export const MAINNET_RPC_URLS: Record<number, string[]> = {
   [arbitrum.id]: [`https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [avalanche.id]: [`https://avax-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [celo.id]: [`https://celo-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  [optimism.id]: [`https://optimism-rpc.publicnode.com`],
+  [bsc.id]: [`https://bsc-dataseed.binance.org`],
+  [monad.id]: [`https://rpc.monad.xyz`],
+  [hyperEvm.id]: [`https://rpc.hyperliquid.xyz/evm`],
 }
 
 export const TESTNET_RPC_URLS: Record<number, string[]> = {
@@ -48,4 +58,6 @@ export const TESTNET_RPC_URLS: Record<number, string[]> = {
   [arbitrumSepolia.id]: [`https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [avalancheFuji.id]: [`https://avax-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
   [celoSepolia.id]: [`https://celo-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`],
+  [bscTestnet.id]: [`https://data-seed-prebsc-1-s1.binance.org:8545`],
+  [hyperliquidEvmTestnet.id]: [`https://rpc.hyperliquid-testnet.xyz/evm`],
 }
