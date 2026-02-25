@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { MdBrokenImage } from 'react-icons/md'
 import { Badge, Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
-import { Balance } from '@centrifuge/sdk'
+import type { Balance } from '@centrifuge/sdk'
 import { formatBalance, ipfsToHttp, useInvestmentsPerVaults } from '@cfg'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
@@ -164,7 +164,8 @@ function AccessPoolCells({
   const totals = useMemo(() => {
     if (!investments || investments.length === 0) return null
 
-    return investments.reduce(
+    const [first, ...rest] = investments
+    return rest.reduce(
       (acc, inv) => ({
         assetBalance: acc.assetBalance.add(inv.assetBalance),
         shareBalance: acc.shareBalance.add(inv.shareBalance),
@@ -174,12 +175,12 @@ function AccessPoolCells({
         claimableRedeemAssets: acc.claimableRedeemAssets.add(inv.claimableRedeemAssets),
       }),
       {
-        assetBalance: Balance.ZERO,
-        shareBalance: Balance.ZERO,
-        pendingDepositAssets: Balance.ZERO,
-        pendingRedeemShares: Balance.ZERO,
-        claimableDepositShares: Balance.ZERO,
-        claimableRedeemAssets: Balance.ZERO,
+        assetBalance: first.assetBalance,
+        shareBalance: first.shareBalance,
+        pendingDepositAssets: first.pendingDepositAssets,
+        pendingRedeemShares: first.pendingRedeemShares,
+        claimableDepositShares: first.claimableDepositShares,
+        claimableRedeemAssets: first.claimableRedeemAssets,
       }
     )
   }, [investments])
