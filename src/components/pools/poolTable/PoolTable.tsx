@@ -139,6 +139,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
                 fontWeight={400}
                 color="fg.solid"
                 textAlign={col.align ?? 'left'}
+                borderBottomWidth={0}
                 _first={{ borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
                 _last={{ borderTopRightRadius: '10px', borderBottomRightRadius: '10px' }}
               >
