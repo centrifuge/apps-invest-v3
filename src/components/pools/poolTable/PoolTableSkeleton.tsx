@@ -6,10 +6,19 @@ export function PoolTableSkeleton({ columns }: { columns: PoolTableColumns[] }) 
     <Box overflowX="auto">
       <Table.Root size="sm" variant="outline">
         <Table.Header>
-          <Table.Row bg="bg.muted">
-            {columns.map((col) => (
-              <Table.ColumnHeader key={col.label} width={col.width} py={3} px={4}>
-                <Text fontSize="xs" fontWeight={600} color="fg.muted" textTransform="uppercase" letterSpacing="wider">
+          <Table.Row bg="border.muted" borderRadius="10px">
+            {columns.map((col, i) => (
+              <Table.ColumnHeader
+                key={col.label}
+                width={col.width}
+                py={4}
+                px={4}
+                borderTopLeftRadius={i === 0 ? '10px' : undefined}
+                borderBottomLeftRadius={i === 0 ? '10px' : undefined}
+                borderTopRightRadius={i === columns.length - 1 ? '10px' : undefined}
+                borderBottomRightRadius={i === columns.length - 1 ? '10px' : undefined}
+              >
+                <Text fontSize="xs" fontWeight={400} color="fg.solid">
                   {col.label}
                 </Text>
               </Table.ColumnHeader>

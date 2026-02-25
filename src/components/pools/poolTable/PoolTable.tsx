@@ -110,7 +110,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
     <Box overflowX="auto">
       <Table.Root size="sm" variant="outline">
         <Table.Header>
-          <Table.Row bg="bg.muted">
+          <Table.Row bg="border.muted" borderRadius="10px">
             {COLUMNS.map((col) => (
               <Table.ColumnHeader
                 key={col.label}
@@ -118,14 +118,14 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
                 cursor={col.field ? 'pointer' : 'default'}
                 onClick={col.field ? () => handleSort(col.field!) : undefined}
                 userSelect="none"
-                py={3}
+                py={4}
                 px={4}
                 fontSize="xs"
-                fontWeight={600}
-                color="fg.muted"
-                textTransform="uppercase"
-                letterSpacing="wider"
+                fontWeight={400}
+                color="fg.solid"
                 textAlign={col.align ?? 'left'}
+                _first={{ borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
+                _last={{ borderTopRightRadius: '10px', borderBottomRightRadius: '10px' }}
               >
                 <Text
                   as="span"
@@ -179,7 +179,7 @@ function VaultHeaderRow({ activeTab }: { activeTab: ActiveTab }) {
   const columns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
 
   return (
-    <Table.Row bg="bg.muted">
+    <Table.Row bg="border.muted">
       {columns.map((col, i) => (
         <Table.Cell
           key={col.label || `empty-${i}`}
@@ -187,10 +187,8 @@ function VaultHeaderRow({ activeTab }: { activeTab: ActiveTab }) {
           py={2}
           px={4}
           fontSize="xs"
-          fontWeight={600}
-          color="fg.muted"
-          textTransform="uppercase"
-          letterSpacing="wider"
+          fontWeight={400}
+          color="fg.solid"
           textAlign={col.align ?? 'left'}
         >
           {col.label}

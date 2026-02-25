@@ -50,15 +50,9 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   const accessRwaPoolRows = useMemo(() => filterByAccess(rwaPoolRows, accessStatus), [rwaPoolRows, accessStatus])
   const accessDeRwaPoolRows = useMemo(() => filterByAccess(deRwaPoolRows, accessStatus), [deRwaPoolRows, accessStatus])
 
-  const rwaHeading = {
-    label: 'RWA',
-    subtitle: 'Tokenized real-world assets issued under various legal structures. KYB onboarding required.',
-  }
-
   const deRwaHeading = {
-    label: 'Secondary Markets (deRWA)',
-    subtitle:
-      'Decentralized real-world asset tokens. Freely transferable tokens with on-chain transparency and liquidity.',
+    label: 'Secondary Markets',
+    subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
   }
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('funds')
@@ -71,63 +65,93 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
       variant="line"
       onValueChange={(details) => setActiveTab(details.value as ActiveTab)}
     >
-      <Tabs.List>
-        <Tabs.Trigger value="access" height="55px" alignItems="flex-end">
+      {/* Tab triggers - z-3 so they render above the wave separator overlay (z-2) */}
+      <Tabs.List borderBottomColor="border.solid" gap={8} position="relative" zIndex={3}>
+        <Tabs.Trigger
+          value="access"
+          height="44px"
+          alignItems="flex-end"
+          pb={4}
+          px={2}
+          fontSize="2xl"
+          fontWeight={400}
+          color="fg.muted"
+          _selected={{ fontWeight: 500, color: 'fg.solid' }}
+        >
           Access & Positions
         </Tabs.Trigger>
-        <Tabs.Trigger value="funds" height="55px" alignItems="flex-end">
+        <Tabs.Trigger
+          value="funds"
+          height="44px"
+          alignItems="flex-end"
+          pb={4}
+          px={2}
+          fontSize="2xl"
+          fontWeight={400}
+          color="fg.subtle"
+          _selected={{ fontWeight: 500, color: 'fg.solid' }}
+        >
           Funds
         </Tabs.Trigger>
         <Tabs.Indicator bg="fg.emphasized" height="2px" borderRadius="1px" bottom="0" />
       </Tabs.List>
 
-      <Tabs.Content value="access" pt={6}>
-        {!address ? (
-          <Box py={8} textAlign="center">
-            <Text color="fg.muted" fontSize="md">
-              Connect your wallet to see pools you have access to and your positions.
-            </Text>
-          </Box>
-        ) : (
-          <>
+      <Box
+        bg="white"
+        width="100vw"
+        position="relative"
+        left="50%"
+        marginLeft="-50vw"
+        pb={16}
+        pt={8}
+        px={{ base: 4, md: 16 }}
+      >
+        <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto" mt={8}>
+          <Tabs.Content value="access" pt={0}>
+            {!address ? (
+              <Box py={8} textAlign="center">
+                <Text color="fg.muted" fontSize="md">
+                  Connect your wallet to see pools you have access to and your positions.
+                </Text>
+              </Box>
+            ) : (
+              <>
+                <PoolTableSection
+                  poolRows={accessRwaPoolRows}
+                  setSelectedPoolId={setSelectedPoolId}
+                  isLoading={isLoading || accessStatus.isLoading}
+                  activeTab={activeTab}
+                />
+                <PoolTableSection
+                  heading={deRwaHeading.label}
+                  subtitle={deRwaHeading.subtitle}
+                  poolRows={accessDeRwaPoolRows}
+                  setSelectedPoolId={setSelectedPoolId}
+                  isLoading={isLoading || accessStatus.isLoading}
+                  activeTab={activeTab}
+                />
+              </>
+            )}
+          </Tabs.Content>
+
+          <Tabs.Content value="funds" pt={0}>
             <PoolTableSection
-              heading={rwaHeading.label}
-              subtitle={rwaHeading.subtitle}
-              poolRows={accessRwaPoolRows}
+              poolRows={rwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
-              isLoading={isLoading || accessStatus.isLoading}
+              isLoading={isLoading}
               activeTab={activeTab}
             />
             <PoolTableSection
               heading={deRwaHeading.label}
               subtitle={deRwaHeading.subtitle}
-              poolRows={accessDeRwaPoolRows}
+              poolRows={deRwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
-              isLoading={isLoading || accessStatus.isLoading}
+              isLoading={isLoading}
               activeTab={activeTab}
             />
-          </>
-        )}
-      </Tabs.Content>
-
-      <Tabs.Content value="funds" pt={6}>
-        <PoolTableSection
-          heading={rwaHeading.label}
-          subtitle={rwaHeading.subtitle}
-          poolRows={rwaPoolRows}
-          setSelectedPoolId={setSelectedPoolId}
-          isLoading={isLoading}
-          activeTab={activeTab}
-        />
-        <PoolTableSection
-          heading={deRwaHeading.label}
-          subtitle={deRwaHeading.subtitle}
-          poolRows={deRwaPoolRows}
-          setSelectedPoolId={setSelectedPoolId}
-          isLoading={isLoading}
-          activeTab={activeTab}
-        />
-      </Tabs.Content>
+          </Tabs.Content>
+        </Box>
+      </Box>
     </Tabs.Root>
   )
 }
