@@ -4,8 +4,8 @@ import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { getVaultPath } from '@routes/routePaths'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
-import type { ActiveTab, PoolRow, SortConfig, SortField } from './types'
-import { sortPoolRows } from './utils'
+import type { ActiveTab, ExpandedPosition, PoolRow, SortConfig, SortField } from './types'
+import { getExpandedCellBorder, sortPoolRows } from './utils'
 import { PoolTableRow } from './PoolTableRow'
 import { VaultSubRow } from './VaultSubRow'
 import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
@@ -123,7 +123,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
 
   return (
     <Box overflowX="auto">
-      <Table.Root size="sm" variant="outline">
+      <Table.Root size="sm" variant="line" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
         <Table.Header>
           <Table.Row bg="border.muted" borderRadius="10px">
             {poolColumns.map((col) => (
@@ -191,25 +191,29 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
   )
 }
 
-function VaultHeaderRow({ activeTab }: { activeTab: ActiveTab }) {
+function VaultHeaderRow({ activeTab, expandedPosition }: { activeTab: ActiveTab; expandedPosition?: ExpandedPosition }) {
   const columns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
 
   return (
     <Table.Row bg="border.muted">
-      {columns.map((col, i) => (
-        <Table.Cell
-          key={col.label || `empty-${i}`}
-          width={col.width}
-          py={2}
-          px={4}
-          fontSize="xs"
-          fontWeight={400}
-          color="fg.solid"
-          textAlign={col.align ?? 'left'}
-        >
-          {col.label}
-        </Table.Cell>
-      ))}
+      {columns.map((col, i) => {
+        const cellPos = i === 0 ? 'first' as const : i === columns.length - 1 ? 'last' as const : 'middle' as const
+        return (
+          <Table.Cell
+            key={col.label || `empty-${i}`}
+            width={col.width}
+            py={2}
+            px={4}
+            fontSize="xs"
+            fontWeight={400}
+            color="fg.solid"
+            textAlign={col.align ?? 'left'}
+            {...getExpandedCellBorder(expandedPosition, cellPos)}
+          >
+            {col.label}
+          </Table.Cell>
+        )
+      })}
     </Table.Row>
   )
 }
@@ -229,6 +233,8 @@ function PoolTableRowGroup({
   setSelectedPoolId: (poolId: PoolId) => void
   activeTab: ActiveTab
 }) {
+  const lastVaultIndex = poolRow.vaults.length - 1
+
   return (
     <>
       <PoolTableRow
@@ -237,10 +243,11 @@ function PoolTableRowGroup({
         onToggle={onToggle}
         onClick={onClick}
         activeTab={activeTab}
+        expandedPosition={isExpanded ? 'top' : undefined}
       />
-      {isExpanded && <VaultHeaderRow activeTab={activeTab} />}
+      {isExpanded && <VaultHeaderRow activeTab={activeTab} expandedPosition="middle" />}
       {isExpanded &&
-        poolRow.vaults.map((vault) => (
+        poolRow.vaults.map((vault, i) => (
           <VaultSubRow
             key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
             vaultRow={vault}
@@ -248,6 +255,7 @@ function PoolTableRowGroup({
             setSelectedPoolId={setSelectedPoolId}
             poolDetails={poolRow.poolDetails}
             activeTab={activeTab}
+            expandedPosition={i === lastVaultIndex ? 'bottom' : 'middle'}
           />
         ))}
     </>

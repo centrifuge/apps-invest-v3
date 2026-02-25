@@ -5,7 +5,8 @@ import { Balance } from '@centrifuge/sdk'
 import { formatBalance, ipfsToHttp, useInvestmentsPerVaults } from '@cfg'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
-import type { ActiveTab, PoolRow } from './types'
+import type { ActiveTab, ExpandedPosition, PoolRow } from './types'
+import { getExpandedCellBorder } from './utils'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
@@ -15,9 +16,10 @@ interface PoolTableRowProps {
   onToggle: () => void
   onClick: () => void
   activeTab: ActiveTab
+  expandedPosition?: ExpandedPosition
 }
 
-export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab }: PoolTableRowProps) {
+export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab, expandedPosition }: PoolTableRowProps) {
   const isExpandable = poolRow.vaults.length > 1
   const poolType = poolRow.poolDetails.metadata?.pool?.asset.class ?? ''
 
@@ -31,7 +33,7 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab
 
   return (
     <Table.Row onClick={handleClick} cursor="pointer" _hover={{ bg: 'bg.subtle' }} transition="background 150ms">
-      <Table.Cell>
+      <Table.Cell {...getExpandedCellBorder(expandedPosition, 'first')}>
         <Flex alignItems="center" gap={2}>
           {isExpandable ? (
             <Icon size="sm" color="fg.muted">
@@ -62,7 +64,7 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab
         </Flex>
       </Table.Cell>
 
-      <Table.Cell textAlign="center">
+      <Table.Cell textAlign="center" {...getExpandedCellBorder(expandedPosition, 'middle')}>
         {poolType ? (
           <Badge size="sm" variant="solid" colorPalette="gray">
             {poolType}
@@ -70,7 +72,11 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab
         ) : null}
       </Table.Cell>
 
-      {activeTab === 'access' ? <AccessPoolCells poolRow={poolRow} /> : <FundsPoolCells poolRow={poolRow} />}
+      {activeTab === 'access' ? (
+        <AccessPoolCells poolRow={poolRow} expandedPosition={expandedPosition} />
+      ) : (
+        <FundsPoolCells poolRow={poolRow} expandedPosition={expandedPosition} />
+      )}
     </Table.Row>
   )
 }
@@ -78,10 +84,10 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab
 const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
-function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
+function FundsPoolCells({ poolRow, expandedPosition }: { poolRow: PoolRow; expandedPosition?: ExpandedPosition }) {
   return (
     <>
-      <Table.Cell textAlign="right">
+      <Table.Cell textAlign="right" {...getExpandedCellBorder(expandedPosition, 'middle')}>
         {poolRow.isRestricted ? (
           <InvestorsOnlyValueBlock />
         ) : (
@@ -91,7 +97,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
         )}
       </Table.Cell>
 
-      <Table.Cell textAlign="center">
+      <Table.Cell textAlign="center" {...getExpandedCellBorder(expandedPosition, 'middle')}>
         {poolRow.isRestricted ? (
           <Text fontSize="sm" color="fg.muted">
             --
@@ -103,15 +109,15 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
         )}
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text fontSize="xs">{poolRow.assetType}</Text>
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text fontSize="xs">{poolRow.investorType}</Text>
       </Table.Cell>
 
-      <Table.Cell textAlign="right">
+      <Table.Cell textAlign="right" {...getExpandedCellBorder(expandedPosition, 'last')}>
         <Text fontSize="sm" fontVariantNumeric="tabular-nums">
           {poolRow.minInvestment}
         </Text>
@@ -120,7 +126,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
   )
 }
 
-function AccessPoolCells({ poolRow }: { poolRow: PoolRow }) {
+function AccessPoolCells({ poolRow, expandedPosition }: { poolRow: PoolRow; expandedPosition?: ExpandedPosition }) {
   const vaults = useMemo(() => poolRow.vaults.map((v) => v.vault), [poolRow.vaults])
   const { data: investments } = useInvestmentsPerVaults(vaults)
 
@@ -151,22 +157,22 @@ function AccessPoolCells({ poolRow }: { poolRow: PoolRow }) {
 
   return (
     <>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell {...numericCellProps} {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text {...numericTextProps}>{fmt(totals?.assetBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell {...numericCellProps} {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text {...numericTextProps}>{fmt(totals?.shareBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell {...numericCellProps} {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text {...numericTextProps}>{fmt(totals?.pendingDepositAssets)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell {...numericCellProps} {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text {...numericTextProps}>{fmt(totals?.pendingRedeemShares)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell {...numericCellProps} {...getExpandedCellBorder(expandedPosition, 'middle')}>
         <Text {...numericTextProps}>{fmt(totals?.claimableDepositShares)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell {...numericCellProps} {...getExpandedCellBorder(expandedPosition, 'last')}>
         <Text {...numericTextProps}>{fmt(totals?.claimableRedeemAssets)}</Text>
       </Table.Cell>
     </>

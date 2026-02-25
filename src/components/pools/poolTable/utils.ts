@@ -1,6 +1,28 @@
 import { formatBalanceAbbreviated, type PoolNetworkVaultData } from '@cfg'
 import { getPoolTVL } from '@utils/getPoolTVL'
-import type { PoolRow, SortConfig, VaultRow } from './types'
+import type { ExpandedPosition, PoolRow, SortConfig, VaultRow } from './types'
+
+export function getExpandedCellBorder(pos: ExpandedPosition | undefined, cell: 'first' | 'middle' | 'last') {
+  if (!pos) return {}
+  const s: Record<string, string> = {}
+
+  if (pos === 'top') { s.borderTopWidth = '2px'; s.borderTopColor = 'border.muted' }
+  if (pos === 'bottom') { s.borderBottomWidth = '2px'; s.borderBottomColor = 'border.muted' }
+
+  if (cell === 'first') {
+    s.borderLeftWidth = '2px'; s.borderLeftColor = 'border.muted'
+    if (pos === 'top') s.borderTopLeftRadius = '8px'
+    if (pos === 'bottom') s.borderBottomLeftRadius = '8px'
+  }
+
+  if (cell === 'last') {
+    s.borderRightWidth = '2px'; s.borderRightColor = 'border.muted'
+    if (pos === 'top') s.borderTopRightRadius = '8px'
+    if (pos === 'bottom') s.borderBottomRightRadius = '8px'
+  }
+
+  return s
+}
 
 export function groupVaultsByPool(
   vaults: PoolNetworkVaultData[],

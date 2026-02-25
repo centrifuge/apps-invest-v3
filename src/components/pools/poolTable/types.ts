@@ -42,3 +42,5 @@ export interface SortConfig {
   field: SortField
   direction: SortDirection
 }
+
+export type ExpandedPosition = 'top' | 'middle' | 'bottom'
