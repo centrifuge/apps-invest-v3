@@ -83,34 +83,34 @@ export function computeInvestmentTotals(
   )
 }
 
-export function getExpandedCellBorder(pos: ExpandedPosition | undefined, cell: 'first' | 'middle' | 'last') {
-  if (!pos) return {}
-  const s: Record<string, string> = {}
+export function getExpandedCellBorder(position: ExpandedPosition | undefined, cell: 'first' | 'middle' | 'last') {
+  if (!position) return {}
+  const borderStyle: Record<string, string> = {}
 
-  if (pos === 'top') {
-    s.borderTopWidth = '2px'
-    s.borderTopColor = 'border.muted'
+  if (position === 'top') {
+    borderStyle.borderTopWidth = '2px'
+    borderStyle.borderTopColor = 'border.muted'
   }
-  if (pos === 'bottom') {
-    s.borderBottomWidth = '2px'
-    s.borderBottomColor = 'border.muted'
+  if (position === 'bottom') {
+    borderStyle.borderBottomWidth = '2px'
+    borderStyle.borderBottomColor = 'border.muted'
   }
 
   if (cell === 'first') {
-    s.borderLeftWidth = '2px'
-    s.borderLeftColor = 'border.muted'
-    if (pos === 'top') s.borderTopLeftRadius = '8px'
-    if (pos === 'bottom') s.borderBottomLeftRadius = '8px'
+    borderStyle.borderLeftWidth = '2px'
+    borderStyle.borderLeftColor = 'border.muted'
+    if (position === 'top') borderStyle.borderTopLeftRadius = '8px'
+    if (position === 'bottom') borderStyle.borderBottomLeftRadius = '8px'
   }
 
   if (cell === 'last') {
-    s.borderRightWidth = '2px'
-    s.borderRightColor = 'border.muted'
-    if (pos === 'top') s.borderTopRightRadius = '8px'
-    if (pos === 'bottom') s.borderBottomRightRadius = '8px'
+    borderStyle.borderRightWidth = '2px'
+    borderStyle.borderRightColor = 'border.muted'
+    if (position === 'top') borderStyle.borderTopRightRadius = '8px'
+    if (position === 'bottom') borderStyle.borderBottomRightRadius = '8px'
   }
 
-  return s
+  return borderStyle
 }
 
 export function sortPoolRows(
@@ -121,35 +121,35 @@ export function sortPoolRows(
   if (!config) return rows
 
   const sorted = [...rows]
-  const dir = config.direction === 'asc' ? 1 : -1
+  const sortDirection = config.direction === 'asc' ? 1 : -1
 
   sorted.sort((a, b) => {
     switch (config.field) {
       case 'name':
-        return dir * a.poolName.localeCompare(b.poolName)
+        return sortDirection * a.poolName.localeCompare(b.poolName)
       case 'tvl': {
         const aVal = parseFloat(a.tvl.replace(/,/g, '')) || 0
         const bVal = parseFloat(b.tvl.replace(/,/g, '')) || 0
-        return dir * (aVal - bVal)
+        return sortDirection * (aVal - bVal)
       }
       case 'apy': {
         const aVal = parseFloat(a.apy) || 0
         const bVal = parseFloat(b.apy) || 0
-        return dir * (aVal - bVal)
+        return sortDirection * (aVal - bVal)
       }
       case 'totalAssets':
         return (
-          dir *
+          sortDirection *
           compareBalance(investmentTotals?.get(a.poolId)?.assetBalance, investmentTotals?.get(b.poolId)?.assetBalance)
         )
       case 'totalShares':
         return (
-          dir *
+          sortDirection *
           compareBalance(investmentTotals?.get(a.poolId)?.shareBalance, investmentTotals?.get(b.poolId)?.shareBalance)
         )
       case 'pendingDeposits':
         return (
-          dir *
+          sortDirection *
           compareBalance(
             investmentTotals?.get(a.poolId)?.pendingDepositAssets,
             investmentTotals?.get(b.poolId)?.pendingDepositAssets
@@ -157,7 +157,7 @@ export function sortPoolRows(
         )
       case 'pendingRedemptions':
         return (
-          dir *
+          sortDirection *
           compareBalance(
             investmentTotals?.get(a.poolId)?.pendingRedeemShares,
             investmentTotals?.get(b.poolId)?.pendingRedeemShares
@@ -165,7 +165,7 @@ export function sortPoolRows(
         )
       case 'depositClaims':
         return (
-          dir *
+          sortDirection *
           compareBalance(
             investmentTotals?.get(a.poolId)?.claimableDepositShares,
             investmentTotals?.get(b.poolId)?.claimableDepositShares
@@ -173,7 +173,7 @@ export function sortPoolRows(
         )
       case 'redeemClaims':
         return (
-          dir *
+          sortDirection *
           compareBalance(
             investmentTotals?.get(a.poolId)?.claimableRedeemAssets,
             investmentTotals?.get(b.poolId)?.claimableRedeemAssets
