@@ -1,6 +1,5 @@
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatDate, useAllPoolDetails } from '@cfg'
-import { Card } from '@ui'
 import { Flex, Skeleton, Text } from '@chakra-ui/react'
 import { IoBarChart } from 'react-icons/io5'
 
@@ -21,20 +20,20 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   const formattedTotalTVL = totalTVL ? formatBalance(totalTVL, 'USD', 0) : 'unknown'
 
   if (isLoading) {
-    return <Skeleton height="102px" width="380px" borderRadius="md" bg="bg.muted" />
+    return <Skeleton height="68px" width="360px" borderRadius="md" />
   }
 
   return (
-    <Card borderRadius="xl">
-      <Text color="fg.muted" fontSize="xs">
-        TVL on {formatDate(new Date(), 'short')}
-      </Text>
-      <Flex alignItems="center" justifyContent="flex-start">
-        <IoBarChart size="1.25rem" color="#FFC012" style={{ marginRight: '.5rem' }} />
-        <Text fontSize="2xl" fontWeight={500}>
-          {formattedTotalTVL}
+    <Flex alignItems="center" gap={3}>
+      <IoBarChart size="3rem" color="fg.emphasized" />
+      <Flex flexDirection="column" alignItems="flex-end">
+        <Text color="fg.subtle" fontSize="sm" fontWeight={500} lineHeight="20px">
+          TVL on {formatDate(new Date(), 'short')}
+        </Text>
+        <Text color="fg.inverted" fontSize="4xl" fontWeight={600} lineHeight="44px" letterSpacing="-0.72px">
+          $ {formattedTotalTVL}
         </Text>
       </Flex>
-    </Card>
+    </Flex>
   )
 }

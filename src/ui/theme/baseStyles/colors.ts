@@ -334,6 +334,9 @@ export const colorTokens = {
   'border.dark-muted': {
     value: { _light: charcoalScale[300] },
   },
+  'border.muted': {
+    value: { _light: charcoalScale[200] },
+  },
   'border.subtle': {
     value: { _light: grayScale[200] },
   },
