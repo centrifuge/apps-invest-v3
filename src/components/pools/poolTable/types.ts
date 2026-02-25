@@ -1,4 +1,4 @@
-import type { Vault } from '@centrifuge/sdk'
+import type { Balance, Vault } from '@centrifuge/sdk'
 import type { Network, PoolDetails, VaultDetails } from '@cfg'
 
 export type ActiveTab = 'access' | 'funds'
@@ -44,3 +44,12 @@ export interface SortConfig {
 }
 
 export type ExpandedPosition = 'top' | 'middle' | 'bottom'
+
+export interface PoolInvestmentTotals {
+  assetBalance: Balance
+  shareBalance: Balance
+  pendingDepositAssets: Balance
+  pendingRedeemShares: Balance
+  claimableDepositShares: Balance
+  claimableRedeemAssets: Balance
+}

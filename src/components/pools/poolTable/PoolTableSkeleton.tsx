@@ -1,5 +1,5 @@
 import { Box, Skeleton, Table, Text } from '@chakra-ui/react'
-import { PoolTableColumns } from '@components/pools/poolTable/PoolTable'
+import { PoolTableColumns } from '@components/pools/poolTable/columnsConfig'
 
 export function PoolTableSkeleton({ columns }: { columns: PoolTableColumns[] }) {
   return (

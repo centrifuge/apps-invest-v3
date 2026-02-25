@@ -17,7 +17,14 @@ interface VaultSubRowProps {
   expandedPosition?: ExpandedPosition
 }
 
-export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, activeTab, expandedPosition }: VaultSubRowProps) {
+export function VaultSubRow({
+  vaultRow,
+  poolId,
+  setSelectedPoolId,
+  poolDetails,
+  activeTab,
+  expandedPosition,
+}: VaultSubRowProps) {
   const navigate = useNavigate()
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
 
@@ -56,7 +63,15 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
 const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
-function AccessVaultCells({ vault, assetSymbol, expandedPosition }: { vault: VaultRow; assetSymbol: string; expandedPosition?: ExpandedPosition }) {
+function AccessVaultCells({
+  vault,
+  assetSymbol,
+  expandedPosition,
+}: {
+  vault: VaultRow
+  assetSymbol: string
+  expandedPosition?: ExpandedPosition
+}) {
   const { data: investment } = useInvestment(vault.vault)
 
   const fmt = (value: unknown) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)

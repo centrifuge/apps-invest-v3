@@ -1,14 +1,21 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
+import { useInvestmentsPerVaults } from '@cfg'
 import { getVaultPath } from '@routes/routePaths'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
-import type { ActiveTab, ExpandedPosition, PoolRow, SortConfig, SortField } from './types'
-import { getExpandedCellBorder, sortPoolRows } from './utils'
+import type { ActiveTab, ExpandedPosition, PoolInvestmentTotals, PoolRow, SortConfig, SortField } from './types'
+import { computeInvestmentTotals, getExpandedCellBorder, sortPoolRows } from './utils'
 import { PoolTableRow } from './PoolTableRow'
 import { VaultSubRow } from './VaultSubRow'
 import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
+import {
+  POOL_COLUMNS_ACCESS,
+  POOL_COLUMNS_FUNDS,
+  VAULT_COLUMNS_ACCESS,
+  VAULT_COLUMNS_FUNDS,
+} from '@components/pools/poolTable/columnsConfig'
 
 interface PoolTableProps {
   poolRows: PoolRow[]
@@ -16,61 +23,6 @@ interface PoolTableProps {
   isLoading?: boolean
   activeTab: ActiveTab
 }
-
-export interface PoolTableColumns {
-  label: string
-  field?: SortField
-  width: string
-  align?: 'left' | 'center' | 'right'
-}
-
-const POOL_COLUMNS_ACCESS: PoolTableColumns[] = [
-  { label: 'Fund', field: 'name', width: '20%' },
-  { label: 'Type', width: '8%', align: 'center' },
-  { label: 'Total Assets', field: 'totalAssets', width: '12%', align: 'right' },
-  { label: 'Total Shares', field: 'totalShares', width: '12%', align: 'right' },
-  { label: 'Total Pending Deposits', field: 'pendingDeposits', width: '12%', align: 'right' },
-  { label: 'Total Pending Redemptions', field: 'pendingRedemptions', width: '12%', align: 'right' },
-  { label: 'Total Deposit Claims', field: 'depositClaims', width: '12%', align: 'right' },
-  { label: 'Total Redeem Claims', field: 'redeemClaims', width: '12%', align: 'right' },
-]
-
-const POOL_COLUMNS_FUNDS: PoolTableColumns[] = [
-  { label: 'Fund', field: 'name', width: '25%' },
-  { label: 'Type', width: '8%', align: 'center' },
-  { label: 'TVL (USD)', field: 'tvl', width: '15%', align: 'right' },
-  { label: 'APY', field: 'apy', width: '8%', align: 'center' },
-  { label: 'Asset type', width: '15%' },
-  { label: 'Investor type', width: '14%' },
-  { label: 'Min. Investment', width: '15%', align: 'right' },
-]
-
-interface VaultColumn {
-  label: string
-  width: string
-  align?: 'left' | 'center' | 'right'
-}
-
-const VAULT_COLUMNS_ACCESS: VaultColumn[] = [
-  { label: 'Vault', width: '14%' },
-  { label: 'Asset', width: '8%', align: 'center' },
-  { label: 'Asset Balance', width: '13%', align: 'right' },
-  { label: 'Share Balance', width: '13%', align: 'right' },
-  { label: 'Pending Deposit', width: '13%', align: 'right' },
-  { label: 'Pending Redeem', width: '13%', align: 'right' },
-  { label: 'Claimable Deposit', width: '14%', align: 'right' },
-  { label: 'Claimable Redeem', width: '14%', align: 'right' },
-]
-
-const VAULT_COLUMNS_FUNDS: VaultColumn[] = [
-  { label: 'Vault', width: '25%' },
-  { label: 'Asset', width: '10%', align: 'center' },
-  { label: 'Token', width: '10%', align: 'center' },
-  { label: 'NAV', width: '13%', align: 'right' },
-  { label: 'Total Issuance', width: '13%', align: 'right' },
-  { label: 'Price/Share', width: '12%', align: 'right' },
-  { label: '', width: '17%' },
-]
 
 export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }: PoolTableProps) {
   const navigate = useNavigate()
@@ -99,8 +51,6 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
     })
   }, [])
 
-  const sortedRows = sortPoolRows(poolRows, sortConfig)
-
   const handlePoolClick = useCallback(
     (poolRow: PoolRow) => {
       const vault = poolRow.vaults[0]
@@ -113,10 +63,33 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
   )
 
   const isAccessTable = activeTab === 'access'
+
+  const allVaults = useMemo(
+    () => (isAccessTable ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
+    [poolRows, isAccessTable]
+  )
+  const { data: allInvestments } = useInvestmentsPerVaults(allVaults)
+
+  const investmentTotalsMap = useMemo(() => {
+    const map = new Map<string, PoolInvestmentTotals>()
+    if (!allInvestments || !isAccessTable) return map
+
+    let offset = 0
+    for (const row of poolRows) {
+      const count = row.vaults.length
+      const investments = allInvestments.slice(offset, offset + count)
+      offset += count
+      const totals = computeInvestmentTotals(investments)
+      if (totals) map.set(row.poolId, totals)
+    }
+    return map
+  }, [allInvestments, poolRows, isAccessTable])
+
+  const sortedRows = sortPoolRows(poolRows, sortConfig, investmentTotalsMap)
   const poolColumns = isAccessTable ? POOL_COLUMNS_ACCESS : POOL_COLUMNS_FUNDS
 
   if (isLoading) {
-    return <PoolTableSkeleton columns={POOL_COLUMNS_FUNDS} />
+    return <PoolTableSkeleton columns={poolColumns} />
   }
 
   if (poolRows.length === 0) return null
@@ -185,6 +158,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
                 onClick={() => handlePoolClick(poolRow)}
                 setSelectedPoolId={setSelectedPoolId}
                 activeTab={activeTab}
+                investmentTotals={investmentTotalsMap.get(poolRow.poolId)}
               />
             )
           })}
@@ -194,13 +168,70 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
   )
 }
 
-function VaultHeaderRow({ activeTab, expandedPosition }: { activeTab: ActiveTab; expandedPosition?: ExpandedPosition }) {
+function PoolTableRowGroup({
+  poolRow,
+  isExpanded,
+  nextIsExpanded,
+  onToggle,
+  onClick,
+  setSelectedPoolId,
+  activeTab,
+  investmentTotals,
+}: {
+  poolRow: PoolRow
+  isExpanded: boolean
+  nextIsExpanded: boolean
+  onToggle: () => void
+  onClick: () => void
+  setSelectedPoolId: (poolId: PoolId) => void
+  activeTab: ActiveTab
+  investmentTotals?: PoolInvestmentTotals
+}) {
+  const lastVaultIndex = poolRow.vaults.length - 1
+
+  return (
+    <>
+      <PoolTableRow
+        poolRow={poolRow}
+        isExpanded={isExpanded}
+        onToggle={onToggle}
+        onClick={onClick}
+        activeTab={activeTab}
+        expandedPosition={isExpanded ? 'top' : undefined}
+        hideBottomBorder={!isExpanded && nextIsExpanded}
+        investmentTotals={investmentTotals}
+      />
+      {isExpanded && <VaultHeaderRow activeTab={activeTab} expandedPosition="middle" />}
+      {isExpanded &&
+        poolRow.vaults.map((vault, i) => (
+          <VaultSubRow
+            key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
+            vaultRow={vault}
+            poolId={poolRow.poolId}
+            setSelectedPoolId={setSelectedPoolId}
+            poolDetails={poolRow.poolDetails}
+            activeTab={activeTab}
+            expandedPosition={i === lastVaultIndex ? 'bottom' : 'middle'}
+          />
+        ))}
+    </>
+  )
+}
+
+function VaultHeaderRow({
+  activeTab,
+  expandedPosition,
+}: {
+  activeTab: ActiveTab
+  expandedPosition?: ExpandedPosition
+}) {
   const columns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
 
   return (
     <Table.Row bg="border.muted">
       {columns.map((col, i) => {
-        const cellPos = i === 0 ? 'first' as const : i === columns.length - 1 ? 'last' as const : 'middle' as const
+        const cellPos =
+          i === 0 ? ('first' as const) : i === columns.length - 1 ? ('last' as const) : ('middle' as const)
         return (
           <Table.Cell
             key={col.label || `empty-${i}`}
@@ -218,52 +249,5 @@ function VaultHeaderRow({ activeTab, expandedPosition }: { activeTab: ActiveTab;
         )
       })}
     </Table.Row>
-  )
-}
-
-function PoolTableRowGroup({
-  poolRow,
-  isExpanded,
-  nextIsExpanded,
-  onToggle,
-  onClick,
-  setSelectedPoolId,
-  activeTab,
-}: {
-  poolRow: PoolRow
-  isExpanded: boolean
-  nextIsExpanded: boolean
-  onToggle: () => void
-  onClick: () => void
-  setSelectedPoolId: (poolId: PoolId) => void
-  activeTab: ActiveTab
-}) {
-  const lastVaultIndex = poolRow.vaults.length - 1
-
-  return (
-    <>
-      <PoolTableRow
-        poolRow={poolRow}
-        isExpanded={isExpanded}
-        onToggle={onToggle}
-        onClick={onClick}
-        activeTab={activeTab}
-        expandedPosition={isExpanded ? 'top' : undefined}
-        hideBottomBorder={!isExpanded && nextIsExpanded}
-      />
-      {isExpanded && <VaultHeaderRow activeTab={activeTab} expandedPosition="middle" />}
-      {isExpanded &&
-        poolRow.vaults.map((vault, i) => (
-          <VaultSubRow
-            key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
-            vaultRow={vault}
-            poolId={poolRow.poolId}
-            setSelectedPoolId={setSelectedPoolId}
-            poolDetails={poolRow.poolDetails}
-            activeTab={activeTab}
-            expandedPosition={i === lastVaultIndex ? 'bottom' : 'middle'}
-          />
-        ))}
-    </>
   )
 }
