@@ -25,7 +25,15 @@ export default function HomePage() {
   return (
     <Box position="relative">
       {/* Dark Hero Background */}
-      <Box position="absolute" top={0} left={0} right={0} height={totalHeroHeight} bg="bg.inverted" overflow="hidden">
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        height={totalHeroHeight}
+        bg="linear-gradient(45deg, #07090A 40%, #252B34 60%)"
+        overflow="hidden"
+      >
         {/* Vector background image */}
         <Box
           position="absolute"
@@ -75,7 +83,7 @@ export default function HomePage() {
           right: 0,
           width: '43.1%',
           height: '50%',
-          bg: 'bg.inverted',
+          bg: 'linear-gradient(45deg, #16181c 20%, #252B34 80%)',
           borderBottomLeftRadius: '15% 100%',
         }}
       />
