@@ -21,15 +21,7 @@ export default function HomePage() {
   return (
     <Box position="relative">
       {/* Dark Hero Background */}
-      <Box
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        height={{ base: '520px', md: '570px' }}
-        bg="bg.inverted"
-        overflow="hidden"
-      >
+      <Box position="absolute" top={0} left={0} right={0} height={{ base: '600px' }} bg="bg.inverted" overflow="hidden">
         {/* Vector background image */}
         <Box
           position="absolute"
@@ -46,7 +38,7 @@ export default function HomePage() {
 
         {/* Yellow decorative dots */}
         <Box position="absolute" bg="yellow.500" width="5px" height="5px" top="194px" left="60%" />
-        <Box position="absolute" bg="yellow.500" width="6px" height="6px" top="500px" left="70%" />
+        <Box position="absolute" bg="yellow.500" width="6px" height="6px" top="380px" left="70%" />
         <Box position="absolute" bg="yellow.500" width="8px" height="8px" top="162px" right="8%" />
       </Box>
 
@@ -55,7 +47,7 @@ export default function HomePage() {
       */}
       <Box
         position="absolute"
-        top={{ base: '380px', md: '420px' }}
+        top={{ base: '480px' }}
         left={0}
         right={0}
         height={{ base: '120px' }}
@@ -84,12 +76,12 @@ export default function HomePage() {
         }}
       />
 
-      <Box position="absolute" top={{ base: '390px', md: '430px' }} right={{ base: '2.5vw', xl: '12.5vw' }} zIndex={3}>
+      <Box position="absolute" top={{ base: '480px' }} right={{ base: '2.5vw', xl: '12.5vw' }} zIndex={3}>
         <PoolsTvlCard poolIds={poolIds} />
       </Box>
 
       {/* Hero content */}
-      <Box position="relative" zIndex={3} pt={{ base: 28, md: 32 }} px={{ base: 4, md: 16 }}>
+      <Box position="relative" zIndex={3} pt={{ base: 32 }} px={{ base: 4, md: 16 }} pb="3rem">
         <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto">
           <Flex flexDirection="column" justifyContent="center" gap={6} py={{ base: 10, md: 12 }} maxW="558px">
             <Text

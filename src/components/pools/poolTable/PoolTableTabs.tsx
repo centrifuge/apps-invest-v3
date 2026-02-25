@@ -88,7 +88,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           px={2}
           fontSize="2xl"
           fontWeight={400}
-          color="fg.subtle"
+          color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
         >
           Funds

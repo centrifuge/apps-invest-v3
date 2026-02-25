@@ -25,7 +25,7 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
 
   return (
     <Flex alignItems="center" gap={3}>
-      <IoBarChart size="3rem" color="fg.emphasized" />
+      <IoBarChart size="3rem" color="#FFC012" />
       <Flex flexDirection="column" alignItems="flex-end">
         <Text color="fg.subtle" fontSize="sm" fontWeight={500} lineHeight="20px">
           TVL on {formatDate(new Date(), 'short')}
