@@ -18,10 +18,14 @@ export default function HomePage() {
 
   if (!poolIds?.length) return <h3>Sorry, there are no pools available at this time.</h3>
 
+  const baseHeroHeight = '480px'
+  const waveHeight = '120px'
+  const totalHeroHeight = `calc(${baseHeroHeight} + ${waveHeight})`
+
   return (
     <Box position="relative">
       {/* Dark Hero Background */}
-      <Box position="absolute" top={0} left={0} right={0} height={{ base: '600px' }} bg="bg.inverted" overflow="hidden">
+      <Box position="absolute" top={0} left={0} right={0} height={totalHeroHeight} bg="bg.inverted" overflow="hidden">
         {/* Vector background image */}
         <Box
           position="absolute"
@@ -47,41 +51,41 @@ export default function HomePage() {
       */}
       <Box
         position="absolute"
-        top={{ base: '480px' }}
+        top={baseHeroHeight}
         left={0}
         right={0}
-        height={{ base: '120px' }}
+        height={waveHeight}
         zIndex={2}
         overflow="hidden"
         pointerEvents="none"
         _before={{
           content: '""',
           position: 'absolute',
-          left: 0,
           bottom: 0,
+          left: 0,
           width: '57.7%',
           height: '100%',
           bg: 'white',
-          borderTopRightRadius: '16% 100%',
+          borderTopRightRadius: '15% 100%',
         }}
         _after={{
           content: '""',
           position: 'absolute',
-          right: 0,
           top: '50%',
+          right: 0,
           width: '43.1%',
           height: '50%',
           bg: 'bg.inverted',
-          borderBottomLeftRadius: '10% 100%',
+          borderBottomLeftRadius: '15% 100%',
         }}
       />
 
-      <Box position="absolute" top={{ base: '480px' }} right={{ base: '2.5vw', xl: '12.5vw' }} zIndex={3}>
+      <Box position="absolute" top={baseHeroHeight} right={{ base: '2.5vw', xl: '12.5vw' }} zIndex={3}>
         <PoolsTvlCard poolIds={poolIds} />
       </Box>
 
       {/* Hero content */}
-      <Box position="relative" zIndex={3} pt={{ base: 32 }} px={{ base: 4, md: 16 }} pb="3rem">
+      <Box position="relative" zIndex={3} pt={{ base: 32 }} px={{ base: 4, md: 16 }} height={baseHeroHeight}>
         <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto">
           <Flex flexDirection="column" justifyContent="center" gap={6} py={{ base: 10, md: 12 }} maxW="558px">
             <Text
@@ -102,7 +106,7 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      <Box position="relative" px={{ base: 4, md: 16 }}>
+      <Box position="relative" px={{ base: 4, md: 16 }} pt="2rem">
         <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto">
           <PoolTableTabs poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
         </Box>
