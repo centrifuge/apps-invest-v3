@@ -1,8 +1,11 @@
 import type { Vault } from '@centrifuge/sdk'
 import type { Network, PoolDetails, VaultDetails } from '@cfg'
 
+export type ActiveTab = 'access' | 'funds'
+
 export interface VaultRow {
   networkName: Network
+  networkDisplayName: string
   centrifugeId: number
   vault: Vault
   vaultDetails: VaultDetails

@@ -4,7 +4,7 @@ import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { getVaultPath } from '@routes/routePaths'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
-import type { PoolRow, SortConfig, SortField } from './types'
+import type { ActiveTab, PoolRow, SortConfig, SortField } from './types'
 import { sortPoolRows } from './utils'
 import { PoolTableRow } from './PoolTableRow'
 import { VaultSubRow } from './VaultSubRow'
@@ -14,25 +14,53 @@ interface PoolTableProps {
   poolRows: PoolRow[]
   setSelectedPoolId: (poolId: PoolId) => void
   isLoading?: boolean
+  activeTab: ActiveTab
 }
 
 export interface PoolTableColumns {
   label: string
   field?: SortField
   width: string
+  align?: 'left' | 'center' | 'right'
 }
 
 const COLUMNS: PoolTableColumns[] = [
   { label: 'Fund', field: 'name', width: '25%' },
-  { label: 'Type', width: '8%' },
-  { label: 'TVL (USD)', field: 'tvl', width: '15%' },
-  { label: 'APY', field: 'apy', width: '8%' },
+  { label: 'Type', width: '8%', align: 'center' },
+  { label: 'TVL (USD)', field: 'tvl', width: '15%', align: 'right' },
+  { label: 'APY', field: 'apy', width: '8%', align: 'center' },
   { label: 'Asset type', width: '15%' },
   { label: 'Investor type', width: '14%' },
-  { label: 'Min. Investment', width: '15%' },
+  { label: 'Min. Investment', width: '15%', align: 'right' },
 ]
 
-export function PoolTable({ poolRows, setSelectedPoolId, isLoading }: PoolTableProps) {
+interface VaultColumn {
+  label: string
+  width: string
+  align?: 'left' | 'center' | 'right'
+}
+
+const VAULT_COLUMNS_ACCESS: VaultColumn[] = [
+  { label: 'Vault', width: '25%' },
+  { label: 'Asset Balance', width: '13%', align: 'right' },
+  { label: 'Share Balance', width: '13%', align: 'right' },
+  { label: 'Pending Deposit', width: '13%', align: 'right' },
+  { label: 'Pending Redeem', width: '12%', align: 'right' },
+  { label: 'Claimable Deposit', width: '12%', align: 'right' },
+  { label: 'Claimable Redeem', width: '12%', align: 'right' },
+]
+
+const VAULT_COLUMNS_FUNDS: VaultColumn[] = [
+  { label: 'Vault', width: '25%' },
+  { label: 'Symbol', width: '13%', align: 'center' },
+  { label: 'NAV', width: '13%', align: 'right' },
+  { label: 'Total Issuance', width: '13%', align: 'right' },
+  { label: 'Price/Share', width: '12%', align: 'right' },
+  { label: '', width: '12%' },
+  { label: '', width: '12%' },
+]
+
+export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }: PoolTableProps) {
   const navigate = useNavigate()
   const [expandedPools, setExpandedPools] = useState<Set<string>>(new Set())
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
@@ -97,8 +125,15 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading }: PoolTableP
                 color="fg.muted"
                 textTransform="uppercase"
                 letterSpacing="wider"
+                textAlign={col.align ?? 'left'}
               >
-                <Text as="span" display="inline-flex" alignItems="center" gap={1}>
+                <Text
+                  as="span"
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  justifyContent={col.align === 'right' ? 'flex-end' : col.align === 'center' ? 'center' : 'flex-start'}
+                >
                   {col.label}
                   {col.field && (
                     <Icon size="xs" color={sortConfig?.field === col.field ? 'fg.solid' : 'fg.muted'}>
@@ -130,6 +165,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading }: PoolTableP
                 onToggle={() => togglePool(poolRow.poolId)}
                 onClick={() => handlePoolClick(poolRow)}
                 setSelectedPoolId={setSelectedPoolId}
+                activeTab={activeTab}
               />
             )
           })}
@@ -139,22 +175,50 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading }: PoolTableP
   )
 }
 
+function VaultHeaderRow({ activeTab }: { activeTab: ActiveTab }) {
+  const columns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
+
+  return (
+    <Table.Row bg="bg.muted">
+      {columns.map((col, i) => (
+        <Table.Cell
+          key={col.label || `empty-${i}`}
+          width={col.width}
+          py={2}
+          px={4}
+          fontSize="xs"
+          fontWeight={600}
+          color="fg.muted"
+          textTransform="uppercase"
+          letterSpacing="wider"
+          textAlign={col.align ?? 'left'}
+        >
+          {col.label}
+        </Table.Cell>
+      ))}
+    </Table.Row>
+  )
+}
+
 function PoolTableRowGroup({
   poolRow,
   isExpanded,
   onToggle,
   onClick,
   setSelectedPoolId,
+  activeTab,
 }: {
   poolRow: PoolRow
   isExpanded: boolean
   onToggle: () => void
   onClick: () => void
   setSelectedPoolId: (poolId: PoolId) => void
+  activeTab: ActiveTab
 }) {
   return (
     <>
       <PoolTableRow poolRow={poolRow} isExpanded={isExpanded} onToggle={onToggle} onClick={onClick} />
+      {isExpanded && <VaultHeaderRow activeTab={activeTab} />}
       {isExpanded &&
         poolRow.vaults.map((vault) => (
           <VaultSubRow
@@ -163,6 +227,7 @@ function PoolTableRowGroup({
             poolId={poolRow.poolId}
             setSelectedPoolId={setSelectedPoolId}
             poolDetails={poolRow.poolDetails}
+            activeTab={activeTab}
           />
         ))}
     </>

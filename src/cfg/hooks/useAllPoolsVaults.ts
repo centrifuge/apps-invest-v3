@@ -12,6 +12,7 @@ export interface PoolNetworkVaultData {
   poolDetails: PoolDetails
   centrifugeId: number
   networkName: Network
+  networkDisplayName: string
   vault: Vault
   vaultDetails: VaultDetails
 }
@@ -84,6 +85,7 @@ function getNetworkVaultsWithDetails(centrifuge: Centrifuge, network: PoolNetwor
       }
 
       const networkName: Network = chainConfig.name.toLowerCase().replace(/\s+/g, '-')
+      const networkDisplayName = formatNetworkDisplayName(chainConfig.name)
 
       const vaultDetailsObservables$ = vaults.map((vault) =>
         vault.details().pipe(
@@ -93,6 +95,7 @@ function getNetworkVaultsWithDetails(centrifuge: Centrifuge, network: PoolNetwor
               poolDetails,
               centrifugeId: network.centrifugeId,
               networkName,
+              networkDisplayName,
               vault,
               vaultDetails,
             }
@@ -103,4 +106,12 @@ function getNetworkVaultsWithDetails(centrifuge: Centrifuge, network: PoolNetwor
       return combineLatest(vaultDetailsObservables$)
     })
   )
+}
+
+const NETWORK_DISPLAY_NAMES: Record<string, string> = {
+  'BNB Smart Chain': 'BNB',
+}
+
+function formatNetworkDisplayName(chainName: string): string {
+  return NETWORK_DISPLAY_NAMES[chainName] ?? chainName
 }

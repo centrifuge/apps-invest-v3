@@ -1,11 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Box, Tabs, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { useAllPoolsVaults, useDebugFlags, useAddress, usePoolsAccessStatus, UsePoolsAccessStatusResult } from '@cfg'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
 import { groupVaultsByPool } from '@components/pools/poolTable//utils'
-import type { PoolRow } from '@components/pools/poolTable//types'
+import type { ActiveTab, PoolRow } from '@components/pools/poolTable//types'
 
 interface PoolTableTabsProps {
   poolIds: PoolId[]
@@ -61,8 +61,16 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
       'Decentralized real-world asset tokens. Freely transferable tokens with on-chain transparency and liquidity.',
   }
 
+  const [activeTab, setActiveTab] = useState<ActiveTab>('funds')
+
   return (
-    <Tabs.Root defaultValue="funds" colorPalette="yellow" size="lg" variant="line">
+    <Tabs.Root
+      defaultValue="funds"
+      colorPalette="yellow"
+      size="lg"
+      variant="line"
+      onValueChange={(details) => setActiveTab(details.value as ActiveTab)}
+    >
       <Tabs.List>
         <Tabs.Trigger value="access" height="55px" alignItems="flex-end">
           Access & Positions
@@ -88,6 +96,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               poolRows={accessRwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isLoading || accessStatus.isLoading}
+              activeTab={activeTab}
             />
             <PoolTableSection
               heading={deRwaHeading.label}
@@ -95,6 +104,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               poolRows={accessDeRwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isLoading || accessStatus.isLoading}
+              activeTab={activeTab}
             />
           </>
         )}
@@ -107,6 +117,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           poolRows={rwaPoolRows}
           setSelectedPoolId={setSelectedPoolId}
           isLoading={isLoading}
+          activeTab={activeTab}
         />
         <PoolTableSection
           heading={deRwaHeading.label}
@@ -114,6 +125,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           poolRows={deRwaPoolRows}
           setSelectedPoolId={setSelectedPoolId}
           isLoading={isLoading}
+          activeTab={activeTab}
         />
       </Tabs.Content>
     </Tabs.Root>

@@ -14,6 +14,7 @@ export function groupVaultsByPool(
     const existing = poolMap.get(v.poolId)
     const vaultRow: VaultRow = {
       networkName: v.networkName,
+      networkDisplayName: v.networkDisplayName,
       centrifugeId: v.centrifugeId,
       vault: v.vault,
       vaultDetails: v.vaultDetails,

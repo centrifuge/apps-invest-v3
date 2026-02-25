@@ -27,12 +27,7 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
   }
 
   return (
-    <Table.Row
-      onClick={handleClick}
-      cursor="pointer"
-      _hover={{ bg: 'bg.subtle' }}
-      transition="background 150ms"
-    >
+    <Table.Row onClick={handleClick} cursor="pointer" _hover={{ bg: 'bg.subtle' }} transition="background 150ms">
       <Table.Cell>
         <Flex alignItems="center" gap={2}>
           {isExpandable ? (
@@ -64,7 +59,7 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
         </Flex>
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell textAlign="center">
         {poolType ? (
           <Badge size="sm" variant="subtle" colorPalette="gray">
             {poolType}
@@ -72,21 +67,25 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
         ) : null}
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell textAlign="right">
         {poolRow.isRestricted ? (
           <InvestorsOnlyValueBlock />
         ) : (
-          <Text fontSize="sm">{poolRow.tvl}</Text>
+          <Text fontSize="sm" fontVariantNumeric="tabular-nums">
+            {poolRow.tvl}
+          </Text>
         )}
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell textAlign="center">
         {poolRow.isRestricted ? (
           <Text fontSize="sm" color="fg.muted">
             --
           </Text>
         ) : (
-          <Text fontSize="sm">{poolRow.apy}</Text>
+          <Text fontSize="sm" fontVariantNumeric="tabular-nums">
+            {poolRow.apy}
+          </Text>
         )}
       </Table.Cell>
 
@@ -98,8 +97,10 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
         <Text fontSize="sm">{poolRow.investorType}</Text>
       </Table.Cell>
 
-      <Table.Cell>
-        <Text fontSize="sm">{poolRow.minInvestment}</Text>
+      <Table.Cell textAlign="right">
+        <Text fontSize="sm" fontVariantNumeric="tabular-nums">
+          {poolRow.minInvestment}
+        </Text>
       </Table.Cell>
     </Table.Row>
   )
