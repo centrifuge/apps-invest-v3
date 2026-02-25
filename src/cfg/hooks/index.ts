@@ -6,6 +6,7 @@ export * from './useAddress'
 export * from './useShareClass'
 export * from './useBlockchains'
 export * from './useAllPoolsVaults'
+export * from './usePoolsAccessStatus'
 
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
 export { useObservable } from './useObservable'

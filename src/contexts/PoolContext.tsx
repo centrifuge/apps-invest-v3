@@ -62,7 +62,6 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
     enabled: !!selectedPoolId,
   })
 
-  // In MVP we assume one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
   const shareClassId = shareClass?.shareClass.id
   const { data: holdings, isLoading: isHoldingsLoading } = useHoldings(shareClass?.shareClass, {
