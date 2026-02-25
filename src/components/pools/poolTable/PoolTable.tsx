@@ -171,13 +171,16 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
         </Table.Header>
 
         <Table.Body>
-          {sortedRows.map((poolRow) => {
+          {sortedRows.map((poolRow, index) => {
             const isExpanded = expandedPools.has(poolRow.poolId)
+            const nextRow = sortedRows[index + 1]
+            const nextIsExpanded = nextRow ? expandedPools.has(nextRow.poolId) : false
             return (
               <PoolTableRowGroup
                 key={poolRow.poolId}
                 poolRow={poolRow}
                 isExpanded={isExpanded}
+                nextIsExpanded={nextIsExpanded}
                 onToggle={() => togglePool(poolRow.poolId)}
                 onClick={() => handlePoolClick(poolRow)}
                 setSelectedPoolId={setSelectedPoolId}
@@ -221,6 +224,7 @@ function VaultHeaderRow({ activeTab, expandedPosition }: { activeTab: ActiveTab;
 function PoolTableRowGroup({
   poolRow,
   isExpanded,
+  nextIsExpanded,
   onToggle,
   onClick,
   setSelectedPoolId,
@@ -228,6 +232,7 @@ function PoolTableRowGroup({
 }: {
   poolRow: PoolRow
   isExpanded: boolean
+  nextIsExpanded: boolean
   onToggle: () => void
   onClick: () => void
   setSelectedPoolId: (poolId: PoolId) => void
@@ -244,6 +249,7 @@ function PoolTableRowGroup({
         onClick={onClick}
         activeTab={activeTab}
         expandedPosition={isExpanded ? 'top' : undefined}
+        hideBottomBorder={!isExpanded && nextIsExpanded}
       />
       {isExpanded && <VaultHeaderRow activeTab={activeTab} expandedPosition="middle" />}
       {isExpanded &&
