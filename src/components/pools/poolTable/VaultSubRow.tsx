@@ -52,7 +52,7 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
 }
 
 const numericCellProps = { textAlign: 'right' as const }
-const numericTextProps = { fontSize: 'sm' as const, fontVariantNumeric: 'tabular-nums' as const }
+const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
 function AccessVaultCells({ vault, assetSymbol }: { vault: VaultRow; assetSymbol: string }) {
   const { data: investment } = useInvestment(vault.vault)
@@ -62,7 +62,7 @@ function AccessVaultCells({ vault, assetSymbol }: { vault: VaultRow; assetSymbol
   return (
     <>
       <Table.Cell textAlign="center">
-        <Text fontSize="sm">{assetSymbol}</Text>
+        <Text fontSize="xs">{assetSymbol}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps}>
         <Text {...numericTextProps}>{fmt(investment?.assetBalance)}</Text>
@@ -95,10 +95,10 @@ function FundsVaultCells({ vaultRow }: { vaultRow: VaultRow }) {
   return (
     <>
       <Table.Cell textAlign="center">
-        <Text fontSize="sm">{vaultRow.vaultDetails.asset.symbol}</Text>
+        <Text fontSize="xs">{vaultRow.vaultDetails.asset.symbol}</Text>
       </Table.Cell>
       <Table.Cell textAlign="center">
-        <Text fontSize="sm">{shareClassDetails?.symbol ?? '-'}</Text>
+        <Text fontSize="xs">{shareClassDetails?.symbol ?? '-'}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps}>
         <Text {...numericTextProps}>{fmt(networkData?.nav)}</Text>

@@ -1,9 +1,11 @@
+import { useMemo } from 'react'
 import { MdBrokenImage } from 'react-icons/md'
 import { Badge, Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
-import { ipfsToHttp } from '@cfg'
+import { Balance } from '@centrifuge/sdk'
+import { formatBalance, ipfsToHttp, useInvestmentsPerVaults } from '@cfg'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
-import type { PoolRow } from './types'
+import type { ActiveTab, PoolRow } from './types'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
@@ -12,9 +14,10 @@ interface PoolTableRowProps {
   isExpanded: boolean
   onToggle: () => void
   onClick: () => void
+  activeTab: ActiveTab
 }
 
-export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTableRowProps) {
+export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick, activeTab }: PoolTableRowProps) {
   const isExpandable = poolRow.vaults.length > 1
   const poolType = poolRow.poolDetails.metadata?.pool?.asset.class ?? ''
 
@@ -61,12 +64,23 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
 
       <Table.Cell textAlign="center">
         {poolType ? (
-          <Badge size="sm" variant="subtle" colorPalette="gray">
+          <Badge size="sm" variant="solid" colorPalette="gray">
             {poolType}
           </Badge>
         ) : null}
       </Table.Cell>
 
+      {activeTab === 'access' ? <AccessPoolCells poolRow={poolRow} /> : <FundsPoolCells poolRow={poolRow} />}
+    </Table.Row>
+  )
+}
+
+const numericCellProps = { textAlign: 'right' as const }
+const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
+
+function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
+  return (
+    <>
       <Table.Cell textAlign="right">
         {poolRow.isRestricted ? (
           <InvestorsOnlyValueBlock />
@@ -90,11 +104,11 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
       </Table.Cell>
 
       <Table.Cell>
-        <Text fontSize="sm">{poolRow.assetType}</Text>
+        <Text fontSize="xs">{poolRow.assetType}</Text>
       </Table.Cell>
 
       <Table.Cell>
-        <Text fontSize="sm">{poolRow.investorType}</Text>
+        <Text fontSize="xs">{poolRow.investorType}</Text>
       </Table.Cell>
 
       <Table.Cell textAlign="right">
@@ -102,6 +116,59 @@ export function PoolTableRow({ poolRow, isExpanded, onToggle, onClick }: PoolTab
           {poolRow.minInvestment}
         </Text>
       </Table.Cell>
-    </Table.Row>
+    </>
+  )
+}
+
+function AccessPoolCells({ poolRow }: { poolRow: PoolRow }) {
+  const vaults = useMemo(() => poolRow.vaults.map((v) => v.vault), [poolRow.vaults])
+  const { data: investments } = useInvestmentsPerVaults(vaults)
+
+  const totals = useMemo(() => {
+    if (!investments || investments.length === 0) return null
+
+    return investments.reduce(
+      (acc, inv) => ({
+        assetBalance: acc.assetBalance.add(inv.assetBalance),
+        shareBalance: acc.shareBalance.add(inv.shareBalance),
+        pendingDepositAssets: acc.pendingDepositAssets.add(inv.pendingDepositAssets),
+        pendingRedeemShares: acc.pendingRedeemShares.add(inv.pendingRedeemShares),
+        claimableDepositShares: acc.claimableDepositShares.add(inv.claimableDepositShares),
+        claimableRedeemAssets: acc.claimableRedeemAssets.add(inv.claimableRedeemAssets),
+      }),
+      {
+        assetBalance: Balance.ZERO,
+        shareBalance: Balance.ZERO,
+        pendingDepositAssets: Balance.ZERO,
+        pendingRedeemShares: Balance.ZERO,
+        claimableDepositShares: Balance.ZERO,
+        claimableRedeemAssets: Balance.ZERO,
+      }
+    )
+  }, [investments])
+
+  const fmt = (value: Balance | undefined) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)
+
+  return (
+    <>
+      <Table.Cell {...numericCellProps}>
+        <Text {...numericTextProps}>{fmt(totals?.assetBalance)}</Text>
+      </Table.Cell>
+      <Table.Cell {...numericCellProps}>
+        <Text {...numericTextProps}>{fmt(totals?.shareBalance)}</Text>
+      </Table.Cell>
+      <Table.Cell {...numericCellProps}>
+        <Text {...numericTextProps}>{fmt(totals?.pendingDepositAssets)}</Text>
+      </Table.Cell>
+      <Table.Cell {...numericCellProps}>
+        <Text {...numericTextProps}>{fmt(totals?.pendingRedeemShares)}</Text>
+      </Table.Cell>
+      <Table.Cell {...numericCellProps}>
+        <Text {...numericTextProps}>{fmt(totals?.claimableDepositShares)}</Text>
+      </Table.Cell>
+      <Table.Cell {...numericCellProps}>
+        <Text {...numericTextProps}>{fmt(totals?.claimableRedeemAssets)}</Text>
+      </Table.Cell>
+    </>
   )
 }

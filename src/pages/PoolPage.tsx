@@ -5,7 +5,7 @@ import { PoolPageSkeleton } from '@components/skeletons/PoolPageSkeleton'
 import { routePaths } from '@routes/routePaths'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
 import { PoolMainStats } from '@components/pools/poolDetails/PoolMainStats'
-import { formatBalance } from '@cfg'
+import { formatBalance, useShareClassDetails } from '@cfg'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
 import { PoolDetailsDeRwa } from '@components/pools/poolDetails/PoolDetailsDeRwa'
@@ -14,11 +14,14 @@ import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { SolanaMarketCard } from '@components/elements/SolanaMarketCard'
 
 export default function PoolPage() {
-  const { isLoading: isPoolLoading, poolId, poolDetails, networks, shareClass } = usePoolContext()
+  const { isLoading: isPoolLoading, poolId, poolDetails, networks, shareClass, holdings } = usePoolContext()
   const { investment, isLoading: isVaultsLoading } = useVaultsContext()
   const { getIsRwaPool } = useGetPoolsByIds()
   const isRwaPool = getIsRwaPool(poolId)
   const poolName = poolDetails?.metadata?.pool?.name ?? ''
+  const { data: d } = useShareClassDetails(shareClass?.shareClass)
+
+  console.log({ holdings, d })
 
   if (isPoolLoading || isVaultsLoading) {
     return <PoolPageSkeleton />

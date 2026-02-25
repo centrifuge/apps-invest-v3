@@ -25,7 +25,17 @@ export interface PoolRow {
   vaults: VaultRow[]
 }
 
-export type SortField = 'name' | 'type' | 'tvl' | 'apy'
+export type SortField =
+  | 'name'
+  | 'type'
+  | 'tvl'
+  | 'apy'
+  | 'totalAssets'
+  | 'totalShares'
+  | 'pendingDeposits'
+  | 'pendingRedemptions'
+  | 'depositClaims'
+  | 'redeemClaims'
 export type SortDirection = 'asc' | 'desc'
 
 export interface SortConfig {
