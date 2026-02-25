@@ -41,23 +41,24 @@ interface VaultColumn {
 }
 
 const VAULT_COLUMNS_ACCESS: VaultColumn[] = [
-  { label: 'Vault', width: '25%' },
+  { label: 'Vault', width: '14%' },
+  { label: 'Asset', width: '8%', align: 'center' },
   { label: 'Asset Balance', width: '13%', align: 'right' },
   { label: 'Share Balance', width: '13%', align: 'right' },
   { label: 'Pending Deposit', width: '13%', align: 'right' },
-  { label: 'Pending Redeem', width: '12%', align: 'right' },
-  { label: 'Claimable Deposit', width: '12%', align: 'right' },
-  { label: 'Claimable Redeem', width: '12%', align: 'right' },
+  { label: 'Pending Redeem', width: '13%', align: 'right' },
+  { label: 'Claimable Deposit', width: '14%', align: 'right' },
+  { label: 'Claimable Redeem', width: '14%', align: 'right' },
 ]
 
 const VAULT_COLUMNS_FUNDS: VaultColumn[] = [
   { label: 'Vault', width: '25%' },
-  { label: 'Symbol', width: '13%', align: 'center' },
+  { label: 'Asset', width: '10%', align: 'center' },
+  { label: 'Token', width: '10%', align: 'center' },
   { label: 'NAV', width: '13%', align: 'right' },
   { label: 'Total Issuance', width: '13%', align: 'right' },
   { label: 'Price/Share', width: '12%', align: 'right' },
-  { label: '', width: '12%' },
-  { label: '', width: '12%' },
+  { label: '', width: '17%' },
 ]
 
 export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }: PoolTableProps) {

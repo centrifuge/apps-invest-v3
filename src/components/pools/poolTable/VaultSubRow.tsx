@@ -1,6 +1,7 @@
-import { Badge, Flex, Table, Text } from '@chakra-ui/react'
+import { Flex, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { formatBalance, PoolDetails, useInvestment } from '@cfg'
+import { formatBalance, useInvestment, useShareClassDetails } from '@cfg'
+import type { PoolDetails } from '@cfg'
 import { NetworkIcon } from '@ui'
 import { getVaultPath } from '@routes/routePaths'
 import { useNavigate } from 'react-router-dom'
@@ -38,13 +39,14 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
           <Text fontSize="sm" color="fg.muted">
             {vaultRow.networkDisplayName}
           </Text>
-          <Badge colorPalette="yellow" size="sm" fontWeight={700} color="yellow.emphasized">
-            {assetSymbol}
-          </Badge>
         </Flex>
       </Table.Cell>
 
-      {activeTab === 'access' ? <AccessVaultCells vault={vaultRow} /> : <FundsVaultCells poolDetails={poolDetails} />}
+      {activeTab === 'access' ? (
+        <AccessVaultCells vault={vaultRow} assetSymbol={assetSymbol} />
+      ) : (
+        <FundsVaultCells vaultRow={vaultRow} />
+      )}
     </Table.Row>
   )
 }
@@ -52,13 +54,16 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
 const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'sm' as const, fontVariantNumeric: 'tabular-nums' as const }
 
-function AccessVaultCells({ vault }: { vault: VaultRow }) {
+function AccessVaultCells({ vault, assetSymbol }: { vault: VaultRow; assetSymbol: string }) {
   const { data: investment } = useInvestment(vault.vault)
 
   const fmt = (value: unknown) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)
 
   return (
     <>
+      <Table.Cell textAlign="center">
+        <Text fontSize="sm">{assetSymbol}</Text>
+      </Table.Cell>
       <Table.Cell {...numericCellProps}>
         <Text {...numericTextProps}>{fmt(investment?.assetBalance)}</Text>
       </Table.Cell>
@@ -81,26 +86,29 @@ function AccessVaultCells({ vault }: { vault: VaultRow }) {
   )
 }
 
-function FundsVaultCells({ poolDetails }: { poolDetails: PoolDetails }) {
-  const shareClassDetails = poolDetails.shareClasses?.[0]?.details
+function FundsVaultCells({ vaultRow }: { vaultRow: VaultRow }) {
+  const { data: shareClassDetails } = useShareClassDetails(vaultRow.vault.shareClass)
+  const networkData = shareClassDetails?.navPerNetwork.find((n) => n.centrifugeId === vaultRow.centrifugeId)
 
   const fmt = (value: unknown) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)
 
   return (
     <>
       <Table.Cell textAlign="center">
+        <Text fontSize="sm">{vaultRow.vaultDetails.asset.symbol}</Text>
+      </Table.Cell>
+      <Table.Cell textAlign="center">
         <Text fontSize="sm">{shareClassDetails?.symbol ?? '-'}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps}>
-        <Text {...numericTextProps}>{fmt(shareClassDetails?.nav)}</Text>
+        <Text {...numericTextProps}>{fmt(networkData?.nav)}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps}>
-        <Text {...numericTextProps}>{fmt(shareClassDetails?.totalIssuance)}</Text>
+        <Text {...numericTextProps}>{fmt(networkData?.totalIssuance)}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps}>
-        <Text {...numericTextProps}>{fmt(shareClassDetails?.pricePerShare)}</Text>
+        <Text {...numericTextProps}>{fmt(networkData?.pricePerShare)}</Text>
       </Table.Cell>
-      <Table.Cell />
       <Table.Cell />
     </>
   )
