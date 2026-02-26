@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table, Icon, Box, Flex, Skeleton, Stack, Text } from '@chakra-ui/react'
-import { FiChevronUp, FiChevronDown, FiCode } from 'react-icons/fi'
+import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
 import { type PaginationMode, IconInfo, Pagination, Tooltip } from '@ui'
 
 export type ColumnDefinition<RowType> = {
@@ -96,12 +96,10 @@ export const DataTable = <RowType extends { id?: string | number }>({
 
   return (
     <Stack gap={0}>
-      {/* Chakra UI Table has a bug where the border is not applied to the table root
-          This is a workaround to apply the border to the table root */}
-      <Box borderRadius="lg" border="1px solid" borderColor="border.solid" overflow="auto">
-        <Table.Root size={size} overflow="hidden" border="none">
+      <Box overflowX="auto">
+        <Table.Root size={size} variant="line" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
           <Table.Header>
-            <Table.Row bg="bg.muted">
+            <Table.Row bg="border.muted" borderRadius="10px">
               {columns.map((col, index) => (
                 <Table.ColumnHeader
                   key={`${col.header}-${index}`}
@@ -110,35 +108,33 @@ export const DataTable = <RowType extends { id?: string | number }>({
                   onClick={() => handleSort(col.sortKey)}
                   cursor={col.sortKey ? 'pointer' : 'default'}
                   userSelect="none"
+                  py={4}
+                  px={4}
                   fontSize="xs"
+                  fontWeight={400}
                   color="fg.solid"
-                  role="group"
+                  borderBottomWidth={0}
+                  _first={{ borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
+                  _last={{ borderTopRightRadius: '10px', borderBottomRightRadius: '10px' }}
                 >
-                  {col.headerTooltip ? tooltipHeader(col.header, col.headerTooltip) : col.header}
-                  {col.sortKey && (
-                    <>
-                      {sortConfig?.key === col.sortKey ? (
-                        <Icon
-                          as={sortConfig.direction === 'asc' ? FiChevronUp : FiChevronDown}
-                          aria-label={sortConfig.direction}
-                          ml={2}
-                          boxSize={4}
-                          color="fg.solid"
-                        />
-                      ) : (
-                        <Icon
-                          as={FiCode}
-                          aria-label="Sortable"
-                          ml={2}
-                          boxSize={3}
-                          color="fg.subtle"
-                          transform="rotate(90deg)"
-                          opacity={0}
-                          _groupHover={{ opacity: 1 }}
-                        />
-                      )}
-                    </>
-                  )}
+                  <Text
+                    as="span"
+                    display="inline-flex"
+                    alignItems="center"
+                    gap={1}
+                    justifyContent={col.textAlign === 'end' ? 'flex-end' : col.textAlign === 'center' ? 'center' : 'flex-start'}
+                  >
+                    {col.headerTooltip ? tooltipHeader(col.header, col.headerTooltip) : col.header}
+                    {col.sortKey && (
+                      <Icon size="xs" color={sortConfig?.key === col.sortKey ? 'fg.solid' : 'fg.muted'}>
+                        {sortConfig?.key === col.sortKey ? (
+                          sortConfig.direction === 'asc' ? <LuArrowUp /> : <LuArrowDown />
+                        ) : (
+                          <LuArrowUpDown />
+                        )}
+                      </Icon>
+                    )}
+                  </Text>
                 </Table.ColumnHeader>
               ))}
             </Table.Row>
@@ -146,7 +142,7 @@ export const DataTable = <RowType extends { id?: string | number }>({
           <Table.Body {...bodyProps}>
             {isLoading && skeletonRows.length > 0
               ? skeletonRows.map((_, rowIndex) => (
-                  <Table.Row key={`skeleton-${rowIndex}`} p="2px">
+                  <Table.Row key={`skeleton-${rowIndex}`}>
                     {skeletonColumns.map((_, colIndex) => (
                       <Table.Cell key={`skeleton-cell-${colIndex}`} textAlign="start">
                         <Skeleton height="28px" />
@@ -157,7 +153,13 @@ export const DataTable = <RowType extends { id?: string | number }>({
               : sortedAndPaginatedData.map((row, rowIndex) => (
                   <Table.Row key={row.id ?? rowIndex}>
                     {columns.map((col, index) => (
-                      <Table.Cell key={`${col.header}-${index}`} textAlign={col.textAlign} width={col.width}>
+                      <Table.Cell
+                        key={`${col.header}-${index}`}
+                        textAlign={col.textAlign}
+                        width={col.width}
+                        fontSize="sm"
+                        fontWeight={500}
+                      >
                         {col.render ? col.render(row) : col.accessor ? String(row[col.accessor] ?? '') : null}
                       </Table.Cell>
                     ))}
