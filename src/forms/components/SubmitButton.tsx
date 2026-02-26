@@ -24,6 +24,7 @@ export function SubmitButton<T extends FieldValues = FieldValues>({
     <Button
       {...props}
       type="submit"
+      borderRadius="3xl"
       disabled={isDisabled}
       loading={formState.isSubmitting || loading}
       loadingText={loadingText}

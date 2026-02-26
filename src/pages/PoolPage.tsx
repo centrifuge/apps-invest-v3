@@ -39,7 +39,6 @@ export default function PoolPage() {
 
   return (
     <Box bg="charcoal.900" minH="100vh">
-      {/* Dark Hero */}
       <Box pt={{ base: 24, md: 28 }} pb={8}>
         <Box maxW={maxScreenSize} mx="auto" p="1.5rem" bg="bg.inverted" borderRadius="2xl">
           <Flex justifyContent="space-between" alignItems="flex-end" justifyItems="center">
@@ -59,7 +58,6 @@ export default function PoolPage() {
           </Flex>
         </Box>
 
-        {/* White Content */}
         <Box bg="white" borderRadius="2xl" minH="80vh" maxW={maxScreenSize} mx="auto" my="2rem">
           <Box maxW={maxScreenSize} mx="auto" px={{ base: 4, md: 8 }} py={8}>
             <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={6}>
