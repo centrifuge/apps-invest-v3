@@ -220,10 +220,7 @@ function VaultGuard({
   }
 
   return (
-    <ConnectionGuard
-      chainId={targetChainId}
-      message="Please switch to the correct network to continue."
-    >
+    <ConnectionGuard chainId={targetChainId} message="Please switch to the correct network to continue.">
       {!vault ? (
         <Text>No vaults found for this pool on this network.</Text>
       ) : (

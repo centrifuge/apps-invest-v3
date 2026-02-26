@@ -122,13 +122,19 @@ export const DataTable = <RowType extends { id?: string | number }>({
                     display="inline-flex"
                     alignItems="center"
                     gap={1}
-                    justifyContent={col.textAlign === 'end' ? 'flex-end' : col.textAlign === 'center' ? 'center' : 'flex-start'}
+                    justifyContent={
+                      col.textAlign === 'end' ? 'flex-end' : col.textAlign === 'center' ? 'center' : 'flex-start'
+                    }
                   >
                     {col.headerTooltip ? tooltipHeader(col.header, col.headerTooltip) : col.header}
                     {col.sortKey && (
                       <Icon size="xs" color={sortConfig?.key === col.sortKey ? 'fg.solid' : 'fg.muted'}>
                         {sortConfig?.key === col.sortKey ? (
-                          sortConfig.direction === 'asc' ? <LuArrowUp /> : <LuArrowDown />
+                          sortConfig.direction === 'asc' ? (
+                            <LuArrowUp />
+                          ) : (
+                            <LuArrowDown />
+                          )
                         ) : (
                           <LuArrowUpDown />
                         )}
