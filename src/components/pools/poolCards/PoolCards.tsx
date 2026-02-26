@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Box, Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { formatNetworkName, Network, PoolNetworkVaultData, useAllPoolsVaults, useDebugFlags } from '@cfg'
+import { formatNetworkName, NetworkSlug, PoolNetworkVaultData, useAllPoolsVaults, useDebugFlags } from '@cfg'
 import { PoolCardsSkeleton } from '@components/skeletons/PoolCardsSkeleton'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { getVaultPath } from '@routes/routePaths'
@@ -15,7 +15,7 @@ interface PoolCardsProps {
 }
 
 interface NetworkGroupedVaults {
-  networkName: Network
+  networkName: NetworkSlug
   centrifugeId: number
   vaults: PoolNetworkVaultData[]
 }

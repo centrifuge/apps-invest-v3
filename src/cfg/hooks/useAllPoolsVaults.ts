@@ -3,7 +3,7 @@ import { useMemo, useRef } from 'react'
 import { combineLatest, of, switchMap } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { PoolDetails, VaultDetails } from '../types'
-import { Network } from '../utils'
+import { NetworkSlug } from '../utils'
 import { useCentrifuge } from './CentrifugeContext'
 import { useObservable } from './useObservable'
 
@@ -11,7 +11,7 @@ export interface PoolNetworkVaultData {
   poolId: string
   poolDetails: PoolDetails
   centrifugeId: number
-  networkName: Network
+  networkName: NetworkSlug
   networkDisplayName: string
   vault: Vault
   vaultDetails: VaultDetails
@@ -84,7 +84,7 @@ function getNetworkVaultsWithDetails(centrifuge: Centrifuge, network: PoolNetwor
         return of([])
       }
 
-      const networkName: Network = chainConfig.name.toLowerCase().replace(/\s+/g, '-')
+      const networkName: NetworkSlug = chainConfig.name.toLowerCase().replace(/\s+/g, '-')
       const networkDisplayName = formatNetworkDisplayName(chainConfig.name)
 
       const vaultDetailsObservables$ = vaults.map((vault) =>
