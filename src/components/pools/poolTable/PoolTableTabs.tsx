@@ -158,8 +158,14 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
 
 function filterByAccess(poolRows: PoolRow[], accessStatus: UsePoolsAccessStatusResult): PoolRow[] {
   if (accessStatus.isLoading || accessStatus.data.size === 0) return poolRows
-  return poolRows.filter((row) => {
-    const status = accessStatus.data.get(row.poolId)
-    return status?.hasAccess ?? false
-  })
+  return poolRows
+    .map((row) => {
+      const status = accessStatus.data.get(row.poolId)
+      if (!status?.hasAccess) return null
+      // Only show vault sub-rows for networks where the user is a member
+      const filteredVaults = row.vaults.filter((v) => status.memberNetworkIds.has(v.centrifugeId))
+      if (filteredVaults.length === 0) return null
+      return { ...row, vaults: filteredVaults }
+    })
+    .filter((row): row is PoolRow => row !== null)
 }

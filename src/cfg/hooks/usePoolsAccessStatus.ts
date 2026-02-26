@@ -5,8 +5,10 @@ import { useCentrifuge } from './CentrifugeContext'
 import { useObservable } from './useObservable'
 import { useAddress } from './useAddress'
 
-interface PoolAccessStatus {
+export interface PoolAccessStatus {
   hasAccess: boolean
+  // Centrifuge IDs of networks where the user is a member
+  memberNetworkIds: Set<number>
 }
 
 export interface UsePoolsAccessStatusResult {
@@ -37,24 +39,33 @@ export function usePoolsAccessStatus(poolIds: PoolId[]): UsePoolsAccessStatusRes
             switchMap((details) => {
               const shareClassId = details.shareClasses?.[0]?.shareClass.id
               if (!shareClassId) {
-                return of({ poolId: poolId.toString(), hasAccess: false })
+                return of({ poolId: poolId.toString(), hasAccess: false, memberNetworkIds: new Set<number>() })
               }
 
               return centrifuge.pool(poolId).pipe(
                 switchMap((pool) => pool.activeNetworks()),
                 switchMap((networks) => {
                   if (!networks?.length) {
-                    return of({ poolId: poolId.toString(), hasAccess: false })
+                    return of({ poolId: poolId.toString(), hasAccess: false, memberNetworkIds: new Set<number>() })
                   }
 
-                  // Check isMember on each network, hasAccess if member on any
+                  // Check isMember on each network
                   const memberChecks$ = networks.map((network) => account.isMember(shareClassId, network.centrifugeId))
 
                   return combineLatest(memberChecks$).pipe(
-                    map((memberResults) => ({
-                      poolId: poolId.toString(),
-                      hasAccess: memberResults.some((isMember) => !!isMember),
-                    }))
+                    map((memberResults) => {
+                      const memberNetworkIds = new Set<number>()
+                      networks.forEach((network, i) => {
+                        if (memberResults[i]) {
+                          memberNetworkIds.add(network.centrifugeId)
+                        }
+                      })
+                      return {
+                        poolId: poolId.toString(),
+                        hasAccess: memberNetworkIds.size > 0,
+                        memberNetworkIds,
+                      }
+                    })
                   )
                 })
               )
@@ -66,7 +77,7 @@ export function usePoolsAccessStatus(poolIds: PoolId[]): UsePoolsAccessStatusRes
           map((results) => {
             const statusMap = new Map<string, PoolAccessStatus>()
             for (const r of results) {
-              statusMap.set(r.poolId, { hasAccess: r.hasAccess })
+              statusMap.set(r.poolId, { hasAccess: r.hasAccess, memberNetworkIds: r.memberNetworkIds })
             }
             return statusMap
           })
