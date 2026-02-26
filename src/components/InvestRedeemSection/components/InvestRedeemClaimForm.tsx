@@ -34,6 +34,7 @@ export function InvestRedeemClaimForm({
     () =>
       execute(vault.claim()).then(() => {
         queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+        queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
         setIsClaimFormDisplayed(false)
       }),
     [vault, execute, queryClient]

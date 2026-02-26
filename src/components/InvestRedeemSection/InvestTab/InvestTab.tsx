@@ -37,6 +37,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     const tx = investment?.isSyncDeposit ? vault.syncDeposit(amount) : vault.asyncDeposit(amount)
     execute(tx).then(() => {
       queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+      queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
     })
   }
 

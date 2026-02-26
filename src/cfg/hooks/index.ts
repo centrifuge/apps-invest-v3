@@ -6,6 +6,8 @@ export * from './useAddress'
 export * from './useShareClass'
 export * from './useBlockchains'
 export * from './useAllPoolsVaults'
+export * from './useAllPoolsVaultsQuery'
+export * from './useInvestmentsPerVaultsQuery'
 export * from './usePoolsAccessStatus'
 export * from './usePoolsAccessStatusQuery'
 

@@ -30,6 +30,7 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   function redeem(amount: Balance) {
     execute(vault.asyncRedeem(amount)).then(() => {
       queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+      queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
     })
   }
 

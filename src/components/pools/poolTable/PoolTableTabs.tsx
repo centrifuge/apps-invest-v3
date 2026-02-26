@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Box, Tabs, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { useAllPoolsVaults, useDebugFlags, useAddress, usePoolsAccessStatusQuery, type PoolAccessStatus } from '@cfg'
+import {
+  type PoolAccessStatus,
+  useAddress,
+  useAllPoolsVaultsQuery,
+  useDebugFlags,
+  usePoolsAccessStatusQuery,
+} from '@cfg'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
 import { groupVaultsByPool } from '@components/pools/poolTable//utils'
@@ -14,7 +20,7 @@ interface PoolTableTabsProps {
 
 export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps) {
   const { showMainnet } = useDebugFlags()
-  const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaults(poolIds)
+  const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaultsQuery(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
   const { address } = useAddress()
   const { data: accessData, isLoading: isAccessLoading } = usePoolsAccessStatusQuery(poolIds)

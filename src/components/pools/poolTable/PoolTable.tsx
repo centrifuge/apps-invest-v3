@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { useInvestmentsPerVaults } from '@cfg'
+import { useInvestmentsPerVaultsQuery } from '@cfg'
 import { getVaultPath } from '@routes/routePaths'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
 import type { ActiveTab, ExpandedPosition, PoolInvestmentTotals, PoolRow, SortConfig, SortField } from './types'
@@ -68,7 +68,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
     () => (isAccessTable ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
     [poolRows, isAccessTable]
   )
-  const { data: allInvestments } = useInvestmentsPerVaults(allVaults)
+  const { data: allInvestments } = useInvestmentsPerVaultsQuery(allVaults)
 
   const investmentTotalsMap = useMemo(() => {
     const map = new Map<string, PoolInvestmentTotals>()

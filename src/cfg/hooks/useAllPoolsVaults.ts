@@ -1,6 +1,6 @@
 import type { Centrifuge, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
 import { useMemo, useRef } from 'react'
-import { combineLatest, of, switchMap } from 'rxjs'
+import { combineLatest, type Observable, of, switchMap } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { PoolDetails, VaultDetails } from '../types'
 import { NetworkSlug } from '../utils'
@@ -21,6 +21,32 @@ interface Options {
   enabled?: boolean
 }
 
+export function createAllPoolsVaults$(centrifuge: Centrifuge, poolIds: PoolId[]): Observable<PoolNetworkVaultData[]> {
+  const poolVaultsObservables$ = poolIds.map((poolId) =>
+    centrifuge.pool(poolId).pipe(
+      switchMap((pool) =>
+        combineLatest([pool.details(), pool.activeNetworks()]).pipe(
+          switchMap(([poolDetails, networks]) => {
+            if (!networks?.length) {
+              return of([])
+            }
+
+            const networkVaultsObservables$ = networks.map((network: PoolNetwork) =>
+              getNetworkVaultsWithDetails(centrifuge, network, poolDetails)
+            )
+
+            return combineLatest(networkVaultsObservables$).pipe(
+              map((networkVaultsArrays) => networkVaultsArrays.flat())
+            )
+          })
+        )
+      )
+    )
+  )
+
+  return combineLatest(poolVaultsObservables$).pipe(map((poolVaultsArrays) => poolVaultsArrays.flat()))
+}
+
 export function useAllPoolsVaults(poolIds: PoolId[], options?: Options) {
   const centrifuge = useCentrifuge()
   const enabled = options?.enabled ?? true
@@ -31,30 +57,7 @@ export function useAllPoolsVaults(poolIds: PoolId[], options?: Options) {
       return of([])
     }
 
-    // For each pool, get details and active networks, then for each network get vaults
-    const poolVaultsObservables$ = poolIds.map((poolId) =>
-      centrifuge.pool(poolId).pipe(
-        switchMap((pool) =>
-          combineLatest([pool.details(), pool.activeNetworks()]).pipe(
-            switchMap(([poolDetails, networks]) => {
-              if (!networks?.length) {
-                return of([])
-              }
-
-              const networkVaultsObservables$ = networks.map((network: PoolNetwork) =>
-                getNetworkVaultsWithDetails(centrifuge, network, poolDetails)
-              )
-
-              return combineLatest(networkVaultsObservables$).pipe(
-                map((networkVaultsArrays) => networkVaultsArrays.flat())
-              )
-            })
-          )
-        )
-      )
-    )
-
-    return combineLatest(poolVaultsObservables$).pipe(map((poolVaultsArrays) => poolVaultsArrays.flat()))
+    return createAllPoolsVaults$(centrifuge, poolIds)
   }, [centrifuge, enabled, poolIds?.map((id) => id.toString()).join(',')])
 
   const result = useObservable(allVaults$)
