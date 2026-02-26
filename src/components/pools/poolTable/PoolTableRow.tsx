@@ -72,11 +72,11 @@ export function PoolTableRow({
               <MdBrokenImage />
             </Icon>
           )}
-          <Text fontSize="sm" fontWeight={500} lineClamp={2}>
-            <Tooltip content={<Text>{poolRow.poolName}</Text>}>
-              <Text>{poolRow.poolName}</Text>
-            </Tooltip>
-          </Text>
+          <Tooltip content={poolRow.poolName}>
+            <Text fontSize="sm" fontWeight={500} lineClamp={2}>
+              {poolRow.poolName}
+            </Text>
+          </Tooltip>
         </Flex>
       </Table.Cell>
 
