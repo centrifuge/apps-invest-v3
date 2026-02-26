@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react'
-import { Balance, PoolNetwork } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce, formatBalance } from '@cfg'
 import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
-import { BalanceDisplay, NetworkIcons } from '@ui'
+import { BalanceDisplay, NetworkIcon } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
@@ -14,7 +14,6 @@ import { useVaultsContext } from '@contexts/VaultsContext'
 interface RedeemAmountProps {
   isDisabled: boolean
   maxRedeemAmount: string
-  networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
 }
@@ -22,16 +21,14 @@ interface RedeemAmountProps {
 export function RedeemAmount({
   isDisabled,
   maxRedeemAmount,
-  networks,
   parsedRedeemAmount,
   parsedReceiveAmount,
 }: RedeemAmountProps) {
-  const { poolDetails } = usePoolContext()
+  const { network, poolDetails } = usePoolContext()
   const { investment, vaultDetails } = useVaultsContext()
   const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const isAllowedToRedeem = investment?.isAllowedToRedeem ?? false
-  const centrifugeIds = networks?.map((network) => network.centrifugeId)
 
   // Get the pricePerShare
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -132,7 +129,7 @@ export function RedeemAmount({
                 {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)} available
               </Text>
             </Flex>
-            <NetworkIcons centrifugeIds={centrifugeIds} />
+            <NetworkIcon centrifugeId={network?.centrifugeId} />
           </Flex>
           {parsedRedeemAmount !== 0 && (
             <>

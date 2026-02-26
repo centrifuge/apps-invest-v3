@@ -4,7 +4,7 @@ import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce } from '@cfg'
 import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
-import { BalanceDisplay, NetworkIcons } from '@ui'
+import { BalanceDisplay, NetworkIcon } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
@@ -29,12 +29,11 @@ export function InvestAmount({
   parsedInvestAmount,
   parsedReceiveAmount,
 }: InvestAmountProps) {
-  const { poolDetails, networks } = usePoolContext()
+  const { poolDetails, network } = usePoolContext()
   const { investment, vaultDetails } = useVaultsContext()
   const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
   const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
-  const centrifugeIds = networks?.map((network) => network.centrifugeId)
   const isDepositAllowed = investment?.isAllowedToDeposit ?? false
 
   // Get the share class info for calculating shares amount to receive
@@ -118,7 +117,7 @@ export function InvestAmount({
                 {formattedMaxInvestAmount} available
               </Text>
             </Flex>
-            <NetworkIcons centrifugeIds={centrifugeIds} />
+            <NetworkIcon centrifugeId={network?.centrifugeId} />
           </Flex>
           {parsedInvestAmount !== 0 && (
             <>
