@@ -1,9 +1,10 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
 import {
+  getNetworkSlug,
   Holdings,
-  isValidNetwork,
-  Network,
+  isValidNetworkSlug,
+  NetworkSlug,
   PoolDetails,
   ShareClassWithDetails,
   useBlockchainsMapByCentrifugeId,
@@ -30,7 +31,7 @@ const PoolContext = createContext<
       isPoolDetailsLoading: boolean
       isHoldingsLoading: boolean
       network: PoolNetwork | undefined
-      networkFromUrl: Network | undefined
+      networkFromUrl: NetworkSlug | undefined
       networks: PoolNetwork[] | undefined
       pool: Pool | undefined
       poolId: string | undefined
@@ -71,10 +72,10 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   const { poolId, network: networkParam, asset: assetParam } = useParams()
   const currentPagePoolId = pools?.find((pool) => pool.id.toString() === poolId)?.id
 
-  const networkFromUrl = useMemo((): Network | undefined => {
+  const networkFromUrl = useMemo((): NetworkSlug | undefined => {
     if (!networkParam) return undefined
     const normalizedNetwork = networkParam.toLowerCase()
-    return isValidNetwork(normalizedNetwork) ? normalizedNetwork : undefined
+    return isValidNetworkSlug(normalizedNetwork) ? normalizedNetwork : undefined
   }, [networkParam])
 
   const assetFromUrl = useMemo((): string | undefined => {
@@ -90,10 +91,12 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!networks?.length) return
 
+    // Match by URL slug: centrifugeId → (blockchains map) → chainId → (getNetworkSlug) → slug
     if (networkFromUrl && blockchainsMapByCentrifugeId) {
       const matchingNetwork = networks.find((n) => {
         const blockchain = blockchainsMapByCentrifugeId.get(n.centrifugeId)
-        return blockchain?.network === networkFromUrl
+        if (!blockchain) return false
+        return getNetworkSlug(blockchain.chainId) === networkFromUrl
       })
       if (matchingNetwork) {
         if (matchingNetwork.centrifugeId !== network?.centrifugeId) {

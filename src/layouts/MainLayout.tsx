@@ -3,7 +3,6 @@ import { Link, Outlet, useMatch } from 'react-router-dom'
 import { Box, Flex } from '@chakra-ui/react'
 import { ErrorBoundary, LogoCentrifugeText } from '@ui'
 import { WalletButton } from '@wallet/WalletButton'
-import { NetworkButton } from '@components/elements/NetworkButton'
 import { routePaths } from '@routes/routePaths'
 
 const MainLayout = memo(() => {
@@ -26,7 +25,6 @@ const MainLayout = memo(() => {
               </Link>
             </Box>
             <Box>
-              <NetworkButton mr={4} size="sm" height="40px" />
               <WalletButton />
             </Box>
           </Flex>

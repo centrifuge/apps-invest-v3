@@ -171,24 +171,22 @@ function VaultGuard({
   tab: Tab,
   setIsClaimFormDisplayed,
 }: VaultGuardProps) {
-  const { networks } = usePoolContext()
+  const { network } = usePoolContext()
   const { investment, vault } = useVaultsContext()
   const { chainId } = useAddress()
   const { data: blockchainsMapByCentrifugeId } = useBlockchainsMapByCentrifugeId()
 
-  const chainIds = useMemo(() => {
-    if (!networks || !blockchainsMapByCentrifugeId) return []
-    return networks
-      .map((network) => blockchainsMapByCentrifugeId.get(network.centrifugeId)?.chainId)
-      .filter((id): id is number => id !== undefined)
-  }, [networks, blockchainsMapByCentrifugeId])
+  const targetChainId = useMemo(() => {
+    if (!network || !blockchainsMapByCentrifugeId) return undefined
+    return blockchainsMapByCentrifugeId.get(network.centrifugeId)?.chainId
+  }, [network, blockchainsMapByCentrifugeId])
 
   const shouldRenderOnboarding = useMemo(
-    () => vault && chainId && chainIds.includes(chainId) && !isInvestorWhiteListed,
-    [vault, chainId, chainIds, isInvestorWhiteListed]
+    () => vault && chainId && targetChainId === chainId && !isInvestorWhiteListed,
+    [vault, chainId, targetChainId, isInvestorWhiteListed]
   )
 
-  if (isLoading) {
+  if (isLoading || !targetChainId) {
     return (
       <Box height="100%" minH="182px" display="flex" alignItems="center" justifyContent="center">
         <Spinner size="lg" color="fg.solid" />
@@ -223,8 +221,8 @@ function VaultGuard({
 
   return (
     <ConnectionGuard
-      networks={chainIds}
-      message="This pool is only available on specific networks. Please switch to one of the supported networks to continue."
+      chainId={targetChainId}
+      message="Please switch to the correct network to continue."
     >
       {!vault ? (
         <Text>No vaults found for this pool on this network.</Text>

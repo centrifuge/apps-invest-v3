@@ -22,8 +22,7 @@ import { AppKitNetwork } from '@reown/appkit/networks'
 /**
  * Chain configuration module - single source of truth for all chain-related config.
  *
- * This module centralizes chain definitions so that Root.tsx (for WalletProvider)
- * and NetworkButton.tsx (for UI selection) stay in sync automatically.
+ * This module centralizes chain definitions for WalletProvider and ConnectionGuard.
  */
 
 const MAINNET_CHAINS = chains
