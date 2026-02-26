@@ -15,6 +15,5 @@ export function useAllPoolsVaultsQuery(poolIds: PoolId[]) {
     queryFn: () => firstValueFrom(createAllPoolsVaults$(centrifuge, poolIds)),
     enabled: poolIds.length > 0,
     staleTime: Infinity,
-    placeholderData: [] as PoolNetworkVaultData[],
   })
 }
