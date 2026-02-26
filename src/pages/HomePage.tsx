@@ -3,6 +3,7 @@ import { PoolTableTabs } from '@components/pools/poolTable/PoolTableTabs'
 import { PoolsTvlCard } from '@components/pools/poolCards/PoolsTvlCard'
 import { usePoolContext } from '@contexts/PoolContext'
 import heroBg from '@assets/logos/centrifuge-logo-lg.svg'
+import { maxScreenSize } from '@layouts/MainLayout'
 
 export default function HomePage() {
   const { pools, isPoolsLoading, setSelectedPoolId } = usePoolContext()
@@ -92,7 +93,7 @@ export default function HomePage() {
 
       {/* Hero content */}
       <Box position="relative" zIndex={3} pt={{ base: 32 }} px={{ base: 4, md: 16 }} height={baseHeroHeight}>
-        <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto">
+        <Box maxW={maxScreenSize} mx="auto">
           <Flex flexDirection="column" justifyContent="center" gap={6} py={{ base: 10, md: 12 }} maxW="558px">
             <Text
               as="h1"
@@ -113,7 +114,7 @@ export default function HomePage() {
       </Box>
 
       <Box position="relative" px={{ base: 4, md: 16 }} pt="2rem">
-        <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto">
+        <Box maxW={maxScreenSize} mx="auto">
           <PoolTableTabs poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
         </Box>
       </Box>

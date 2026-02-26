@@ -12,6 +12,7 @@ import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
 import { groupVaultsByPool } from '@components/pools/poolTable//utils'
 import type { ActiveTab, PoolRow } from '@components/pools/poolTable//types'
+import { maxScreenSize } from '@layouts/MainLayout'
 
 interface PoolTableTabsProps {
   poolIds: PoolId[]
@@ -112,7 +113,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
         pt={8}
         px={{ base: 4, md: 16 }}
       >
-        <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto" mt={8}>
+        <Box maxW={maxScreenSize} mx="auto" mt={8}>
           <Tabs.Content value="access" pt={0}>
             {!address ? (
               <Box py={8} textAlign="center">
