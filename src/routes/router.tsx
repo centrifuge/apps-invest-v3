@@ -35,36 +35,35 @@ export const router = createBrowserRouter([
               </LoadingBoundary>
             ),
           },
-          {
-            path: 'pool/:poolId',
-            loader: () => redirect('/'),
-          },
-          {
-            path: 'pools/*',
-            loader: () => redirect('/'),
-          },
-          {
-            path: 'portfolio',
-            loader: () => redirect('/'),
-          },
-          // Add catch-all routes for migrate paths
-          {
-            path: 'portfolio/migrate/*',
-            element: <div>Redirecting to migration app...</div>,
-            loader: () => {
-              window.location.replace('https://migrate.centrifuge.io')
-              return null
-            },
-          },
-          {
-            path: 'migrate/*',
-            element: <div>Redirecting to migration app...</div>,
-            loader: () => {
-              window.location.replace('https://migrate.centrifuge.io')
-              return null
-            },
-          },
         ],
+      },
+      {
+        path: 'pool/:poolId',
+        loader: () => redirect('/'),
+      },
+      {
+        path: 'pools/*',
+        loader: () => redirect('/'),
+      },
+      {
+        path: 'portfolio',
+        loader: () => redirect('/'),
+      },
+      {
+        path: 'portfolio/migrate/*',
+        element: <div>Redirecting to migration app...</div>,
+        loader: () => {
+          window.location.replace('https://migrate.centrifuge.io')
+          return null
+        },
+      },
+      {
+        path: 'migrate/*',
+        element: <div>Redirecting to migration app...</div>,
+        loader: () => {
+          window.location.replace('https://migrate.centrifuge.io')
+          return null
+        },
       },
     ],
   },
