@@ -27,19 +27,19 @@ export function WalletButton({
     open()
   }
 
-  return isConnected && address ? (
+  const label = isConnected && address ? truncateAddress(address) : 'Connect wallet'
+  const palette = isConnected ? connectedBtnColor : disconnectedBtnColor
+  const v = isConnected ? connectedBtnVariant : disconnectedBtnVariant
+
+  return (
     <Button
       onClick={handleConnect}
-      label={truncateAddress(address)}
-      colorPalette={connectedBtnColor}
-      variant={connectedBtnVariant}
-    />
-  ) : (
-    <Button
-      onClick={handleConnect}
-      label="Connect wallet"
-      colorPalette={disconnectedBtnColor}
-      variant={disconnectedBtnVariant}
+      label={label}
+      colorPalette={palette}
+      variant={v}
+      bg="charcoal.700"
+      _hover={{ bg: 'charcoal.600' }}
+      rounded="3xl"
     />
   )
 }
