@@ -49,14 +49,12 @@ export default function HomePage() {
         />
 
         {/* Yellow decorative dots */}
-        <Box position="absolute" bg="yellow.500" width="5px" height="5px" top="194px" left="60%" />
-        <Box position="absolute" bg="yellow.500" width="6px" height="6px" top="380px" left="70%" />
-        <Box position="absolute" bg="yellow.500" width="8px" height="8px" top="162px" right="8%" />
+        <Box position="absolute" bg="fg.emphasized" width="5px" height="5px" top="194px" left="60%" />
+        <Box position="absolute" bg="fg.emphasized" width="6px" height="6px" top="380px" left="70%" />
+        <Box position="absolute" bg="fg.emphasized" width="8px" height="8px" top="162px" right="8%" />
       </Box>
 
-      {/*
-        Wave separator - creates the curved boundary between dark hero and white content.
-      */}
+      {/* Wave separator - creates the curved boundary between dark hero and white content. */}
       <Box
         position="absolute"
         top={baseHeroHeight}
