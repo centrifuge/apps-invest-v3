@@ -44,7 +44,7 @@ export function ConnectionGuard({ chainId, children, message = 'Unsupported netw
   return (
     <Stack gap={2}>
       <Text>{message}</Text>
-      <Button onClick={handleSwitch}>
+      <Button onClick={handleSwitch} borderRadius="3xl">
         <NetworkIcon centrifugeId={centrifugeId} />
         Switch to {networkName}
       </Button>

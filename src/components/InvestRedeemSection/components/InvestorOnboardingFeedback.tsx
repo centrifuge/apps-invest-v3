@@ -48,7 +48,7 @@ export function InvestorOnboardingFeedback({
             }
           />
         </Box>
-        <Button disabled colorPalette="yellow" mt={8}>
+        <Button disabled colorPalette="yellow" mt={8} borderRadius="3xl">
           Invest
         </Button>
         {isBaseDeJAAA && (
