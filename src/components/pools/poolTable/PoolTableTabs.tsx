@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Box, Tabs, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { useAllPoolsVaults, useDebugFlags, useAddress, usePoolsAccessStatus, UsePoolsAccessStatusResult } from '@cfg'
+import { useAllPoolsVaults, useDebugFlags, useAddress, usePoolsAccessStatusQuery, type PoolAccessStatus } from '@cfg'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
 import { groupVaultsByPool } from '@components/pools/poolTable//utils'
@@ -14,10 +14,10 @@ interface PoolTableTabsProps {
 
 export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps) {
   const { showMainnet } = useDebugFlags()
-  const { data: allVaults, isLoading } = useAllPoolsVaults(poolIds)
+  const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaults(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
   const { address } = useAddress()
-  const accessStatus = usePoolsAccessStatus(poolIds)
+  const { data: accessData, isLoading: isAccessLoading } = usePoolsAccessStatusQuery(poolIds)
 
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
 
@@ -47,8 +47,8 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
     [deRwaVaults, getIsRestrictedPool]
   )
 
-  const accessRwaPoolRows = useMemo(() => filterByAccess(rwaPoolRows, accessStatus), [rwaPoolRows, accessStatus])
-  const accessDeRwaPoolRows = useMemo(() => filterByAccess(deRwaPoolRows, accessStatus), [deRwaPoolRows, accessStatus])
+  const accessRwaPoolRows = useMemo(() => filterByAccess(rwaPoolRows, accessData), [rwaPoolRows, accessData])
+  const accessDeRwaPoolRows = useMemo(() => filterByAccess(deRwaPoolRows, accessData), [deRwaPoolRows, accessData])
 
   const deRwaHeading = {
     label: 'Secondary Markets',
@@ -119,7 +119,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                 <PoolTableSection
                   poolRows={accessRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
-                  isLoading={isLoading || accessStatus.isLoading}
+                  isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={activeTab}
                 />
                 <PoolTableSection
@@ -127,7 +127,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                   subtitle={deRwaHeading.subtitle}
                   poolRows={accessDeRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
-                  isLoading={isLoading || accessStatus.isLoading}
+                  isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={activeTab}
                 />
               </>
@@ -138,7 +138,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
             <PoolTableSection
               poolRows={rwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
-              isLoading={isLoading}
+              isLoading={isPoolsVaultsLoading}
               activeTab={activeTab}
             />
             <PoolTableSection
@@ -146,7 +146,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               subtitle={deRwaHeading.subtitle}
               poolRows={deRwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
-              isLoading={isLoading}
+              isLoading={isPoolsVaultsLoading}
               activeTab={activeTab}
             />
           </Tabs.Content>
@@ -156,11 +156,11 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   )
 }
 
-function filterByAccess(poolRows: PoolRow[], accessStatus: UsePoolsAccessStatusResult): PoolRow[] {
-  if (accessStatus.isLoading || accessStatus.data.size === 0) return poolRows
+function filterByAccess(poolRows: PoolRow[], accessData: Map<string, PoolAccessStatus> | undefined): PoolRow[] {
+  if (!accessData || accessData.size === 0) return poolRows
   return poolRows
     .map((row) => {
-      const status = accessStatus.data.get(row.poolId)
+      const status = accessData.get(row.poolId)
       if (!status?.hasAccess) return null
       // Only show vault sub-rows for networks where the user is a member
       const filteredVaults = row.vaults.filter((v) => status.memberNetworkIds.has(v.centrifugeId))

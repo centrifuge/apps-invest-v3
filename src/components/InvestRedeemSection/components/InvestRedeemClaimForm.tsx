@@ -1,5 +1,6 @@
 import { Balance, CurrencyDetails, Vault } from '@centrifuge/sdk'
 import { formatBalance, useCentrifugeTransaction } from '@cfg'
+import { useQueryClient } from '@tanstack/react-query'
 import { Tooltip } from '@ui'
 import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { Dispatch, SetStateAction, useCallback } from 'react'
@@ -27,8 +28,16 @@ export function InvestRedeemClaimForm({
   setIsClaimFormDisplayed,
 }: InvestRedeemClaimFormProps) {
   const { execute, isPending } = useCentrifugeTransaction()
+  const queryClient = useQueryClient()
 
-  const claim = useCallback(() => execute(vault.claim()).then(() => setIsClaimFormDisplayed(false)), [vault, execute])
+  const claim = useCallback(
+    () =>
+      execute(vault.claim()).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+        setIsClaimFormDisplayed(false)
+      }),
+    [vault, execute, queryClient]
+  )
   const shareCurrencySymbol = share?.symbol ?? ''
   const investmentCurrencySymbol = asset?.symbol ?? ''
 
