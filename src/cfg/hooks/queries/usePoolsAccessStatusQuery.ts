@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { firstValueFrom } from 'rxjs'
 import type { HexString, PoolId } from '@centrifuge/sdk'
-import { useCentrifuge } from './CentrifugeContext'
-import { useAddress } from './useAddress'
-import { createPoolsAccessStatus$ } from './usePoolsAccessStatus'
+import { useCentrifuge } from '../CentrifugeContext'
+import { useAddress } from '../useAddress'
+import { createPoolsAccessStatus$ } from '../usePoolsAccessStatus'
 
 export const poolsAccessStatusQueryKey = (address: HexString) => ['poolsAccessStatus', address] as const
 

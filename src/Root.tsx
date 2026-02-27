@@ -16,7 +16,14 @@ import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
 import { VaultsProvider } from '@contexts/VaultsContext'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 600000,
+      gcTime: 600000,
+    },
+  },
+})
 
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
