@@ -15,6 +15,7 @@ import {
   monad,
   hyperEvm,
   hyperliquidEvmTestnet,
+  plumeMainnet,
 } from 'viem/chains'
 import { chains } from '@centrifuge/sdk'
 import { AppKitNetwork } from '@reown/appkit/networks'
@@ -49,6 +50,7 @@ export const MAINNET_RPC_URLS: Record<number, string[]> = {
   [bsc.id]: [`https://bsc-dataseed.binance.org`],
   [monad.id]: [`https://rpc.monad.xyz`],
   [hyperEvm.id]: [`https://rpc.hyperliquid.xyz/evm`],
+  [plumeMainnet.id]: [`https://rpc.plume.org`],
 }
 
 export const TESTNET_RPC_URLS: Record<number, string[]> = {
