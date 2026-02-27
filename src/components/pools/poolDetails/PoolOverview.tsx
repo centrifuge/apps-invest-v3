@@ -26,7 +26,10 @@ export function PoolOverview() {
     { label: 'Asset type', value: assetType },
     { label: 'APY', value: apyPercentage ? `${apyPercentage}%` : null },
     { label: 'Average asset maturity', value: apy },
-    { label: 'Min. investment', value: formatBalance(shareClass?.details.minInitialInvestment ?? 0, { currency: 'USD' }) },
+    {
+      label: 'Min. investment',
+      value: formatBalance(shareClass?.details.minInitialInvestment ?? 0, { currency: 'USD' }),
+    },
     { label: 'Investor type', value: metadata?.pool.investorType || 'Non-US Professional' },
     {
       label: 'Available networks',
