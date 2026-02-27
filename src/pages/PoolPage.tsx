@@ -58,7 +58,7 @@ export default function PoolPage() {
           </Flex>
         </Box>
 
-        <Box bg="white" borderRadius="2xl" minH="80vh" maxW={maxScreenSize} mx="auto" my="2rem">
+        <Box bg="white" borderRadius="2xl" minH="75vh" maxW={maxScreenSize} mx="auto" my="2rem">
           <Box maxW={maxScreenSize} mx="auto" px={{ base: 4, md: 8 }} py={8}>
             <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={6}>
               <Box minW={0}>

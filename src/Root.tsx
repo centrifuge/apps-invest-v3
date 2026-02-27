@@ -53,10 +53,9 @@ function RootProviders() {
    * because AppKit cannot dynamically update networks after initialization.
    * The actual environment switching (mainnet vs testnet) is handled by the Centrifuge SDK above.
    *
-   * IMPORTANT: We use static chain imports from wagmi/chains (ALL_CHAINS) instead of
-   * creating and importing from extra Centrifuge SDK instances (getChainConfig()), as each
-   * instance creates its own viem publicClient per chain with independent event watchers and polling,
-   * which would multiply RPC requests unnecessarily.
+   * ALL_CHAINS is built from the static `chains` export of @centrifuge/sdk — a plain array
+   * of chain definition objects, equivalent to importing from viem/chains. No SDK instance
+   * is created here, so there are no extra publicClients, event watchers, or polling.
    */
 
   return (

@@ -14,7 +14,7 @@ export function BalanceDisplay(props: BalanceDisplayProps) {
   const { balance, currency, precision = 2, minPrecision = 2, ...rest } = props
 
   const formattedValue = useMemo(() => {
-    return !balance ? '0' : formatBalance(balance, currency, precision, minPrecision)
+    return !balance ? '0.00' : formatBalance(balance, currency, precision, minPrecision)
   }, [balance, currency, precision, minPrecision])
 
   return (
