@@ -1,6 +1,16 @@
-import { Balance } from '@centrifuge/sdk'
+import { Balance, Price } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
 import { formatUnits, type Address } from 'viem'
+
+export type FormattableBalance = Balance | Price | string | number | bigint
+
+export interface FormatBalanceOptions {
+  precision?: number
+  tokenDecimals?: number
+  useGrouping?: boolean
+  currency?: string
+  notation?: 'standard' | 'compact'
+}
 
 export function truncateAddress(string: Address | string, start = 7, end = 7) {
   if (!string) return ''
@@ -51,39 +61,72 @@ export function formatBalanceAbbreviated(
 }
 
 export function formatBalance(
-  amount: number | Decimal | string | Balance,
-  currency?: string,
-  precision?: number,
-  minPrecision = precision
+  value: FormattableBalance | null | undefined,
+  options: FormatBalanceOptions = {}
 ): string {
-  let val: Decimal
+  if (value == null) return '0.00'
 
-  if (typeof amount === 'number' || typeof amount === 'string') {
-    val = new Decimal(amount.toString())
-  } else if (amount instanceof Balance) {
-    val = amount.toDecimal()
-  } else if (amount instanceof Decimal) {
-    val = amount
-  } else {
-    val = new Decimal(0)
+  const { precision, tokenDecimals, useGrouping = true, currency, notation = 'standard' } = options
+
+  try {
+    let decimal: Decimal
+    if (value instanceof Balance || value instanceof Price) {
+      decimal = value.toDecimal()
+    } else {
+      decimal = new Decimal(String(value))
+      if (tokenDecimals !== undefined) {
+        decimal = decimal.div(new Decimal(10).pow(tokenDecimals))
+      }
+    }
+
+    const maxDecimals = precision ?? 6
+    const minDecimals = precision ?? 2
+    decimal = decimal.toDecimalPlaces(maxDecimals, Decimal.ROUND_HALF_UP)
+
+    let formatted: string
+    if (notation === 'compact') {
+      formatted = formatCompactNumber(decimal, minDecimals)
+    } else {
+      formatted = decimal.toFixed(maxDecimals)
+
+      if (precision === undefined) {
+        formatted = trimTrailingZeros(formatted, minDecimals)
+      }
+
+      if (useGrouping) {
+        const [int, frac] = formatted.split('.')
+        const intWithCommas = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+        formatted = frac ? `${intWithCommas}.${frac}` : intWithCommas
+      }
+    }
+
+    return currency ? `${formatted} ${currency}` : formatted
+  } catch (err) {
+    console.error('Failed to format balance:', value, err)
+    return '0.00'
   }
+}
 
-  const fixedDecimal = val.toDecimalPlaces(precision ?? undefined, Decimal.ROUND_DOWN)
-  const decimalString = fixedDecimal.toString()
-  const [integerPart, decimalPart = ''] = decimalString.split('.')
-  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+function formatCompactNumber(decimal: Decimal, precision: number): string {
+  const abs = decimal.abs()
 
-  let formattedDecimal = decimalPart
-  if (precision !== undefined) {
-    formattedDecimal = decimalPart.padEnd(precision, '0').slice(0, precision)
-  }
-  if (minPrecision !== undefined && formattedDecimal.length < minPrecision) {
-    formattedDecimal = formattedDecimal.padEnd(minPrecision, '0')
-  }
+  if (abs.gte(1e15)) return `${decimal.div(1e15).toFixed(precision)}Q`
+  if (abs.gte(1e12)) return `${decimal.div(1e12).toFixed(precision)}T`
+  if (abs.gte(1e9)) return `${decimal.div(1e9).toFixed(precision)}B`
+  if (abs.gte(1e6)) return `${decimal.div(1e6).toFixed(precision)}M`
+  if (abs.gte(1e3)) return `${decimal.div(1e3).toFixed(precision)}K`
 
-  const formattedAmount = formattedDecimal ? `${formattedInteger}.${formattedDecimal}` : formattedInteger
+  return decimal.toFixed(precision)
+}
 
-  return currency ? `${formattedAmount} ${currency}` : formattedAmount
+function trimTrailingZeros(str: string, minDecimals: number): string {
+  const [int, frac = ''] = str.split('.')
+  if (!frac) return int
+
+  const trimmed = frac.replace(/0+$/, '')
+  const kept = trimmed.padEnd(minDecimals, '0').slice(0, Math.max(trimmed.length, minDecimals))
+
+  return kept ? `${int}.${kept}` : int
 }
 
 export function formatBigintToString(bigInt: bigint, bigintDecimals: number, formatDecimals?: number) {

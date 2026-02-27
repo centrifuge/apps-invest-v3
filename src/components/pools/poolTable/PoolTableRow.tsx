@@ -168,7 +168,7 @@ function AccessPoolCells({
   const borderBottom = hideBottomBorder ? noBorderBottom : {}
   const totals = investmentTotals ?? null
 
-  const fmt = (value: Balance | undefined) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)
+  const fmt = (value: Balance | undefined) => formatBalance(value, { precision: 2 })
 
   return (
     <>

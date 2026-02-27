@@ -1,7 +1,7 @@
 import { Flex, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { formatBalance, useInvestment, useShareClassDetails } from '@cfg'
-import type { PoolDetails } from '@cfg'
+import type { FormattableBalance, PoolDetails } from '@cfg'
 import { NetworkIcon } from '@ui'
 import { getVaultPath } from '@routes/routePaths'
 import { useNavigate } from 'react-router-dom'
@@ -74,7 +74,7 @@ function AccessVaultCells({
 }) {
   const { data: investment } = useInvestment(vault.vault)
 
-  const fmt = (value: unknown) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)
+  const fmt = (value: unknown) => formatBalance(value as FormattableBalance, { precision: 2 })
 
   return (
     <>
@@ -107,7 +107,7 @@ function FundsVaultCells({ vaultRow, expandedPosition }: { vaultRow: VaultRow; e
   const { data: shareClassDetails } = useShareClassDetails(vaultRow.vault.shareClass)
   const networkData = shareClassDetails?.navPerNetwork.find((n) => n.centrifugeId === vaultRow.centrifugeId)
 
-  const fmt = (value: unknown) => formatBalance(value as Parameters<typeof formatBalance>[0], undefined, 2)
+  const fmt = (value: unknown) => formatBalance(value as FormattableBalance, { precision: 2 })
 
   return (
     <>

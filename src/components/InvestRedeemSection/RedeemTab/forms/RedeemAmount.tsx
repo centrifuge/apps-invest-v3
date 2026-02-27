@@ -126,7 +126,7 @@ export function RedeemAmount({
                 MAX
               </Badge>
               <Text color="fg.solid" opacity={0.5} alignSelf="flex-end" ml={2}>
-                {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)} available
+                {formatBalance(maxRedeemBalance, { currency: shareCurrencySymbol, precision: 0 })} available
               </Text>
             </Flex>
             <NetworkIcon centrifugeId={network?.centrifugeId} />
