@@ -1,10 +1,8 @@
-import { useMemo, type Dispatch, type SetStateAction } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import type { Balance } from '@centrifuge/sdk'
 import { type RedeemActionType, RedeemAction } from '@components/InvestRedeemSection/components/defaults'
 import { RedeemAmount } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemAmount'
 import { RedeemTxFeedback } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxFeedback'
-import { useVaultsContext } from '@contexts/VaultsContext'
-import { usePoolContext } from '@contexts/PoolContext'
 // import { RedeemTxCancelled } from '@components/InvestRedeemSection/RedeemTab/forms/RedeemTxCancelled'
 
 interface RedeemTabFormProps {
@@ -24,26 +22,12 @@ export function RedeemTabForm({
   parsedReceiveAmount,
   setActionType,
 }: RedeemTabFormProps) {
-  const { networks } = usePoolContext()
-  const { investment } = useVaultsContext()
-  const redeemCurrencySymbol = investment?.share.symbol ?? ''
-  const receiveCurrencySymbol = investment?.asset.symbol ?? ''
-
-  const currencies = useMemo(
-    () => ({
-      redeemCurrency: redeemCurrencySymbol,
-      receiveCurrency: receiveCurrencySymbol,
-    }),
-    [redeemCurrencySymbol, receiveCurrencySymbol]
-  )
-
   switch (actionType) {
     case RedeemAction.REDEEM_AMOUNT:
       return (
         <RedeemAmount
           isDisabled={isDisabled}
           maxRedeemAmount={maxRedeemAmount}
-          networks={networks}
           parsedRedeemAmount={parsedRedeemAmount}
           parsedReceiveAmount={parsedReceiveAmount}
         />
@@ -51,7 +35,6 @@ export function RedeemTabForm({
     case RedeemAction.CONFIRM:
       return (
         <RedeemTxFeedback
-          currencies={currencies}
           isDisabled={isDisabled}
           parsedRedeemAmount={parsedRedeemAmount}
           parsedReceiveAmount={parsedReceiveAmount}

@@ -16,7 +16,14 @@ import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
 import { VaultsProvider } from '@contexts/VaultsContext'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 600000,
+      gcTime: 600000,
+    },
+  },
+})
 
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
@@ -46,16 +53,19 @@ function RootProviders() {
    * because AppKit cannot dynamically update networks after initialization.
    * The actual environment switching (mainnet vs testnet) is handled by the Centrifuge SDK above.
    *
-   * IMPORTANT: We use static chain imports from wagmi/chains (ALL_CHAINS) instead of
-   * creating and importing from extra Centrifuge SDK instances (getChainConfig()), as each
-   * instance creates its own viem publicClient per chain with independent event watchers and polling,
-   * which would multiply RPC requests unnecessarily.
+   * ALL_CHAINS is built from the static `chains` export of @centrifuge/sdk — a plain array
+   * of chain definition objects, equivalent to importing from viem/chains. No SDK instance
+   * is created here, so there are no extra publicClients, event watchers, or polling.
    */
 
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={ALL_CHAINS}>
+        <WalletProvider
+          projectId={import.meta.env.VITE_REOWN_APP_ID!}
+          networks={ALL_CHAINS}
+          rpcUrls={{ ...MAINNET_RPC_URLS, ...TESTNET_RPC_URLS }}
+        >
           <TransactionProvider>
             <PoolProvider>
               <VaultsProvider>

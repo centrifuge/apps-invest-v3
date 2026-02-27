@@ -1,40 +1,38 @@
 import { memo } from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import { Box, Flex, Separator } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 import { ErrorBoundary, LogoCentrifugeText } from '@ui'
 import { WalletButton } from '@wallet/WalletButton'
-import { NetworkButton } from '@components/elements/NetworkButton'
 import { routePaths } from '@routes/routePaths'
-import mainBg from '../assets/main_bg.jpg'
+
+export const maxScreenSize = { base: '95vw', xl: '75vw' }
 
 const MainLayout = memo(() => {
   return (
-    <Box bg="bg.subtle" minH="100vh">
-      <Box minH="100vh" bgImage={`url(${mainBg})`} bgRepeat="no-repeat" bgSize="cover" backgroundPosition="left">
-        <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
+    <Box minH="100vh" bg="white" overflowX="hidden">
+      <Box position="absolute" top={0} left={0} right={0} zIndex={10}>
+        <Box maxW={maxScreenSize} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
           <Flex
             flexDirection={{ base: 'column', md: 'row' }}
             justifyContent="space-between"
             alignItems="center"
             gap={4}
-            mb={8}
           >
             <Box width={32}>
               <Link to={routePaths.home}>
-                <LogoCentrifugeText fill="fg.solid" />
+                <LogoCentrifugeText fill="white" />
               </Link>
             </Box>
             <Box>
-              <NetworkButton mr={4} size="sm" height="40px" />
               <WalletButton />
             </Box>
           </Flex>
-          <Separator mb={4} />
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
         </Box>
       </Box>
+
+      <ErrorBoundary>
+        <Outlet />
+      </ErrorBoundary>
     </Box>
   )
 })

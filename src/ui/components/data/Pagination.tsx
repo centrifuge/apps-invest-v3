@@ -78,7 +78,7 @@ export function Pagination({
         page={currentPage}
         onPageChange={(e) => handlePageChange(e.page)}
       >
-        <ButtonGroup variant="outline" size="sm" gap={0}>
+        <ButtonGroup variant="ghost" size="sm">
           <ChakraPagination.PrevTrigger asChild>
             <IconButton aria-label="Previous page" px={2} disabled={currentPage === 1}>
               <IconTailArrowLeft /> Previous
@@ -86,7 +86,7 @@ export function Pagination({
           </ChakraPagination.PrevTrigger>
           <ChakraPagination.Items
             render={(page) => (
-              <IconButton variant={{ base: 'outline', _selected: 'solid' }} aria-label={`Page ${page.value}`}>
+              <IconButton variant="ghost" aria-label={`Page ${page.value}`}>
                 {page.value}
               </IconButton>
             )}

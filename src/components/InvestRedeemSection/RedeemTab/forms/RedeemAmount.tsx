@@ -1,21 +1,19 @@
 import { useCallback, useMemo } from 'react'
-import { Balance, PoolNetwork } from '@centrifuge/sdk'
+import { Balance } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce, formatBalance } from '@cfg'
 import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
-import { BalanceDisplay, NetworkIcons } from '@ui'
+import { BalanceDisplay, NetworkIcon } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
-import { useGetVaultCurrencyOptions } from '@hooks/useGetVaultCurrencyOptions'
 
 interface RedeemAmountProps {
   isDisabled: boolean
   maxRedeemAmount: string
-  networks?: PoolNetwork[]
   parsedRedeemAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
 }
@@ -23,17 +21,14 @@ interface RedeemAmountProps {
 export function RedeemAmount({
   isDisabled,
   maxRedeemAmount,
-  networks,
   parsedRedeemAmount,
   parsedReceiveAmount,
 }: RedeemAmountProps) {
-  const { poolDetails } = usePoolContext()
-  const { investment, vaults, vaultDetails, setVault } = useVaultsContext()
+  const { network, poolDetails } = usePoolContext()
+  const { investment, vaultDetails } = useVaultsContext()
   const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
   const { setValue } = useFormContext()
-  const redemptionCurrencies = useGetVaultCurrencyOptions({ isRedeem: true })
   const isAllowedToRedeem = investment?.isAllowedToRedeem ?? false
-  const centrifugeIds = networks?.map((network) => network.centrifugeId)
 
   // Get the pricePerShare
   const poolShareClass = poolDetails?.shareClasses.find(
@@ -72,14 +67,6 @@ export function RedeemAmount({
   )
 
   const debouncedCalculateRedeemAmount = useMemo(() => debounce(calculateRedeemAmount, 250), [calculateRedeemAmount])
-
-  const changeVault = useCallback(
-    (value: string | number) => {
-      const newVault = vaults?.find((vault) => vault.address === value)
-      setVault(newVault)
-    },
-    [vaults]
-  )
 
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
@@ -139,10 +126,10 @@ export function RedeemAmount({
                 MAX
               </Badge>
               <Text color="fg.solid" opacity={0.5} alignSelf="flex-end" ml={2}>
-                {formatBalance(maxRedeemBalance, shareCurrencySymbol, 0)} available
+                {formatBalance(maxRedeemBalance, { currency: shareCurrencySymbol, precision: 0 })} available
               </Text>
             </Flex>
-            <NetworkIcons centrifugeIds={centrifugeIds} />
+            <NetworkIcon centrifugeId={network?.centrifugeId} />
           </Flex>
           {parsedRedeemAmount !== 0 && (
             <>
@@ -162,8 +149,7 @@ export function RedeemAmount({
                 placeholder="0.00"
                 decimals={vaultDetails?.asset.decimals}
                 onChange={debouncedCalculateRedeemAmount}
-                selectOptions={redemptionCurrencies}
-                onSelectChange={changeVault}
+                currency={vaultDetails?.asset.symbol}
               />
             </>
           )}

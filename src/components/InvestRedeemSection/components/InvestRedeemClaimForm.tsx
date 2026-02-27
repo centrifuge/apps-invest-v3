@@ -1,5 +1,6 @@
 import { Balance, CurrencyDetails, Vault } from '@centrifuge/sdk'
 import { formatBalance, useCentrifugeTransaction } from '@cfg'
+import { useQueryClient } from '@tanstack/react-query'
 import { Tooltip } from '@ui'
 import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
 import { Dispatch, SetStateAction, useCallback } from 'react'
@@ -27,8 +28,17 @@ export function InvestRedeemClaimForm({
   setIsClaimFormDisplayed,
 }: InvestRedeemClaimFormProps) {
   const { execute, isPending } = useCentrifugeTransaction()
+  const queryClient = useQueryClient()
 
-  const claim = useCallback(() => execute(vault.claim()).then(() => setIsClaimFormDisplayed(false)), [vault, execute])
+  const claim = useCallback(
+    () =>
+      execute(vault.claim()).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+        queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
+        setIsClaimFormDisplayed(false)
+      }),
+    [vault, execute, queryClient]
+  )
   const shareCurrencySymbol = share?.symbol ?? ''
   const investmentCurrencySymbol = asset?.symbol ?? ''
 
@@ -46,7 +56,9 @@ export function InvestRedeemClaimForm({
             <Box mt={6}>
               <Text fontWeight={500}>Claimable shares</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">{formatBalance(claimableDepositShares, shareCurrencySymbol, 2)}</Heading>
+                <Heading fontSize="xl">
+                  {formatBalance(claimableDepositShares, { currency: shareCurrencySymbol, precision: 2 })}
+                </Heading>
               </Flex>
             </Box>
           )}
@@ -55,7 +67,7 @@ export function InvestRedeemClaimForm({
               <Text fontWeight={500}>Claimable invest currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableDepositAssetEquivalent, investmentCurrencySymbol, 2)}
+                  {formatBalance(claimableDepositAssetEquivalent, { currency: investmentCurrencySymbol, precision: 2 })}
                 </Heading>
               </Flex>
             </Box>
@@ -65,7 +77,7 @@ export function InvestRedeemClaimForm({
               <Text fontWeight={500}>Claimable redeem amount</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableRedeemSharesEquivalent, shareCurrencySymbol, 2)}
+                  {formatBalance(claimableRedeemSharesEquivalent, { currency: shareCurrencySymbol, precision: 2 })}
                 </Heading>
               </Flex>
             </Box>
@@ -74,7 +86,9 @@ export function InvestRedeemClaimForm({
             <Box mt={3}>
               <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">{formatBalance(claimableRedeemAssets, investmentCurrencySymbol, 2)}</Heading>
+                <Heading fontSize="xl">
+                  {formatBalance(claimableRedeemAssets, { currency: investmentCurrencySymbol, precision: 2 })}
+                </Heading>
               </Flex>
             </Box>
           )}

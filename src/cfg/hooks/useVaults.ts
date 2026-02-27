@@ -1,6 +1,7 @@
-import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
+import type { HexString, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { combineLatest, of } from 'rxjs'
+import { type Observable, combineLatest, of } from 'rxjs'
+import type { Investment } from '../types'
 import { useObservable } from './useObservable'
 import { useAddress } from './useAddress'
 
@@ -50,9 +51,13 @@ export function useInvestmentsPerVaults(vaults?: Vault[], options?: Options) {
   const investmentsPerVaults$ = useMemo(() => {
     if (!vaults || !vaults.length || !address || !enabled) return of([])
 
-    const investment$ = vaults.map((vault) => vault.investment(address))
-    return combineLatest(investment$)
+    return createInvestmentsPerVaults$(vaults, address)
   }, [vaults, address, enabled])
 
   return useObservable(investmentsPerVaults$)
+}
+
+export function createInvestmentsPerVaults$(vaults: Vault[], address: HexString): Observable<Investment[]> {
+  const investment$ = vaults.map((vault) => vault.investment(address))
+  return combineLatest(investment$)
 }
