@@ -5,8 +5,6 @@ export { mockMetadata } from './mockMetadata'
 // Formatting
 export * from './formatDate'
 export * from './formatting'
-export * from './parseBalance'
-export * from './formatDisplayPrice'
 
 // Network utilities
 export * from './networkUtils'
