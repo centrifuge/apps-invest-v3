@@ -1,21 +1,22 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
-import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { useInvestmentsPerVaultsQuery } from '@cfg'
-import { getVaultPath } from '@routes/routePaths'
-import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
-import type { ActiveTab, PoolInvestmentTotals, PoolRow, SortConfig, SortField } from './types'
-import { computeInvestmentTotals, sortPoolRows } from './utils'
-import { PoolTableRow } from './PoolTableRow'
-import { VaultSubRow } from './VaultSubRow'
-import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
+import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import {
   POOL_COLUMNS_ACCESS,
   POOL_COLUMNS_FUNDS,
   VAULT_COLUMNS_ACCESS,
   VAULT_COLUMNS_FUNDS,
 } from '@components/pools/poolTable/columnsConfig'
+import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
+import { getVaultPath } from '@routes/routePaths'
+import { PoolTableRow } from './PoolTableRow'
+import type { ActiveTab, PoolInvestmentTotals, PoolRow, SortConfig, SortField } from './types'
+import { POOL_TABLE_TABS } from './types'
+import { computeInvestmentTotals, sortPoolRows } from './utils'
+import { VaultSubRow } from './VaultSubRow'
 
 interface PoolTableProps {
   poolRows: PoolRow[]
@@ -62,11 +63,18 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
     [navigate, setSelectedPoolId]
   )
 
-  const isAccessTable = activeTab === 'access'
+  const isAccessTable = activeTab === POOL_TABLE_TABS.access
+
+  // Fixes flicker during observable re-subscription cycles.
+  const hasRenderedDataRef = useRef(false)
+  if (!isLoading && poolRows.length > 0) {
+    hasRenderedDataRef.current = true
+  }
+  const showSkeleton = isLoading && !hasRenderedDataRef.current
 
   const allVaults = useMemo(
-    () => (isAccessTable ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
-    [poolRows, isAccessTable]
+    () => (isAccessTable && !showSkeleton ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
+    [poolRows, isAccessTable, showSkeleton]
   )
   const { data: allInvestments } = useInvestmentsPerVaultsQuery(allVaults)
 
@@ -88,7 +96,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
   const sortedRows = sortPoolRows(poolRows, sortConfig, investmentTotalsMap)
   const poolColumns = isAccessTable ? POOL_COLUMNS_ACCESS : POOL_COLUMNS_FUNDS
 
-  if (isLoading) {
+  if (showSkeleton) {
     return <PoolTableSkeleton columns={poolColumns} />
   }
 
@@ -186,7 +194,7 @@ function PoolTableRowGroup({
   colSpan: number
 }) {
   const lastVaultIndex = poolRow.vaults.length - 1
-  const vaultColumns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
+  const vaultColumns = activeTab === POOL_TABLE_TABS.access ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
 
   return (
     <>

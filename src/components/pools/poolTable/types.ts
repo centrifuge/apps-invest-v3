@@ -1,7 +1,12 @@
 import type { Balance, Vault } from '@centrifuge/sdk'
 import type { NetworkSlug, PoolDetails, VaultDetails } from '@cfg'
 
-export type ActiveTab = 'access' | 'funds'
+export const POOL_TABLE_TABS = {
+  access: 'access',
+  funds: 'funds',
+} as const
+
+export type ActiveTab = (typeof POOL_TABLE_TABS)[keyof typeof POOL_TABLE_TABS]
 
 export interface VaultRow {
   networkName: NetworkSlug

@@ -1,11 +1,12 @@
 import { MdBrokenImage } from 'react-icons/md'
-import { Badge, Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
+import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 import type { Balance } from '@centrifuge/sdk'
 import { formatBalance, ipfsToHttp } from '@cfg'
+import { Badge, Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
-import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
-import type { ActiveTab, PoolInvestmentTotals, PoolRow } from './types'
 import { Tooltip } from '@ui'
+import type { ActiveTab, PoolInvestmentTotals, PoolRow } from './types'
+import { POOL_TABLE_TABS } from './types'
 
 const pinataGateway = import.meta.env.VITE_PINATA_GATEWAY
 
@@ -89,7 +90,7 @@ export function PoolTableRow({
         ) : null}
       </Table.Cell>
 
-      {activeTab === 'access' ? (
+      {activeTab === POOL_TABLE_TABS.access ? (
         <AccessPoolCells investmentTotals={investmentTotals} />
       ) : (
         <FundsPoolCells poolRow={poolRow} />

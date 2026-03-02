@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Box, Tabs, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import {
@@ -8,10 +8,10 @@ import {
   useDebugFlags,
   usePoolsAccessStatusQuery,
 } from '@cfg'
-import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
+import { POOL_TABLE_TABS, type PoolRow } from '@components/pools/poolTable//types'
 import { groupVaultsByPool } from '@components/pools/poolTable//utils'
-import type { ActiveTab, PoolRow } from '@components/pools/poolTable//types'
+import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { maxScreenSize } from '@layouts/MainLayout'
 
 interface PoolTableTabsProps {
@@ -24,7 +24,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaultsQuery(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
   const { address } = useAddress()
-  const { data: accessData, isLoading: isAccessLoading } = usePoolsAccessStatusQuery(poolIds)
+  const { data: accessData } = usePoolsAccessStatusQuery(poolIds)
 
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
 
@@ -62,20 +62,12 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
     subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
   }
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('access')
-
   return (
-    <Tabs.Root
-      defaultValue="access"
-      colorPalette="yellow"
-      size="lg"
-      variant="line"
-      onValueChange={(details) => setActiveTab(details.value as ActiveTab)}
-    >
+    <Tabs.Root defaultValue={POOL_TABLE_TABS.access} colorPalette="yellow" size="lg" variant="line">
       {/* Tab triggers - z-3 so they render above the wave separator overlay (z-2) */}
       <Tabs.List borderBottomColor="border.solid" width="fit-content" gap={8} position="relative" zIndex={3}>
         <Tabs.Trigger
-          value="access"
+          value={POOL_TABLE_TABS.access}
           height="44px"
           alignItems="flex-end"
           pb={4}
@@ -85,10 +77,10 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
         >
-          Access & Positions
+          Your Positions
         </Tabs.Trigger>
         <Tabs.Trigger
-          value="funds"
+          value={POOL_TABLE_TABS.funds}
           height="44px"
           alignItems="flex-end"
           pb={4}
@@ -114,7 +106,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
         px={{ base: 4, md: 16 }}
       >
         <Box maxW={maxScreenSize} mx="auto" mt={8}>
-          <Tabs.Content value="access" pt={0}>
+          <Tabs.Content value={POOL_TABLE_TABS.access} pt={0}>
             {!address ? (
               <Box py={8} textAlign="center">
                 <Text color="fg.muted" fontSize="md">
@@ -126,27 +118,27 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                 <PoolTableSection
                   poolRows={accessRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
-                  isLoading={isPoolsVaultsLoading || isAccessLoading}
-                  activeTab={activeTab}
+                  isLoading={isPoolsVaultsLoading}
+                  activeTab={POOL_TABLE_TABS.access}
                 />
                 <PoolTableSection
                   heading={deRwaHeading.label}
                   subtitle={deRwaHeading.subtitle}
                   poolRows={accessDeRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
-                  isLoading={isPoolsVaultsLoading || isAccessLoading}
-                  activeTab={activeTab}
+                  isLoading={isPoolsVaultsLoading}
+                  activeTab={POOL_TABLE_TABS.access}
                 />
               </>
             )}
           </Tabs.Content>
 
-          <Tabs.Content value="funds" pt={0}>
+          <Tabs.Content value={POOL_TABLE_TABS.funds} pt={0}>
             <PoolTableSection
               poolRows={rwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isPoolsVaultsLoading}
-              activeTab={activeTab}
+              activeTab={POOL_TABLE_TABS.funds}
             />
             <PoolTableSection
               heading={deRwaHeading.label}
@@ -154,7 +146,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               poolRows={deRwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isPoolsVaultsLoading}
-              activeTab={activeTab}
+              activeTab={POOL_TABLE_TABS.funds}
             />
           </Tabs.Content>
         </Box>

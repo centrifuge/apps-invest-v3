@@ -8,7 +8,11 @@ export const allPoolsVaultsQueryKey = (poolIdsKey: string) => ['allPoolsVaults',
 
 export function useAllPoolsVaultsQuery(poolIds: PoolId[]) {
   const centrifuge = useCentrifuge()
-  const poolIdsKey = poolIds?.map((id) => id.toString()).join(',') ?? ''
+  const poolIdsKey =
+    poolIds
+      ?.map((id) => id.toString())
+      .sort()
+      .join(',') ?? ''
 
   return useQuery({
     queryKey: allPoolsVaultsQueryKey(poolIdsKey),

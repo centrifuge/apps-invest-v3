@@ -5,7 +5,7 @@ import type { FormattableBalance, PoolDetails } from '@cfg'
 import { NetworkIcon } from '@ui'
 import { getVaultPath } from '@routes/routePaths'
 import { useNavigate } from 'react-router-dom'
-import type { ActiveTab, VaultRow } from './types'
+import { type ActiveTab, type VaultRow, POOL_TABLE_TABS } from './types'
 
 interface VaultSubRowProps {
   vaultRow: VaultRow
@@ -46,7 +46,7 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
         </Flex>
       </Table.Cell>
 
-      {activeTab === 'access' ? (
+      {activeTab === POOL_TABLE_TABS.access ? (
         <AccessVaultCells vault={vaultRow} assetSymbol={assetSymbol} isLast={isLast} />
       ) : (
         <FundsVaultCells vaultRow={vaultRow} isLast={isLast} />

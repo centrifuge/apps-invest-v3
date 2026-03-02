@@ -1,4 +1,4 @@
-import { Badge, Box, Flex, Text } from '@chakra-ui/react'
+import { Badge, Flex, Text } from '@chakra-ui/react'
 import { IconInfo } from '@ui'
 
 export function InvestorsOnlyValueBlock() {
