@@ -5,8 +5,8 @@ import { PoolId } from '@centrifuge/sdk'
 import { useInvestmentsPerVaultsQuery } from '@cfg'
 import { getVaultPath } from '@routes/routePaths'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
-import type { ActiveTab, ExpandedPosition, PoolInvestmentTotals, PoolRow, SortConfig, SortField } from './types'
-import { computeInvestmentTotals, getExpandedCellBorder, sortPoolRows } from './utils'
+import type { ActiveTab, PoolInvestmentTotals, PoolRow, SortConfig, SortField } from './types'
+import { computeInvestmentTotals, sortPoolRows } from './utils'
 import { PoolTableRow } from './PoolTableRow'
 import { VaultSubRow } from './VaultSubRow'
 import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
@@ -144,21 +144,19 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
         </Table.Header>
 
         <Table.Body>
-          {sortedRows.map((poolRow, index) => {
+          {sortedRows.map((poolRow) => {
             const isExpanded = expandedPools.has(poolRow.poolId)
-            const nextRow = sortedRows[index + 1]
-            const nextIsExpanded = nextRow ? expandedPools.has(nextRow.poolId) : false
             return (
               <PoolTableRowGroup
                 key={poolRow.poolId}
                 poolRow={poolRow}
                 isExpanded={isExpanded}
-                nextIsExpanded={nextIsExpanded}
                 onToggle={() => togglePool(poolRow.poolId)}
                 onClick={() => handlePoolClick(poolRow)}
                 setSelectedPoolId={setSelectedPoolId}
                 activeTab={activeTab}
                 investmentTotals={investmentTotalsMap.get(poolRow.poolId)}
+                colSpan={poolColumns.length}
               />
             )
           })}
@@ -171,23 +169,24 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
 function PoolTableRowGroup({
   poolRow,
   isExpanded,
-  nextIsExpanded,
   onToggle,
   onClick,
   setSelectedPoolId,
   activeTab,
   investmentTotals,
+  colSpan,
 }: {
   poolRow: PoolRow
   isExpanded: boolean
-  nextIsExpanded: boolean
   onToggle: () => void
   onClick: () => void
   setSelectedPoolId: (poolId: PoolId) => void
   activeTab: ActiveTab
   investmentTotals?: PoolInvestmentTotals
+  colSpan: number
 }) {
   const lastVaultIndex = poolRow.vaults.length - 1
+  const vaultColumns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
 
   return (
     <>
@@ -197,57 +196,54 @@ function PoolTableRowGroup({
         onToggle={onToggle}
         onClick={onClick}
         activeTab={activeTab}
-        expandedPosition={isExpanded ? 'top' : undefined}
-        hideBottomBorder={!isExpanded && nextIsExpanded}
         investmentTotals={investmentTotals}
       />
-      {isExpanded && <VaultHeaderRow activeTab={activeTab} expandedPosition="middle" />}
-      {isExpanded &&
-        poolRow.vaults.map((vault, i) => (
-          <VaultSubRow
-            key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
-            vaultRow={vault}
-            poolId={poolRow.poolId}
-            setSelectedPoolId={setSelectedPoolId}
-            poolDetails={poolRow.poolDetails}
-            activeTab={activeTab}
-            expandedPosition={i === lastVaultIndex ? 'bottom' : 'middle'}
-          />
-        ))}
-    </>
-  )
-}
-
-function VaultHeaderRow({
-  activeTab,
-  expandedPosition,
-}: {
-  activeTab: ActiveTab
-  expandedPosition?: ExpandedPosition
-}) {
-  const columns = activeTab === 'access' ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
-
-  return (
-    <Table.Row bg="border.muted">
-      {columns.map((col, i) => {
-        const cellPos =
-          i === 0 ? ('first' as const) : i === columns.length - 1 ? ('last' as const) : ('middle' as const)
-        return (
-          <Table.Cell
-            key={col.label || `empty-${i}`}
-            width={col.width}
-            py={2}
-            px={4}
-            fontSize="xs"
-            fontWeight={400}
-            color="fg.solid"
-            textAlign={col.align ?? 'left'}
-            {...getExpandedCellBorder(expandedPosition, cellPos)}
-          >
-            {col.label}
+      {isExpanded && (
+        <Table.Row>
+          <Table.Cell colSpan={colSpan} p={0} borderBottomWidth={0}>
+            <Box px={4} pb={4}>
+              <Box border="1px solid" borderColor="border.solid" borderRadius="10px" overflow="hidden">
+                <Table.Root size="sm" variant="line" css={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+                  <Table.Header>
+                    <Table.Row bg="bg.panel">
+                      {vaultColumns.map((col, i) => (
+                        <Table.ColumnHeader
+                          key={col.label || `empty-${i}`}
+                          width={col.width}
+                          py={2}
+                          px={4}
+                          fontSize="xs"
+                          fontWeight={400}
+                          color="fg.solid"
+                          textAlign={col.align ?? 'left'}
+                          borderBottomWidth="1px"
+                          borderColor="border.solid"
+                          {...(i === 0 ? { pl: 8 } : {})}
+                        >
+                          {col.label}
+                        </Table.ColumnHeader>
+                      ))}
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {poolRow.vaults.map((vault, i) => (
+                      <VaultSubRow
+                        key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
+                        vaultRow={vault}
+                        poolId={poolRow.poolId}
+                        setSelectedPoolId={setSelectedPoolId}
+                        poolDetails={poolRow.poolDetails}
+                        activeTab={activeTab}
+                        isLast={i === lastVaultIndex}
+                      />
+                    ))}
+                  </Table.Body>
+                </Table.Root>
+              </Box>
+            </Box>
           </Table.Cell>
-        )
-      })}
-    </Table.Row>
+        </Table.Row>
+      )}
+    </>
   )
 }

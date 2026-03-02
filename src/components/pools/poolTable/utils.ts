@@ -1,7 +1,7 @@
 import type { Balance } from '@centrifuge/sdk'
 import { formatBalanceAbbreviated, type PoolNetworkVaultData } from '@cfg'
 import { getPoolTVL } from '@utils/getPoolTVL'
-import type { ExpandedPosition, PoolInvestmentTotals, PoolRow, SortConfig, VaultRow } from './types'
+import type { PoolInvestmentTotals, PoolRow, SortConfig, VaultRow } from './types'
 
 export function groupVaultsByPool(
   vaults: PoolNetworkVaultData[],
@@ -81,36 +81,6 @@ export function computeInvestmentTotals(
       claimableRedeemAssets: first.claimableRedeemAssets,
     }
   )
-}
-
-export function getExpandedCellBorder(position: ExpandedPosition | undefined, cell: 'first' | 'middle' | 'last') {
-  if (!position) return {}
-  const borderStyle: Record<string, string> = {}
-
-  if (position === 'top') {
-    borderStyle.borderTopWidth = '2px'
-    borderStyle.borderTopColor = 'border.muted'
-  }
-  if (position === 'bottom') {
-    borderStyle.borderBottomWidth = '2px'
-    borderStyle.borderBottomColor = 'border.muted'
-  }
-
-  if (cell === 'first') {
-    borderStyle.borderLeftWidth = '2px'
-    borderStyle.borderLeftColor = 'border.muted'
-    if (position === 'top') borderStyle.borderTopLeftRadius = '8px'
-    if (position === 'bottom') borderStyle.borderBottomLeftRadius = '8px'
-  }
-
-  if (cell === 'last') {
-    borderStyle.borderRightWidth = '2px'
-    borderStyle.borderRightColor = 'border.muted'
-    if (position === 'top') borderStyle.borderTopRightRadius = '8px'
-    if (position === 'bottom') borderStyle.borderBottomRightRadius = '8px'
-  }
-
-  return borderStyle
 }
 
 export function sortPoolRows(

@@ -43,8 +43,6 @@ export interface SortConfig {
   direction: SortDirection
 }
 
-export type ExpandedPosition = 'top' | 'middle' | 'bottom'
-
 export interface PoolInvestmentTotals {
   assetBalance: Balance
   shareBalance: Balance
