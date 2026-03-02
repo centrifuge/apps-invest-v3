@@ -1,7 +1,7 @@
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatDate, useAllPoolDetails } from '@cfg'
 import { Flex, Skeleton, Text } from '@chakra-ui/react'
-import { IoBarChart } from 'react-icons/io5'
+import { MdOutlineInsertChart } from 'react-icons/md'
 
 export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   const { data: poolsDetails, isLoading } = useAllPoolDetails(poolIds, { enabled: poolIds.length > 0 })
@@ -25,7 +25,7 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
 
   return (
     <Flex alignItems="center" gap={3}>
-      <IoBarChart size="3rem" color="#FFC012" style={{ marginTop: '0.75rem' }} />
+      <MdOutlineInsertChart size="3rem" color="#FFC012" style={{ marginTop: '1.3rem' }} />
       <Flex flexDirection="column" alignItems="flex-end">
         <Text color="fg.subtle" fontSize="sm" fontWeight={500} lineHeight="20px">
           TVL on {formatDate(new Date(), 'short')}

@@ -73,7 +73,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
       onValueChange={(details) => setActiveTab(details.value as ActiveTab)}
     >
       {/* Tab triggers - z-3 so they render above the wave separator overlay (z-2) */}
-      <Tabs.List borderBottomColor="border.solid" gap={8} position="relative" zIndex={3}>
+      <Tabs.List borderBottomColor="border.solid" width="fit-content" gap={8} position="relative" zIndex={3}>
         <Tabs.Trigger
           value="access"
           height="44px"

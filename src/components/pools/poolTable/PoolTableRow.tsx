@@ -73,7 +73,7 @@ export function PoolTableRow({
             </Icon>
           )}
           <Tooltip content={poolRow.poolName}>
-            <Text fontSize="sm" fontWeight={500} lineClamp={2}>
+            <Text fontSize="sm" fontWeight={500} lineClamp={1}>
               {poolRow.poolName}
             </Text>
           </Tooltip>
@@ -82,7 +82,7 @@ export function PoolTableRow({
 
       <Table.Cell textAlign="center" {...getExpandedCellBorder(expandedPosition, 'middle')} {...borderBottom}>
         {poolType ? (
-          <Badge size="sm" variant="solid" colorPalette="gray">
+          <Badge size="sm" variant="solid" colorPalette="yellow">
             {poolType}
           </Badge>
         ) : null}
@@ -140,11 +140,19 @@ function FundsPoolCells({
       </Table.Cell>
 
       <Table.Cell {...getExpandedCellBorder(expandedPosition, 'middle')} {...borderBottom}>
-        <Text fontSize="xs">{poolRow.assetType}</Text>
+        <Tooltip content={poolRow.assetType}>
+          <Text fontSize="xs" lineClamp={1}>
+            {poolRow.assetType}
+          </Text>
+        </Tooltip>
       </Table.Cell>
 
       <Table.Cell {...getExpandedCellBorder(expandedPosition, 'middle')} {...borderBottom}>
-        <Text fontSize="xs">{poolRow.investorType}</Text>
+        <Tooltip content={poolRow.investorType}>
+          <Text fontSize="xs" lineClamp={1}>
+            {poolRow.investorType}
+          </Text>
+        </Tooltip>
       </Table.Cell>
 
       <Table.Cell textAlign="right" {...getExpandedCellBorder(expandedPosition, 'last')} {...borderBottom}>

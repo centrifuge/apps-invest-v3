@@ -21,7 +21,8 @@ export default function HomePage() {
 
   const baseHeroHeight = '480px'
   const waveHeight = '120px'
-  const totalHeroHeight = `calc(${baseHeroHeight} + ${waveHeight})`
+  const halfWaveHeight = `calc(${waveHeight} / 2)`
+  const totalHeroHeight = `calc(${baseHeroHeight} + ${halfWaveHeight} + 10px)` // add 10px padding to prevent color bleed
 
   return (
     <Box position="relative">
@@ -32,7 +33,7 @@ export default function HomePage() {
         left={0}
         right={0}
         height={totalHeroHeight}
-        bg="linear-gradient(45deg, #07090A 40%, #252B34 60%)"
+        bg="linear-gradient(to top, #07090A 30%, #252B34 70%)"
         overflow="hidden"
       >
         {/* Vector background image */}
@@ -68,26 +69,31 @@ export default function HomePage() {
         _before={{
           content: '""',
           position: 'absolute',
-          bottom: 0,
+          top: 0,
           left: 0,
           width: '57.7%',
-          height: '100%',
+          height: '60%',
           bg: 'white',
-          borderTopRightRadius: '15% 100%',
+          borderTopRightRadius: '10% 100%',
         }}
         _after={{
           content: '""',
           position: 'absolute',
-          top: '50%',
+          top: '58%',
           right: 0,
-          width: '43.1%',
-          height: '50%',
-          bg: 'linear-gradient(45deg, #16181c 20%, #252B34 80%)',
-          borderBottomLeftRadius: '15% 100%',
+          width: '42.3%',
+          height: '40%',
+          bg: '#07090A',
+          borderBottomLeftRadius: '10% 100%',
         }}
       />
 
-      <Box position="absolute" top={baseHeroHeight} right={{ base: '2.5vw', xl: '12.5vw' }} zIndex={3}>
+      <Box
+        position="absolute"
+        top={`calc(${baseHeroHeight} + 1.5rem)`}
+        right={{ base: '2.5vw', xl: '12.5vw' }}
+        zIndex={3}
+      >
         <PoolsTvlCard poolIds={poolIds} />
       </Box>
 
@@ -97,7 +103,7 @@ export default function HomePage() {
           <Flex flexDirection="column" justifyContent="center" gap={6} py={{ base: 10, md: 12 }} maxW="558px">
             <Text
               as="h1"
-              fontSize={{ base: '3xl', md: '5xl', lg: '6xl' }}
+              fontSize="4rem"
               fontWeight={400}
               color="fg.inverted"
               lineHeight={{ base: '40px', md: '72px' }}
@@ -113,7 +119,7 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      <Box position="relative" px={{ base: 4, md: 16 }} pt="2rem">
+      <Box position="relative" px={{ base: 4, md: 16 }} pt="3.5rem">
         <Box maxW={maxScreenSize} mx="auto">
           <PoolTableTabs poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
         </Box>

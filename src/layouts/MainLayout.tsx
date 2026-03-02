@@ -11,7 +11,7 @@ const MainLayout = memo(() => {
   return (
     <Box minH="100vh" bg="white" overflowX="hidden">
       <Box position="absolute" top={0} left={0} right={0} zIndex={10}>
-        <Box maxW={maxScreenSize} mx="auto" px={{ base: 4, md: 8 }} py={{ base: 4, md: 8 }}>
+        <Box maxW={maxScreenSize} mx="auto" py={{ base: 4, md: 8 }}>
           <Flex
             flexDirection={{ base: 'column', md: 'row' }}
             justifyContent="space-between"
