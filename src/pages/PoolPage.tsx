@@ -27,7 +27,7 @@ export default function PoolPage() {
 
   if (!poolDetails || !poolDetails?.metadata?.pool || !networks || !shareClass) {
     return (
-      <Box bg="charcoal.900" minH="100vh">
+      <Box bg="linear-gradient(to bottom, #07090A, #252B34)" minH="100vh">
         <Box pt={{ base: 24, md: 28 }} pb={8}>
           <Box maxW={maxScreenSize} mx="auto" px={{ base: 4, md: 8 }}>
             <BackLink heading="Sorry, no pool data available at this time." />
@@ -38,7 +38,7 @@ export default function PoolPage() {
   }
 
   return (
-    <Box bg="charcoal.900" minH="100vh">
+    <Box bg="linear-gradient(to bottom, #07090A, #252B34)" minH="100vh">
       <Box pt={{ base: 24, md: 28 }} pb={8}>
         <Box maxW={maxScreenSize} mx="auto" p="1.5rem" bg="bg.inverted" borderRadius="2xl">
           <Flex justifyContent="space-between" alignItems="flex-end" justifyItems="center">

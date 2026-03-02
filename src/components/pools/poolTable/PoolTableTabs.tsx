@@ -62,11 +62,11 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
     subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
   }
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('funds')
+  const [activeTab, setActiveTab] = useState<ActiveTab>('access')
 
   return (
     <Tabs.Root
-      defaultValue="funds"
+      defaultValue="access"
       colorPalette="yellow"
       size="lg"
       variant="line"

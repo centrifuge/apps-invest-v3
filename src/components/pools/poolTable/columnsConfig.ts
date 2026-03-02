@@ -18,10 +18,10 @@ export const POOL_COLUMNS_ACCESS: PoolTableColumns[] = [
   { label: 'Type', width: '8%', align: 'center' },
   { label: 'Total Assets', field: 'totalAssets', width: '12%', align: 'right' },
   { label: 'Total Shares', field: 'totalShares', width: '12%', align: 'right' },
-  { label: 'Total Pending Deposits', field: 'pendingDeposits', width: '12%', align: 'right' },
-  { label: 'Total Pending Redemptions', field: 'pendingRedemptions', width: '12%', align: 'right' },
-  { label: 'Total Deposit Claims', field: 'depositClaims', width: '12%', align: 'right' },
-  { label: 'Total Redeem Claims', field: 'redeemClaims', width: '12%', align: 'right' },
+  { label: 'Pending Deposits', field: 'pendingDeposits', width: '12%', align: 'right' },
+  { label: 'Pending Redeems', field: 'pendingRedemptions', width: '12%', align: 'right' },
+  { label: 'Deposit Claims', field: 'depositClaims', width: '12%', align: 'right' },
+  { label: 'Redeem Claims', field: 'redeemClaims', width: '12%', align: 'right' },
 ]
 
 export const VAULT_COLUMNS_ACCESS: VaultColumn[] = [
