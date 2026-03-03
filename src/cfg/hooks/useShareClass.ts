@@ -1,6 +1,9 @@
 import { ShareClass } from '@centrifuge/sdk'
-import { useObservable } from './useObservable'
+import { useQuery } from '@tanstack/react-query'
+import { firstValueFrom } from 'rxjs'
 import { useMemo } from 'react'
+import { useObservable } from './useObservable'
+import { queryKeys } from './queries/queryKeys'
 
 export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true
@@ -13,6 +16,9 @@ export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boole
 
 export function useShareClassDetails(shareClass: ShareClass | undefined, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true
-  const details$ = useMemo(() => (enabled && shareClass ? shareClass.details() : undefined), [shareClass?.id, enabled])
-  return useObservable(details$)
+  return useQuery({
+    queryKey: queryKeys.shareClassDetails(shareClass?.id?.toString() ?? ''),
+    queryFn: () => firstValueFrom(shareClass!.details()),
+    enabled: !!shareClass && enabled,
+  })
 }

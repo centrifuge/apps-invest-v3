@@ -1,9 +1,5 @@
-import { useMemo, useRef } from 'react'
 import { combineLatest, map, of, switchMap, type Observable } from 'rxjs'
 import type { Centrifuge, HexString, PoolId } from '@centrifuge/sdk'
-import { useCentrifuge } from './CentrifugeContext'
-import { useObservable } from './useObservable'
-import { useAddress } from './useAddress'
 
 export interface PoolAccessStatus {
   hasAccess: boolean
@@ -79,29 +75,4 @@ export function createPoolsAccessStatus$(
       )
     })
   )
-}
-
-export function usePoolsAccessStatus(poolIds: PoolId[]): UsePoolsAccessStatusResult {
-  const centrifuge = useCentrifuge()
-  const { address } = useAddress()
-  const lastValidDataRef = useRef<Map<string, PoolAccessStatus>>(new Map())
-
-  const access$ = useMemo(() => {
-    if (!address || !poolIds?.length) {
-      return of(new Map<string, PoolAccessStatus>())
-    }
-
-    return createPoolsAccessStatus$(centrifuge, address, poolIds)
-  }, [centrifuge, address, poolIds?.map((id) => id.toString()).join(',')])
-
-  const result = useObservable(access$)
-
-  if (result.data && result.data.size > 0) {
-    lastValidDataRef.current = result.data
-  }
-
-  return {
-    data: result.data ?? lastValidDataRef.current,
-    isLoading: result.isLoading && lastValidDataRef.current.size === 0,
-  }
 }

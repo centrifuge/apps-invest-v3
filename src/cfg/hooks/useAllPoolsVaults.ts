@@ -1,11 +1,8 @@
-import type { Centrifuge, PoolId, PoolNetwork, Vault } from '@centrifuge/sdk'
-import { useMemo, useRef } from 'react'
+import type { Centrifuge, PoolId, PoolNetwork } from '@centrifuge/sdk'
 import { combineLatest, type Observable, of, switchMap } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { PoolDetails, VaultDetails } from '../types'
 import { NetworkSlug } from '../utils'
-import { useCentrifuge } from './CentrifugeContext'
-import { useObservable } from './useObservable'
 
 export interface PoolNetworkVaultData {
   poolId: string
@@ -13,12 +10,8 @@ export interface PoolNetworkVaultData {
   centrifugeId: number
   networkName: NetworkSlug
   networkDisplayName: string
-  vault: Vault
+  vault: import('@centrifuge/sdk').Vault
   vaultDetails: VaultDetails
-}
-
-interface Options {
-  enabled?: boolean
 }
 
 export function createAllPoolsVaults$(centrifuge: Centrifuge, poolIds: PoolId[]): Observable<PoolNetworkVaultData[]> {
@@ -45,33 +38,6 @@ export function createAllPoolsVaults$(centrifuge: Centrifuge, poolIds: PoolId[])
   )
 
   return combineLatest(poolVaultsObservables$).pipe(map((poolVaultsArrays) => poolVaultsArrays.flat()))
-}
-
-export function useAllPoolsVaults(poolIds: PoolId[], options?: Options) {
-  const centrifuge = useCentrifuge()
-  const enabled = options?.enabled ?? true
-  const lastValidDataRef = useRef<PoolNetworkVaultData[] | undefined>(undefined)
-
-  const allVaults$ = useMemo(() => {
-    if (!enabled || !poolIds?.length) {
-      return of([])
-    }
-
-    return createAllPoolsVaults$(centrifuge, poolIds)
-  }, [centrifuge, enabled, poolIds?.map((id) => id.toString()).join(',')])
-
-  const result = useObservable(allVaults$)
-
-  // Store last valid data to prevent flickering during resubscription
-  if (result.data && result.data.length > 0) {
-    lastValidDataRef.current = result.data
-  }
-
-  return {
-    ...result,
-    data: result.data ?? lastValidDataRef.current,
-    isLoading: result.isLoading && !lastValidDataRef.current,
-  }
 }
 
 function getNetworkVaultsWithDetails(centrifuge: Centrifuge, network: PoolNetwork, poolDetails: PoolDetails) {

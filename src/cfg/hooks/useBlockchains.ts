@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
-import { useObservable } from './useObservable'
+import { useQuery } from '@tanstack/react-query'
+import { firstValueFrom } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
+import { queryKeys } from './queries/queryKeys'
 
 export interface Blockchain {
   explorer: string | null
@@ -13,12 +15,10 @@ export interface Blockchain {
 
 export function useBlockchains() {
   const centrifuge = useCentrifuge()
-
-  const blockchains$ = useMemo(() => {
-    return centrifuge.blockchains()
-  }, [centrifuge])
-
-  return useObservable<Blockchain[]>(blockchains$)
+  return useQuery({
+    queryKey: queryKeys.blockchains(),
+    queryFn: () => firstValueFrom(centrifuge.blockchains()),
+  })
 }
 
 export function useBlockchainByCentrifugeId(centrifugeId?: number) {

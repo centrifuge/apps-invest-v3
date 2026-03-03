@@ -4,7 +4,6 @@ import { Box, Spinner } from '@chakra-ui/react'
 import { Form, useForm, safeParse, createBalanceSchema } from '@forms'
 import type { Balance } from '@centrifuge/sdk'
 import { formatBalance, useCentrifugeTransaction } from '@cfg'
-import { useQueryClient } from '@tanstack/react-query'
 import {
   type InvestActionType,
   InvestAction,
@@ -20,7 +19,6 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
   const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)
   const { execute, isPending } = useCentrifugeTransaction()
-  const queryClient = useQueryClient()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
   const maxInvestAmount = useMemo(() => {
@@ -35,10 +33,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   function invest(amount: Balance) {
     const tx = investment?.isSyncDeposit ? vault.syncDeposit(amount) : vault.asyncDeposit(amount)
-    execute(tx).then(() => {
-      queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
-      queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
-    })
+    execute(tx)
   }
 
   const schema = z.object({

@@ -1,9 +1,12 @@
 import type { HexString, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { type Observable, combineLatest, of } from 'rxjs'
+import { type Observable, combineLatest } from 'rxjs'
+import { useQuery } from '@tanstack/react-query'
+import { firstValueFrom } from 'rxjs'
 import type { Investment } from '../types'
 import { useObservable } from './useObservable'
 import { useAddress } from './useAddress'
+import { queryKeys } from './queries/queryKeys'
 
 interface Options {
   enabled?: boolean
@@ -11,28 +14,33 @@ interface Options {
 
 export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId, options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaults$ = useMemo(() => {
-    if (!poolNetwork || !scId || !enabled) return undefined
-    return poolNetwork.vaults(scId)
-  }, [poolNetwork?.centrifugeId, scId?.toString(), enabled])
-  return useObservable(vaults$)
+  return useQuery({
+    queryKey: queryKeys.vaults(poolNetwork?.centrifugeId ?? 0, scId?.toString() ?? ''),
+    queryFn: () => firstValueFrom(poolNetwork!.vaults(scId!)),
+    enabled: !!poolNetwork && !!scId && enabled,
+  })
 }
 
 export function useVaultDetails(vault?: Vault | null, options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaultDetails$ = useMemo(() => (vault && enabled ? vault.details() : undefined), [vault?.address, enabled])
-  return useObservable(vaultDetails$)
+  return useQuery({
+    queryKey: queryKeys.vaultDetails(vault?.address ?? ''),
+    queryFn: () => firstValueFrom(vault!.details()),
+    enabled: !!vault && enabled,
+  })
 }
 
 export function useVaultsDetails(vaults?: Vault[], options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaultsDetails$ = useMemo(() => {
-    if (!vaults || vaults.length === 0 || !enabled) return undefined
-    const vaultDetails$ = vaults.map((vault) => vault.details())
-    return combineLatest(vaultDetails$)
-  }, [vaults, enabled])
-
-  return useObservable(vaultsDetails$)
+  const vaultAddressesKey = useMemo(
+    () => vaults?.map((v) => v.address).sort().join(',') ?? '',
+    [vaults]
+  )
+  return useQuery({
+    queryKey: queryKeys.vaultsDetails(vaultAddressesKey),
+    queryFn: () => firstValueFrom(combineLatest(vaults!.map((v) => v.details()))),
+    enabled: !!vaults && vaults.length > 0 && enabled,
+  })
 }
 
 export function useInvestment(vault?: Vault, options?: Options) {
@@ -43,18 +51,6 @@ export function useInvestment(vault?: Vault, options?: Options) {
     [vault?.address, address, enabled]
   )
   return useObservable(investment$)
-}
-
-export function useInvestmentsPerVaults(vaults?: Vault[], options?: Options) {
-  const enabled = options?.enabled ?? true
-  const { address } = useAddress()
-  const investmentsPerVaults$ = useMemo(() => {
-    if (!vaults || !vaults.length || !address || !enabled) return of([])
-
-    return createInvestmentsPerVaults$(vaults, address)
-  }, [vaults, address, enabled])
-
-  return useObservable(investmentsPerVaults$)
 }
 
 export function createInvestmentsPerVaults$(vaults: Vault[], address: HexString): Observable<Investment[]> {

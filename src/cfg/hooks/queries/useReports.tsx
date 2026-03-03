@@ -26,7 +26,7 @@ export function useTokenPrices(pool: Pool | undefined, filters: TokenPriceFilter
 
   return useQuery({
     enabled: !!pool && Number.isFinite(fromNum) && Number.isFinite(toNum),
-    queryKey: ['sharePrices', pool?.id, fromNum, toNum, filters.groupBy, unit],
+    queryKey: ['sharePrices', pool?.id.toString(), fromNum, toNum, filters.groupBy, unit],
     queryFn: async () => {
       return pool!.reports.sharePrices({
         from: fromNum,

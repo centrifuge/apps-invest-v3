@@ -13,7 +13,7 @@ import {
   usePool,
   usePoolActiveNetworks,
   usePoolDetails,
-  usePoolsQuery,
+  usePools,
 } from '@cfg'
 import { useParams } from 'react-router-dom'
 import { getPoolTVL } from '@utils/getPoolTVL'
@@ -47,7 +47,7 @@ const PoolContext = createContext<
 >(undefined)
 
 export const PoolProvider = ({ children }: { children: ReactNode }) => {
-  const { data: pools, isLoading: isPoolsLoading } = usePoolsQuery()
+  const { data: pools, isLoading: isPoolsLoading } = usePools()
   const { data: blockchainsMapByChainId } = useBlockchainsMapByChainId()
   const { data: blockchainsMapByCentrifugeId } = useBlockchainsMapByCentrifugeId()
   const connectedChainId = useChainId()

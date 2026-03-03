@@ -1,5 +1,5 @@
 import { type OperationConfirmedStatus, type Transaction } from '@centrifuge/sdk'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { lastValueFrom, tap } from 'rxjs'
 import { useConnectorClient } from 'wagmi'
 import { useCentrifuge } from './CentrifugeContext'
@@ -9,6 +9,7 @@ export function useCentrifugeTransaction() {
   const centrifuge = useCentrifuge()
   const { updateTransaction, addOrUpdateTransaction, addTransaction } = useTransactions()
   const { data: client } = useConnectorClient()
+  const queryClient = useQueryClient()
   const { mutateAsync, ...rest } = useMutation({
     mutationFn: execute,
   })
@@ -46,6 +47,14 @@ export function useCentrifugeTransaction() {
                   status: 'succeeded',
                   result: result.receipt,
                 })
+                // Centralized cache invalidation after any successful transaction.
+                // Only add queries here that need to be refetched after any transaction.
+                // Avoid adding queries that can be refetched by specific components to prevent unnecessary refetches.
+                queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
+                queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+                queryClient.invalidateQueries({ queryKey: ['portfolio'] })
+                queryClient.invalidateQueries({ queryKey: ['investor'] })
+                queryClient.invalidateQueries({ queryKey: ['isMember'] })
             }
           })
         )

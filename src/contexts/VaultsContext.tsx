@@ -2,18 +2,17 @@ import { Vault } from '@centrifuge/sdk'
 import {
   Investment,
   useInvestment,
-  useInvestmentsPerVaults,
   useVaultDetails,
   useVaults,
   useVaultsDetails,
   VaultDetails,
 } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
+import { useQueryClient } from '@tanstack/react-query'
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useRef, useState } from 'react'
 
 export interface VaultsContextValues {
   investment?: Investment
-  investmentsPerVaults?: Investment[]
   isInvestmentLoading: boolean
   isLoading: boolean
   isVaultDetailsLoading: boolean
@@ -27,7 +26,6 @@ export interface VaultsContextValues {
 
 const defaultVaultsContextValues: VaultsContextValues = {
   investment: undefined,
-  investmentsPerVaults: [],
   isInvestmentLoading: false,
   isLoading: false,
   isVaultDetailsLoading: false,
@@ -43,6 +41,7 @@ const VaultsContext = createContext<VaultsContextValues>(defaultVaultsContextVal
 
 export const VaultsProvider = ({ children }: { children: ReactNode }) => {
   const { assetFromUrl, isPoolDataReady, network, shareClassId } = usePoolContext()
+  const queryClient = useQueryClient()
   const [vault, setVault] = useState<Vault | undefined>(undefined)
   const [vaults, setVaults] = useState<Vault[] | undefined>(undefined)
 
@@ -58,9 +57,17 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
   const { data: investment, isLoading: isInvestmentLoading } = useInvestment(vault, {
     enabled: isPoolDataReady,
   })
-  const { data: investmentsPerVaults, isLoading: isInvestmentsPerVaultsLoading } = useInvestmentsPerVaults(vaults, {
-    enabled: isPoolDataReady,
-  })
+
+  // Reactive cache invalidation: when investment stream detects changes,
+  // invalidate the investmentsPerVaults query cache so HomePage data stays fresh
+  const prevInvestmentRef = useRef<Investment | undefined>(undefined)
+  useEffect(() => {
+    if (!investment) return
+    if (prevInvestmentRef.current && investment !== prevInvestmentRef.current) {
+      queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
+    }
+    prevInvestmentRef.current = investment
+  }, [investment, queryClient])
 
   const lastNetworkCentrifugeIdRef = useRef<number | undefined>(undefined)
 
@@ -107,14 +114,12 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
     isPoolVaultsLoading ||
     isVaultDetailsLoading ||
     isVaultsDetailsLoading ||
-    isInvestmentLoading ||
-    isInvestmentsPerVaultsLoading
+    isInvestmentLoading
 
   return (
     <VaultsContext.Provider
       value={{
         investment,
-        investmentsPerVaults,
         isInvestmentLoading,
         isLoading,
         isVaultDetailsLoading,

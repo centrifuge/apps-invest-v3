@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
-import { useObservable } from './useObservable'
+import { useQuery } from '@tanstack/react-query'
+import { firstValueFrom } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
 import { useAddress } from './useAddress'
 import { ShareClassId } from '@centrifuge/sdk'
+import { queryKeys } from './queries/queryKeys'
 
 interface Options {
   enabled?: boolean
@@ -11,22 +12,28 @@ interface Options {
 export function useInvestor() {
   const centrifuge = useCentrifuge()
   const { address } = useAddress()
-  const investor$ = useMemo(() => (address ? centrifuge.investor(address) : undefined), [address, centrifuge])
-  return useObservable(investor$)
+  return useQuery({
+    queryKey: queryKeys.investor(address ?? ''),
+    queryFn: () => firstValueFrom(centrifuge.investor(address!)),
+    enabled: !!address,
+  })
 }
 
 export function usePortfolio() {
   const { data: account } = useInvestor()
-  const portfolio$ = useMemo(() => (account ? account?.portfolio() : undefined), [account?.address])
-  return useObservable(portfolio$)
+  return useQuery({
+    queryKey: queryKeys.portfolio(account?.address ?? ''),
+    queryFn: () => firstValueFrom(account!.portfolio()),
+    enabled: !!account,
+  })
 }
 
 export function useIsMember(shareClassId?: ShareClassId, centrifugeId?: number, options?: Options) {
   const enabled = options?.enabled ?? true
   const { data: account } = useInvestor()
-  const isMember$ = useMemo(() => {
-    if (!account || !shareClassId || !centrifugeId || !enabled) return undefined
-    return account.isMember(shareClassId, centrifugeId)
-  }, [account?.address, centrifugeId, shareClassId?.toString()])
-  return useObservable(isMember$)
+  return useQuery({
+    queryKey: queryKeys.isMember(account?.address ?? '', shareClassId?.toString() ?? '', centrifugeId ?? 0),
+    queryFn: () => firstValueFrom(account!.isMember(shareClassId!, centrifugeId!)),
+    enabled: !!account && !!shareClassId && !!centrifugeId && enabled,
+  })
 }

@@ -4,7 +4,6 @@ import { Box, Spinner } from '@chakra-ui/react'
 import { createBalanceSchema, Form, safeParse, useForm } from '@forms'
 import type { Balance } from '@centrifuge/sdk'
 import { useCentrifugeTransaction } from '@cfg'
-import { useQueryClient } from '@tanstack/react-query'
 import {
   RedeemAction,
   RedeemFormDefaultValues,
@@ -18,7 +17,6 @@ import { balanceToString } from '@utils/balance'
 export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { isInvestmentLoading, isVaultDetailsLoading, investment, vaultDetails } = useVaultsContext()
   const { execute, isPending } = useCentrifugeTransaction()
-  const queryClient = useQueryClient()
   const [actionType, setActionType] = useState<RedeemActionType>(RedeemAction.REDEEM_AMOUNT)
   const maxRedeemBalance = investment?.shareBalance ?? 0
 
@@ -28,10 +26,7 @@ export function RedeemTab({ isLoading: isTabLoading, vault }: TabProps) {
   }, [maxRedeemBalance])
 
   function redeem(amount: Balance) {
-    execute(vault.asyncRedeem(amount)).then(() => {
-      queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
-      queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
-    })
+    execute(vault.asyncRedeem(amount))
   }
 
   const schema = z.object({

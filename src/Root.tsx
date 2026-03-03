@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
@@ -6,6 +6,7 @@ import {
   CentrifugeProvider,
   DebugFlags,
   TransactionProvider,
+  useAddress,
   useDebugFlags,
   ALL_CHAINS,
   MAINNET_RPC_URLS,
@@ -65,6 +66,7 @@ function RootProviders() {
           networks={ALL_CHAINS}
           rpcUrls={{ ...MAINNET_RPC_URLS, ...TESTNET_RPC_URLS }}
         >
+          <WalletInvalidator />
           <TransactionProvider>
             <PoolProvider>
               <LoadingProvider>
@@ -76,6 +78,21 @@ function RootProviders() {
       </CentrifugeProvider>
     </QueryClientProvider>
   )
+}
+
+// Remove all queries when the connected wallet address changes
+function WalletInvalidator() {
+  const { address } = useAddress()
+  const prevAddressRef = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (prevAddressRef.current !== address) {
+      queryClient.removeQueries()
+    }
+    prevAddressRef.current = address
+  }, [address])
+
+  return null
 }
 
 export default function Root() {

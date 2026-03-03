@@ -1,7 +1,7 @@
 import { Flex, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import { formatBalance, useInvestment, useShareClassDetails } from '@cfg'
-import type { FormattableBalance, PoolDetails } from '@cfg'
+import { formatBalance, useShareClassDetails } from '@cfg'
+import type { FormattableBalance, Investment, PoolDetails } from '@cfg'
 import { NetworkIcon } from '@ui'
 import { getVaultPath } from '@routes/routePaths'
 import { useNavigate } from 'react-router-dom'
@@ -13,10 +13,11 @@ interface VaultSubRowProps {
   setSelectedPoolId: (poolId: PoolId) => void
   poolDetails: PoolDetails
   activeTab: ActiveTab
+  investment?: Investment
   isLast?: boolean
 }
 
-export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, activeTab, isLast }: VaultSubRowProps) {
+export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, activeTab, investment, isLast }: VaultSubRowProps) {
   const navigate = useNavigate()
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
 
@@ -47,7 +48,7 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
       </Table.Cell>
 
       {activeTab === POOL_TABLE_TABS.access ? (
-        <AccessVaultCells vault={vaultRow} assetSymbol={assetSymbol} isLast={isLast} />
+        <AccessVaultCells investment={investment} assetSymbol={assetSymbol} isLast={isLast} />
       ) : (
         <FundsVaultCells vaultRow={vaultRow} isLast={isLast} />
       )}
@@ -58,9 +59,7 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
 const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
-function AccessVaultCells({ vault, assetSymbol, isLast }: { vault: VaultRow; assetSymbol: string; isLast?: boolean }) {
-  const { data: investment } = useInvestment(vault.vault)
-
+function AccessVaultCells({ investment, assetSymbol, isLast }: { investment?: Investment; assetSymbol: string; isLast?: boolean }) {
   const fmt = (value: unknown) => formatBalance(value as FormattableBalance, { precision: 2 })
   const borderBottom = isLast ? { borderBottomWidth: 0 } : {}
 

@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
 import { PoolId } from '@centrifuge/sdk'
-import { useInvestmentsPerVaultsQuery } from '@cfg'
+import { type Investment, useInvestmentsPerVaultsQuery } from '@cfg'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import {
   POOL_COLUMNS_ACCESS,
@@ -65,12 +65,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
 
   const isAccessTable = activeTab === POOL_TABLE_TABS.access
 
-  // Fixes flicker during observable re-subscription cycles.
-  const hasRenderedDataRef = useRef(false)
-  if (!isLoading && poolRows.length > 0) {
-    hasRenderedDataRef.current = true
-  }
-  const showSkeleton = isLoading && !hasRenderedDataRef.current
+  const showSkeleton = isLoading && poolRows.length === 0
 
   const allVaults = useMemo(
     () => (isAccessTable && !showSkeleton ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
@@ -90,6 +85,17 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
       const totals = computeInvestmentTotals(investments)
       if (totals) map.set(row.poolId, totals)
     }
+    return map
+  }, [allInvestments, poolRows, isAccessTable])
+
+  // Build per-vault investment map from the batch query for passing to VaultSubRow
+  const vaultInvestmentMap = useMemo(() => {
+    const map = new Map<string, Investment>()
+    if (!allInvestments || !isAccessTable) return map
+    const allVaultsList = poolRows.flatMap((row) => row.vaults)
+    allVaultsList.forEach((v, i) => {
+      if (allInvestments[i]) map.set(v.vault.address, allInvestments[i])
+    })
     return map
   }, [allInvestments, poolRows, isAccessTable])
 
@@ -164,6 +170,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
                 setSelectedPoolId={setSelectedPoolId}
                 activeTab={activeTab}
                 investmentTotals={investmentTotalsMap.get(poolRow.poolId)}
+                vaultInvestmentMap={vaultInvestmentMap}
                 colSpan={poolColumns.length}
               />
             )
@@ -182,6 +189,7 @@ function PoolTableRowGroup({
   setSelectedPoolId,
   activeTab,
   investmentTotals,
+  vaultInvestmentMap,
   colSpan,
 }: {
   poolRow: PoolRow
@@ -191,6 +199,7 @@ function PoolTableRowGroup({
   setSelectedPoolId: (poolId: PoolId) => void
   activeTab: ActiveTab
   investmentTotals?: PoolInvestmentTotals
+  vaultInvestmentMap: Map<string, Investment>
   colSpan: number
 }) {
   const lastVaultIndex = poolRow.vaults.length - 1
@@ -242,6 +251,7 @@ function PoolTableRowGroup({
                         setSelectedPoolId={setSelectedPoolId}
                         poolDetails={poolRow.poolDetails}
                         activeTab={activeTab}
+                        investment={vaultInvestmentMap.get(vault.vault.address)}
                         isLast={i === lastVaultIndex}
                       />
                     ))}

@@ -24,7 +24,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaultsQuery(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
   const { address } = useAddress()
-  const { data: accessData } = usePoolsAccessStatusQuery(poolIds)
+  const { data: accessData, isLoading: isAccessLoading } = usePoolsAccessStatusQuery(poolIds)
 
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
 
@@ -118,7 +118,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                 <PoolTableSection
                   poolRows={accessRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
-                  isLoading={isPoolsVaultsLoading}
+                  isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={POOL_TABLE_TABS.access}
                 />
                 <PoolTableSection
@@ -126,7 +126,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                   subtitle={deRwaHeading.subtitle}
                   poolRows={accessDeRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
-                  isLoading={isPoolsVaultsLoading}
+                  isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={POOL_TABLE_TABS.access}
                 />
               </>
@@ -156,7 +156,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
 }
 
 function filterByAccess(poolRows: PoolRow[], accessData: Map<string, PoolAccessStatus> | undefined): PoolRow[] {
-  if (!accessData || accessData.size === 0) return poolRows
+  if (!accessData || accessData.size === 0) return []
   return poolRows
     .map((row) => {
       const status = accessData.get(row.poolId)
