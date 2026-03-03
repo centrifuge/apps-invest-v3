@@ -15,6 +15,7 @@ interface VaultSubRowProps {
   activeTab: ActiveTab
   investment?: Investment
   isLast?: boolean
+  isDuplicateNav?: boolean
 }
 
 export function VaultSubRow({
@@ -25,6 +26,7 @@ export function VaultSubRow({
   activeTab,
   investment,
   isLast,
+  isDuplicateNav,
 }: VaultSubRowProps) {
   const navigate = useNavigate()
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
@@ -58,7 +60,7 @@ export function VaultSubRow({
       {activeTab === POOL_TABLE_TABS.access ? (
         <AccessVaultCells investment={investment} assetSymbol={assetSymbol} isLast={isLast} />
       ) : (
-        <FundsVaultCells vaultRow={vaultRow} isLast={isLast} />
+        <FundsVaultCells vaultRow={vaultRow} isLast={isLast} isDuplicateNav={isDuplicateNav} />
       )}
     </Table.Row>
   )
@@ -106,12 +108,21 @@ function AccessVaultCells({
   )
 }
 
-function FundsVaultCells({ vaultRow, isLast }: { vaultRow: VaultRow; isLast?: boolean }) {
+function FundsVaultCells({
+  vaultRow,
+  isLast,
+  isDuplicateNav,
+}: {
+  vaultRow: VaultRow
+  isLast?: boolean
+  isDuplicateNav?: boolean
+}) {
   const { data: shareClassDetails } = useShareClassDetails(vaultRow.vault.shareClass)
   const networkData = shareClassDetails?.navPerNetwork.find((n) => n.centrifugeId === vaultRow.centrifugeId)
 
   const fmt = (value: unknown) => formatBalance(value as FormattableBalance, { precision: 2 })
   const borderBottom = isLast ? { borderBottomWidth: 0 } : {}
+  const duplicateProps = isDuplicateNav ? { opacity: 0.35 } : {}
 
   return (
     <>
@@ -122,13 +133,13 @@ function FundsVaultCells({ vaultRow, isLast }: { vaultRow: VaultRow; isLast?: bo
         <Text fontSize="xs">{shareClassDetails?.symbol ?? '-'}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
-        <Text {...numericTextProps}>{fmt(networkData?.nav)}</Text>
+        <Text {...numericTextProps} {...duplicateProps}>{fmt(networkData?.nav)}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
-        <Text {...numericTextProps}>{fmt(networkData?.totalIssuance)}</Text>
+        <Text {...numericTextProps} {...duplicateProps}>{fmt(networkData?.totalIssuance)}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
-        <Text {...numericTextProps}>{fmt(networkData?.pricePerShare)}</Text>
+        <Text {...numericTextProps} {...duplicateProps}>{fmt(networkData?.pricePerShare)}</Text>
       </Table.Cell>
       <Table.Cell {...borderBottom} borderColor="charcoal.200" />
     </>

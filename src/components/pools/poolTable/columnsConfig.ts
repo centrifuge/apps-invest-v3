@@ -25,8 +25,8 @@ export const POOL_COLUMNS_ACCESS: PoolTableColumns[] = [
 ]
 
 export const VAULT_COLUMNS_ACCESS: VaultColumn[] = [
-  { label: 'Vault', width: '20%' },
-  { label: 'Asset', width: '8%', align: 'center' },
+  { label: 'Network', width: '20%' },
+  { label: 'Vault', width: '8%', align: 'center' },
   { label: 'Asset Balance', width: '12%', align: 'right' },
   { label: 'Share Balance', width: '12%', align: 'right' },
   { label: 'Pending Deposit', width: '12%', align: 'right' },
@@ -46,8 +46,8 @@ export const POOL_COLUMNS_FUNDS: PoolTableColumns[] = [
 ]
 
 export const VAULT_COLUMNS_FUNDS: VaultColumn[] = [
-  { label: 'Vault', width: '20%' },
-  { label: 'Asset', width: '8%', align: 'center' },
+  { label: 'Network', width: '20%' },
+  { label: 'Vault', width: '8%', align: 'center' },
   { label: 'Token', width: '8%', align: 'center' },
   { label: 'NAV', width: '14%', align: 'right' },
   { label: 'Total Issuance', width: '20%', align: 'right' },

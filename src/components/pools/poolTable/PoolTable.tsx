@@ -243,18 +243,24 @@ function PoolTableRowGroup({
                     </Table.Row>
                   </Table.Header>
                   <Table.Body>
-                    {poolRow.vaults.map((vault, i) => (
-                      <VaultSubRow
-                        key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
-                        vaultRow={vault}
-                        poolId={poolRow.poolId}
-                        setSelectedPoolId={setSelectedPoolId}
-                        poolDetails={poolRow.poolDetails}
-                        activeTab={activeTab}
-                        investment={vaultInvestmentMap.get(vault.vault.address)}
-                        isLast={i === lastVaultIndex}
-                      />
-                    ))}
+                    {poolRow.vaults.map((vault, i) => {
+                      const isDuplicateNav = poolRow.vaults
+                        .slice(0, i)
+                        .some((v) => v.centrifugeId === vault.centrifugeId)
+                      return (
+                        <VaultSubRow
+                          key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
+                          vaultRow={vault}
+                          poolId={poolRow.poolId}
+                          setSelectedPoolId={setSelectedPoolId}
+                          poolDetails={poolRow.poolDetails}
+                          activeTab={activeTab}
+                          investment={vaultInvestmentMap.get(vault.vault.address)}
+                          isLast={i === lastVaultIndex}
+                          isDuplicateNav={isDuplicateNav}
+                        />
+                      )
+                    })}
                   </Table.Body>
                 </Table.Root>
               </Box>
