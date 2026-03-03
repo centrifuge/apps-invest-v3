@@ -1,7 +1,6 @@
 import { MdBrokenImage } from 'react-icons/md'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
-import type { Balance } from '@centrifuge/sdk'
-import { formatBalance, ipfsToHttp } from '@cfg'
+import { formatBalance, ipfsToHttp, type FormattableBalance } from '@cfg'
 import { Badge, Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { Tooltip } from '@ui'
@@ -155,7 +154,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
 function AccessPoolCells({ investmentTotals }: { investmentTotals?: PoolInvestmentTotals }) {
   const totals = investmentTotals ?? null
 
-  const fmt = (value: Balance | undefined) => formatBalance(value, { precision: 2 })
+  const fmt = (value: FormattableBalance | undefined) => formatBalance(value, { precision: 2 })
 
   return (
     <>

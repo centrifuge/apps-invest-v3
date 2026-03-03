@@ -2,7 +2,7 @@ import { Balance, Price } from '@centrifuge/sdk'
 import Decimal from 'decimal.js-light'
 import { formatUnits, type Address } from 'viem'
 
-export type FormattableBalance = Balance | Price | string | number | bigint
+export type FormattableBalance = Balance | Price | Decimal | string | number | bigint
 
 export interface FormatBalanceOptions {
   precision?: number

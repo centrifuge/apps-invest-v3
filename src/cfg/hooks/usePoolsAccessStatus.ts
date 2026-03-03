@@ -1,4 +1,4 @@
-import { combineLatest, map, of, switchMap, type Observable } from 'rxjs'
+import { catchError, combineLatest, EMPTY, map, of, switchMap, timeout, type Observable } from 'rxjs'
 import type { Centrifuge, HexString, PoolId } from '@centrifuge/sdk'
 
 export interface PoolAccessStatus {
@@ -21,7 +21,7 @@ export function createPoolsAccessStatus$(
 
   return investor$.pipe(
     switchMap((account) => {
-      if (!account) return of(new Map<string, PoolAccessStatus>())
+      if (!account) return EMPTY
 
       // For each pool, check membership on its first active network
       const poolChecks$ = poolIds.map((poolId) =>
@@ -41,7 +41,12 @@ export function createPoolsAccessStatus$(
                 }
 
                 // Check isMember on each network
-                const memberChecks$ = networks.map((network) => account.isMember(shareClassId, network.centrifugeId))
+                const memberChecks$ = networks.map((network) =>
+                  account.isMember(shareClassId, network.centrifugeId).pipe(
+                    timeout(30000),
+                    catchError(() => of(false))
+                  )
+                )
 
                 return combineLatest(memberChecks$).pipe(
                   map((memberResults) => {

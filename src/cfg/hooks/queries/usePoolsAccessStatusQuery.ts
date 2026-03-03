@@ -5,7 +5,8 @@ import { useCentrifuge } from '../CentrifugeContext'
 import { useAddress } from '../useAddress'
 import { createPoolsAccessStatus$ } from '../usePoolsAccessStatus'
 
-export const poolsAccessStatusQueryKey = (poolIdsKey: string) => ['poolsAccessStatus', poolIdsKey] as const
+export const poolsAccessStatusQueryKey = (poolIdsKey: string, address?: string) =>
+  ['poolsAccessStatus', poolIdsKey, address] as const
 
 export function usePoolsAccessStatusQuery(poolIds: PoolId[]) {
   const centrifuge = useCentrifuge()
@@ -17,7 +18,7 @@ export function usePoolsAccessStatusQuery(poolIds: PoolId[]) {
       .join(',') ?? ''
 
   return useQuery({
-    queryKey: poolsAccessStatusQueryKey(poolIdsKey),
+    queryKey: poolsAccessStatusQueryKey(poolIdsKey, address),
     queryFn: () => firstValueFrom(createPoolsAccessStatus$(centrifuge, address!, poolIds)),
     enabled: !!address && poolIds.length > 0,
     staleTime: Infinity,

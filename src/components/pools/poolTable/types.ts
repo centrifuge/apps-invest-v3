@@ -1,4 +1,5 @@
-import type { Balance, Vault } from '@centrifuge/sdk'
+import type { Vault } from '@centrifuge/sdk'
+import type Decimal from 'decimal.js-light'
 import type { NetworkSlug, PoolDetails, VaultDetails } from '@cfg'
 
 export const POOL_TABLE_TABS = {
@@ -49,10 +50,10 @@ export interface SortConfig {
 }
 
 export interface PoolInvestmentTotals {
-  assetBalance: Balance
-  shareBalance: Balance
-  pendingDepositAssets: Balance
-  pendingRedeemShares: Balance
-  claimableDepositShares: Balance
-  claimableRedeemAssets: Balance
+  assetBalance: Decimal
+  shareBalance: Decimal
+  pendingDepositAssets: Decimal
+  pendingRedeemShares: Decimal
+  claimableDepositShares: Decimal
+  claimableRedeemAssets: Decimal
 }

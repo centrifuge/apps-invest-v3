@@ -1,4 +1,5 @@
 import type { Balance } from '@centrifuge/sdk'
+import Decimal from 'decimal.js-light'
 import { formatBalanceAbbreviated, type PoolNetworkVaultData } from '@cfg'
 import { getPoolTVL } from '@utils/getPoolTVL'
 import type { PoolInvestmentTotals, PoolRow, SortConfig, VaultRow } from './types'
@@ -62,23 +63,25 @@ export function computeInvestmentTotals(
 ): PoolInvestmentTotals | null {
   if (!investments || investments.length === 0) return null
 
+  const toDecimal = (b: Balance) => b.toDecimal()
+
   const [first, ...rest] = investments
   return rest.reduce(
     (acc, inv) => ({
-      assetBalance: acc.assetBalance.add(inv.assetBalance),
-      shareBalance: acc.shareBalance.add(inv.shareBalance),
-      pendingDepositAssets: acc.pendingDepositAssets.add(inv.pendingDepositAssets),
-      pendingRedeemShares: acc.pendingRedeemShares.add(inv.pendingRedeemShares),
-      claimableDepositShares: acc.claimableDepositShares.add(inv.claimableDepositShares),
-      claimableRedeemAssets: acc.claimableRedeemAssets.add(inv.claimableRedeemAssets),
+      assetBalance: acc.assetBalance.add(toDecimal(inv.assetBalance)),
+      shareBalance: acc.shareBalance.add(toDecimal(inv.shareBalance)),
+      pendingDepositAssets: acc.pendingDepositAssets.add(toDecimal(inv.pendingDepositAssets)),
+      pendingRedeemShares: acc.pendingRedeemShares.add(toDecimal(inv.pendingRedeemShares)),
+      claimableDepositShares: acc.claimableDepositShares.add(toDecimal(inv.claimableDepositShares)),
+      claimableRedeemAssets: acc.claimableRedeemAssets.add(toDecimal(inv.claimableRedeemAssets)),
     }),
     {
-      assetBalance: first.assetBalance,
-      shareBalance: first.shareBalance,
-      pendingDepositAssets: first.pendingDepositAssets,
-      pendingRedeemShares: first.pendingRedeemShares,
-      claimableDepositShares: first.claimableDepositShares,
-      claimableRedeemAssets: first.claimableRedeemAssets,
+      assetBalance: toDecimal(first.assetBalance),
+      shareBalance: toDecimal(first.shareBalance),
+      pendingDepositAssets: toDecimal(first.pendingDepositAssets),
+      pendingRedeemShares: toDecimal(first.pendingRedeemShares),
+      claimableDepositShares: toDecimal(first.claimableDepositShares),
+      claimableRedeemAssets: toDecimal(first.claimableRedeemAssets),
     }
   )
 }
@@ -157,8 +160,8 @@ export function sortPoolRows(
   return sorted
 }
 
-function compareBalance(a?: Balance, b?: Balance): number {
-  const aVal = a?.toFloat() ?? 0
-  const bVal = b?.toFloat() ?? 0
+function compareBalance(a?: Decimal, b?: Decimal): number {
+  const aVal = a?.toNumber() ?? 0
+  const bVal = b?.toNumber() ?? 0
   return aVal - bVal
 }
