@@ -1,12 +1,5 @@
 import { Vault } from '@centrifuge/sdk'
-import {
-  Investment,
-  useInvestment,
-  useVaultDetails,
-  useVaults,
-  useVaultsDetails,
-  VaultDetails,
-} from '@cfg'
+import { Investment, useInvestment, useVaultDetails, useVaults, useVaultsDetails, VaultDetails } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useQueryClient } from '@tanstack/react-query'
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useRef, useState } from 'react'
@@ -110,11 +103,7 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [poolNetworkVaults, vaultsDetails, assetFromUrl, currentVaultAssetAddress, vault])
 
-  const isLoading =
-    isPoolVaultsLoading ||
-    isVaultDetailsLoading ||
-    isVaultsDetailsLoading ||
-    isInvestmentLoading
+  const isLoading = isPoolVaultsLoading || isVaultDetailsLoading || isVaultsDetailsLoading || isInvestmentLoading
 
   return (
     <VaultsContext.Provider

@@ -17,7 +17,15 @@ interface VaultSubRowProps {
   isLast?: boolean
 }
 
-export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, activeTab, investment, isLast }: VaultSubRowProps) {
+export function VaultSubRow({
+  vaultRow,
+  poolId,
+  setSelectedPoolId,
+  poolDetails,
+  activeTab,
+  investment,
+  isLast,
+}: VaultSubRowProps) {
   const navigate = useNavigate()
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
 
@@ -59,7 +67,15 @@ export function VaultSubRow({ vaultRow, poolId, setSelectedPoolId, poolDetails, 
 const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
-function AccessVaultCells({ investment, assetSymbol, isLast }: { investment?: Investment; assetSymbol: string; isLast?: boolean }) {
+function AccessVaultCells({
+  investment,
+  assetSymbol,
+  isLast,
+}: {
+  investment?: Investment
+  assetSymbol: string
+  isLast?: boolean
+}) {
   const fmt = (value: unknown) => formatBalance(value as FormattableBalance, { precision: 2 })
   const borderBottom = isLast ? { borderBottomWidth: 0 } : {}
 

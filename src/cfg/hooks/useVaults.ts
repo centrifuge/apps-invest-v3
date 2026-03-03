@@ -33,7 +33,11 @@ export function useVaultDetails(vault?: Vault | null, options?: Options) {
 export function useVaultsDetails(vaults?: Vault[], options?: Options) {
   const enabled = options?.enabled ?? true
   const vaultAddressesKey = useMemo(
-    () => vaults?.map((v) => v.address).sort().join(',') ?? '',
+    () =>
+      vaults
+        ?.map((v) => v.address)
+        .sort()
+        .join(',') ?? '',
     [vaults]
   )
   return useQuery({

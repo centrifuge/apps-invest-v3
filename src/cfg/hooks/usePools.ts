@@ -40,13 +40,15 @@ export function usePoolDetails(poolId?: PoolId, options?: Options) {
 export function useAllPoolDetails(poolIds: PoolId[], options?: Options) {
   const centrifuge = useCentrifuge()
   const enabled = options?.enabled ?? true
-  const poolIdsKey = poolIds?.map((id) => id.toString()).sort().join(',') ?? ''
+  const poolIdsKey =
+    poolIds
+      ?.map((id) => id.toString())
+      .sort()
+      .join(',') ?? ''
   return useQuery({
     queryKey: queryKeys.allPoolDetails(poolIdsKey),
     queryFn: () =>
-      firstValueFrom(
-        combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
-      ),
+      firstValueFrom(combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))),
     enabled: !!poolIds?.length && enabled,
   })
 }
