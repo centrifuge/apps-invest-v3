@@ -72,6 +72,8 @@ export function formatBalance(
     let decimal: Decimal
     if (value instanceof Balance || value instanceof Price) {
       decimal = value.toDecimal()
+    } else if (value instanceof Decimal) {
+      decimal = value
     } else {
       decimal = new Decimal(String(value))
       if (tokenDecimals !== undefined) {
