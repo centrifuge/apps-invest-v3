@@ -133,13 +133,19 @@ function FundsVaultCells({
         <Text fontSize="xs">{shareClassDetails?.symbol ?? '-'}</Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
-        <Text {...numericTextProps} {...duplicateProps}>{fmt(networkData?.nav)}</Text>
+        <Text {...numericTextProps} {...duplicateProps}>
+          {fmt(networkData?.nav)}
+        </Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
-        <Text {...numericTextProps} {...duplicateProps}>{fmt(networkData?.totalIssuance)}</Text>
+        <Text {...numericTextProps} {...duplicateProps}>
+          {fmt(networkData?.totalIssuance)}
+        </Text>
       </Table.Cell>
       <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
-        <Text {...numericTextProps} {...duplicateProps}>{fmt(networkData?.pricePerShare)}</Text>
+        <Text {...numericTextProps} {...duplicateProps}>
+          {fmt(networkData?.pricePerShare)}
+        </Text>
       </Table.Cell>
       <Table.Cell {...borderBottom} borderColor="charcoal.200" />
     </>
