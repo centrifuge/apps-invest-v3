@@ -9,7 +9,8 @@ import {
   usePoolsAccessStatusQuery,
 } from '@cfg'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
-import { POOL_TABLE_TABS, type PoolRow } from '@components/pools/poolTable//types'
+import { type ActiveTab, type PoolRow, POOL_TABLE_TABS } from '@components/pools/poolTable//types'
+import { usePoolContext } from '@contexts/PoolContext'
 import { groupVaultsByPool } from '@components/pools/poolTable//utils'
 import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
 import { maxScreenSize } from '@layouts/MainLayout'
@@ -20,6 +21,7 @@ interface PoolTableTabsProps {
 }
 
 export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps) {
+  const { activeHomeTab, setActiveHomeTab } = usePoolContext()
   const { showMainnet } = useDebugFlags()
   const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaultsQuery(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
@@ -63,7 +65,13 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   }
 
   return (
-    <Tabs.Root defaultValue={POOL_TABLE_TABS.access} colorPalette="yellow" size="lg" variant="line">
+    <Tabs.Root
+      value={activeHomeTab}
+      colorPalette="yellow"
+      size="lg"
+      variant="line"
+      onValueChange={(e) => setActiveHomeTab(e.value as ActiveTab)}
+    >
       {/* Tab triggers - z-3 so they render above the wave separator overlay (z-2) */}
       <Tabs.List borderBottomColor="border.solid" width="fit-content" gap={8} position="relative" zIndex={3}>
         <Tabs.Trigger

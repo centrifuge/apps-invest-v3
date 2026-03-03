@@ -1,4 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { useChainId } from 'wagmi'
 import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
 import {
   getNetworkSlug,
@@ -15,12 +17,12 @@ import {
   usePoolDetails,
   usePools,
 } from '@cfg'
-import { useParams } from 'react-router-dom'
+import { type ActiveTab, POOL_TABLE_TABS } from '@components/pools/poolTable/types'
 import { getPoolTVL } from '@utils/getPoolTVL'
-import { useChainId } from 'wagmi'
 
 const PoolContext = createContext<
   | {
+      activeHomeTab: ActiveTab
       assetFromUrl: string | undefined
       connectedChainId: number | undefined
       holdings?: Holdings
@@ -41,6 +43,7 @@ const PoolContext = createContext<
       selectedPoolId: PoolId | undefined
       shareClass: ShareClassWithDetails | undefined
       shareClassId: ShareClassId | undefined
+      setActiveHomeTab: (tab: ActiveTab) => void
       setSelectedPoolId: (poolId: PoolId) => void
     }
   | undefined
@@ -53,6 +56,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   const connectedChainId = useChainId()
   const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
+  const [activeHomeTab, setActiveHomeTab] = useState<ActiveTab>(POOL_TABLE_TABS.access)
 
   const { data: pool, isLoading: isPoolLoading } = usePool(selectedPoolId, { enabled: !!selectedPoolId })
 
@@ -153,6 +157,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   return (
     <PoolContext.Provider
       value={{
+        activeHomeTab,
         assetFromUrl,
         connectedChainId,
         holdings,
@@ -173,6 +178,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
         selectedPoolId,
         shareClass,
         shareClassId,
+        setActiveHomeTab,
         setSelectedPoolId,
       }}
     >
