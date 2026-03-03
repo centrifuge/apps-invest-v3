@@ -14,7 +14,6 @@ import {
 import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
-import { VaultsProvider } from '@contexts/VaultsContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,11 +67,9 @@ function RootProviders() {
         >
           <TransactionProvider>
             <PoolProvider>
-              <VaultsProvider>
-                <LoadingProvider>
-                  <Outlet />
-                </LoadingProvider>
-              </VaultsProvider>
+              <LoadingProvider>
+                <Outlet />
+              </LoadingProvider>
             </PoolProvider>
           </TransactionProvider>
         </WalletProvider>

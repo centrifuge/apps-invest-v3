@@ -2,6 +2,7 @@ import { createBrowserRouter, redirect } from 'react-router-dom'
 import { LoadingBoundary } from '@ui'
 import MainLayout from '@layouts/MainLayout'
 import { HomeRoute, PoolRoute, RootRoute } from '@routes/routes'
+import { VaultsProvider } from '@contexts/VaultsContext'
 import NotFoundOrRedirect from './NotFound'
 import HashUrlHandler from './HashUrlHandler'
 
@@ -31,7 +32,9 @@ export const router = createBrowserRouter([
             path: 'pool/:poolId/:network/:asset',
             element: (
               <LoadingBoundary>
-                <PoolRoute />
+                <VaultsProvider>
+                  <PoolRoute />
+                </VaultsProvider>
               </LoadingBoundary>
             ),
           },
