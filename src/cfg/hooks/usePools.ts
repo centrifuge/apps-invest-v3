@@ -37,7 +37,9 @@ export function usePoolDetails(poolId?: PoolId, options?: Options) {
   return useQuery({
     queryKey: queryKeys.poolDetails(poolId?.toString() ?? ''),
     queryFn: () =>
-      firstValueWithTimeout(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))),
+      firstValueWithTimeout(
+        centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))
+      ),
     enabled: !!poolId && enabled,
     staleTime: POOL_STALE_TIME,
   })
@@ -54,7 +56,9 @@ export function useAllPoolDetails(poolIds: PoolId[], options?: Options) {
   return useQuery({
     queryKey: queryKeys.allPoolDetails(poolIdsKey),
     queryFn: () =>
-      firstValueWithTimeout(combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))),
+      firstValueWithTimeout(
+        combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
+      ),
     enabled: !!poolIds?.length && enabled,
     staleTime: POOL_STALE_TIME,
   })
@@ -79,7 +83,9 @@ export function usePoolNetworks(poolId?: PoolId) {
   return useQuery({
     queryKey: queryKeys.poolNetworks(poolId?.toString() ?? ''),
     queryFn: () =>
-      firstValueWithTimeout(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))),
+      firstValueWithTimeout(
+        centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))
+      ),
     enabled: !!poolId,
     staleTime: POOL_STALE_TIME,
   })
