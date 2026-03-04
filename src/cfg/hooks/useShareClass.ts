@@ -1,17 +1,18 @@
 import { ShareClass } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
 import { firstValueFrom } from 'rxjs'
-import { useMemo } from 'react'
-import { useObservable } from './useObservable'
 import { queryKeys } from './queries/queryKeys'
+
+const HOLDINGS_REFETCH_INTERVAL = 60_000
 
 export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true
-  const holdings$ = useMemo(
-    () => (enabled && shareClass ? shareClass.balances() : undefined),
-    [shareClass?.id.toString(), enabled]
-  )
-  return useObservable(holdings$)
+  return useQuery({
+    queryKey: queryKeys.holdings(shareClass?.id?.toString() ?? ''),
+    queryFn: () => firstValueFrom(shareClass!.balances()),
+    enabled: !!shareClass && enabled,
+    refetchInterval: HOLDINGS_REFETCH_INTERVAL,
+  })
 }
 
 export function useShareClassDetails(shareClass: ShareClass | undefined, options?: { enabled?: boolean }) {

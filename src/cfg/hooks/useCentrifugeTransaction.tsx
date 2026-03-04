@@ -8,8 +8,7 @@ import { useTransactions } from './TransactionProvider'
 
 /**
  * Polling interval (ms) for fast transaction receipt detection.
- * The global SDK pollingInterval is 60s (to reduce RPC load for data queries),
- * but we poll much faster here so the UI reflects confirmed transactions quickly.
+ * We poll faster than the SDK default so the UI reflects confirmed transactions quickly.
  */
 const TX_POLLING_INTERVAL = 2_000
 
@@ -28,6 +27,9 @@ export function useCentrifugeTransaction() {
     queryClient.invalidateQueries({ queryKey: ['portfolio'] })
     queryClient.invalidateQueries({ queryKey: ['investor'] })
     queryClient.invalidateQueries({ queryKey: ['isMember'] })
+    queryClient.invalidateQueries({ queryKey: ['investment'] })
+    queryClient.invalidateQueries({ queryKey: ['holdings'] })
+    queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
   }
 
   function execute(observable: Transaction): Promise<OperationConfirmedStatus> {

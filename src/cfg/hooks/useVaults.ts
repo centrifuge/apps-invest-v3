@@ -1,13 +1,12 @@
 import type { HexString, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { type Observable, combineLatest, firstValueFrom } from 'rxjs'
+import { combineLatest, firstValueFrom } from 'rxjs'
 import { useQuery } from '@tanstack/react-query'
-import type { Investment } from '../types'
 import { useAddress } from './useAddress'
-import { useObservable } from './useObservable'
 import { queryKeys } from './queries/queryKeys'
 
 const VAULT_STALE_TIME = 5 * 60 * 1000 // 5 minutes
+const INVESTMENT_REFETCH_INTERVAL = 60_000
 
 interface Options {
   enabled?: boolean
@@ -54,14 +53,11 @@ export function useVaultsDetails(vaults?: Vault[], options?: Options) {
 export function useInvestment(vault?: Vault, options?: Options) {
   const enabled = options?.enabled ?? true
   const { address } = useAddress()
-  const investment$ = useMemo(() => {
-    if (!vault || !address || !enabled) return undefined
-    return vault.investment(address)
-  }, [vault, address, enabled])
-  return useObservable(investment$)
-}
-
-export function createInvestmentsPerVaults$(vaults: Vault[], address: HexString): Observable<Investment[]> {
-  const investment$ = vaults.map((vault) => vault.investment(address))
-  return combineLatest(investment$)
+  return useQuery({
+    queryKey: queryKeys.investment(vault?.address ?? '', address ?? ''),
+    queryFn: () => firstValueFrom(vault!.investment(address! as HexString)),
+    enabled: !!vault && !!address && enabled,
+    staleTime: 0,
+    refetchInterval: INVESTMENT_REFETCH_INTERVAL,
+  })
 }
