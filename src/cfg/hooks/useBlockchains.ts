@@ -18,6 +18,7 @@ export function useBlockchains() {
   return useQuery({
     queryKey: queryKeys.blockchains(),
     queryFn: () => firstValueFrom(centrifuge.blockchains()),
+    staleTime: Infinity,
   })
 }
 

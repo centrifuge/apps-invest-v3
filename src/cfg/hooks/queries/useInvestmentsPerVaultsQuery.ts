@@ -21,5 +21,6 @@ export function useInvestmentsPerVaultsQuery(vaults?: Vault[]) {
     queryFn: () => firstValueFrom(createInvestmentsPerVaults$(vaults!, address!)),
     enabled: !!address && !!vaults && vaults.length > 0,
     placeholderData: [] as Investment[],
+    staleTime: 60000,
   })
 }

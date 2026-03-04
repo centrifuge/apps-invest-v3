@@ -9,7 +9,7 @@ export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boole
   const enabled = options?.enabled ?? true
   const holdings$ = useMemo(
     () => (enabled && shareClass ? shareClass.balances() : undefined),
-    [shareClass?.id, enabled]
+    [shareClass?.id.toString(), enabled]
   )
   return useObservable(holdings$)
 }

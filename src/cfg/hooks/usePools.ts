@@ -4,6 +4,8 @@ import { combineLatest, firstValueFrom, of, switchMap } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
 import { queryKeys } from './queries/queryKeys'
 
+const POOL_STALE_TIME = 5 * 60 * 1000 // 5 minutes
+
 interface Options {
   enabled?: boolean
 }
@@ -13,6 +15,7 @@ export function usePools() {
   return useQuery({
     queryKey: queryKeys.pools(),
     queryFn: () => firstValueFrom(centrifuge.pools()),
+    staleTime: POOL_STALE_TIME,
   })
 }
 
@@ -23,6 +26,7 @@ export function usePool(poolId?: PoolId, options?: Options) {
     queryKey: queryKeys.pool(poolId?.toString() ?? ''),
     queryFn: () => firstValueFrom(centrifuge.pool(poolId!)),
     enabled: !!poolId && enabled,
+    staleTime: POOL_STALE_TIME,
   })
 }
 
@@ -34,6 +38,7 @@ export function usePoolDetails(poolId?: PoolId, options?: Options) {
     queryFn: () =>
       firstValueFrom(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))),
     enabled: !!poolId && enabled,
+    staleTime: POOL_STALE_TIME,
   })
 }
 
@@ -50,6 +55,7 @@ export function useAllPoolDetails(poolIds: PoolId[], options?: Options) {
     queryFn: () =>
       firstValueFrom(combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))),
     enabled: !!poolIds?.length && enabled,
+    staleTime: POOL_STALE_TIME,
   })
 }
 
@@ -63,6 +69,7 @@ export function usePoolActiveNetworks(poolId?: PoolId, options?: Options) {
         centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
       ),
     enabled: !!poolId && enabled,
+    staleTime: POOL_STALE_TIME,
   })
 }
 
@@ -73,5 +80,6 @@ export function usePoolNetworks(poolId?: PoolId) {
     queryFn: () =>
       firstValueFrom(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))),
     enabled: !!poolId,
+    staleTime: POOL_STALE_TIME,
   })
 }

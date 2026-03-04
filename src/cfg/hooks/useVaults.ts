@@ -1,11 +1,13 @@
 import type { HexString, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { type Observable, combineLatest } from 'rxjs'
+import { type Observable, combineLatest, firstValueFrom } from 'rxjs'
 import { useQuery } from '@tanstack/react-query'
-import { firstValueFrom } from 'rxjs'
 import type { Investment } from '../types'
 import { useAddress } from './useAddress'
+import { useObservable } from './useObservable'
 import { queryKeys } from './queries/queryKeys'
+
+const VAULT_STALE_TIME = 5 * 60 * 1000 // 5 minutes
 
 interface Options {
   enabled?: boolean
@@ -17,6 +19,7 @@ export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId, option
     queryKey: queryKeys.vaults(poolNetwork?.centrifugeId ?? 0, scId?.toString() ?? ''),
     queryFn: () => firstValueFrom(poolNetwork!.vaults(scId!)),
     enabled: !!poolNetwork && !!scId && enabled,
+    staleTime: VAULT_STALE_TIME,
   })
 }
 
@@ -26,6 +29,7 @@ export function useVaultDetails(vault?: Vault | null, options?: Options) {
     queryKey: queryKeys.vaultDetails(vault?.address ?? ''),
     queryFn: () => firstValueFrom(vault!.details()),
     enabled: !!vault && enabled,
+    staleTime: VAULT_STALE_TIME,
   })
 }
 
@@ -43,18 +47,18 @@ export function useVaultsDetails(vaults?: Vault[], options?: Options) {
     queryKey: queryKeys.vaultsDetails(vaultAddressesKey),
     queryFn: () => firstValueFrom(combineLatest(vaults!.map((v) => v.details()))),
     enabled: !!vaults && vaults.length > 0 && enabled,
+    staleTime: VAULT_STALE_TIME,
   })
 }
 
 export function useInvestment(vault?: Vault, options?: Options) {
   const enabled = options?.enabled ?? true
   const { address } = useAddress()
-  return useQuery({
-    queryKey: queryKeys.investment(vault?.address ?? '', address ?? ''),
-    queryFn: () => firstValueFrom(vault!.investment(address!)),
-    enabled: !!vault && !!address && enabled,
-    refetchInterval: 60000,
-  })
+  const investment$ = useMemo(() => {
+    if (!vault || !address || !enabled) return undefined
+    return vault.investment(address)
+  }, [vault, address, enabled])
+  return useObservable(investment$)
 }
 
 export function createInvestmentsPerVaults$(vaults: Vault[], address: HexString): Observable<Investment[]> {

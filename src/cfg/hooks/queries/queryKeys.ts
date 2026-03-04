@@ -17,6 +17,7 @@ export const queryKeys = {
 
   // Share class keys
   shareClassDetails: (shareClassId: string) => ['shareClassDetails', shareClassId] as const,
+  holdings: (shareClassId: string) => ['holdings', shareClassId] as const,
 
   // Investor keys
   investor: (address: string) => ['investor', address] as const,
