@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useRef, useSyncExternalStore } from 'react'
+import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 
@@ -21,6 +21,20 @@ export function useObservable<T = void>(observable?: Observable<T>, _options?: O
     isSuccess: snapshot.status === 'success',
     isError: snapshot.status === 'error',
     retry,
+  }
+}
+
+export function useObservableWithRefresh<T = void>(observable?: Observable<T>, _options?: ObservableOptions) {
+  const query = useObservable(observable, _options)
+  const [visibleData, setVisibleData] = useState(query.data)
+
+  return {
+    ...query,
+    data: visibleData,
+    hasFreshData: query.data !== visibleData,
+    refresh: () => {
+      setVisibleData(query.data)
+    },
   }
 }
 
