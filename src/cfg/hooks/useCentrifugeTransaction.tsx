@@ -23,6 +23,9 @@ export function useCentrifugeTransaction() {
   })
 
   function invalidateTransactionQueries() {
+    // Clear SDK's memoized observable cache so React Query refetches
+    // get fresh blockchain data instead of stale ReplaySubject values.
+    centrifuge.clearQueryCache()
     queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
     queryClient.invalidateQueries({ queryKey: ['portfolio'] })
     queryClient.invalidateQueries({ queryKey: ['investor'] })
@@ -132,7 +135,6 @@ export function useCentrifugeTransaction() {
             settleError(error)
           },
           complete: () => {
-            // Clean up once the SDK observable completes
             subscription.unsubscribe()
           },
         })

@@ -44,7 +44,7 @@ function RootProviders() {
       environment: isMainnet ? 'mainnet' : 'testnet',
       indexerUrl,
       rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
-      pollingInterval: 60000,
+      disableRepeatOnEvents: true,
     })
   }, [showMainnet])
 
