@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { Balance } from '@centrifuge/sdk'
 import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce, formatBalance } from '@cfg'
-import { balanceToString, divideBalanceByPrice } from '@utils/balance'
+import { balanceToString, divideBalanceByPrice, scaleBalanceDecimals } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
 import { BalanceDisplay, NetworkIcon } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
@@ -46,7 +46,8 @@ export function RedeemAmount({
     (inputStringValue: string, redeemInputAmount?: Balance) => {
       if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) return
 
-      const calculatedReceiveAmount = balanceToString(redeemInputAmount.mul(pricePerShare))
+      const assetDecimals = vaultDetails?.asset.decimals ?? 6
+      const calculatedReceiveAmount = balanceToString(scaleBalanceDecimals(redeemInputAmount.mul(pricePerShare), assetDecimals))
       setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
@@ -71,10 +72,11 @@ export function RedeemAmount({
   const setMaxRedeemAmount = useCallback(() => {
     if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
 
-    const calculatedReceiveAmount = balanceToString(maxRedeemBalance.mul(pricePerShare))
+    const assetDecimals = vaultDetails?.asset.decimals ?? 6
+    const calculatedReceiveAmount = balanceToString(scaleBalanceDecimals(maxRedeemBalance.mul(pricePerShare), assetDecimals))
 
-    setValue('redeemAmount', maxRedeemAmount)
-    setValue('receiveAmount', calculatedReceiveAmount)
+    setValue('redeemAmount', maxRedeemAmount, { shouldValidate: true })
+    setValue('receiveAmount', calculatedReceiveAmount, { shouldValidate: true })
   }, [maxRedeemAmount, pricePerShare])
 
   return (
