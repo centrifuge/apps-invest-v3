@@ -60,7 +60,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   const accessDeRwaPoolRows = useMemo(() => filterByAccess(deRwaPoolRows, accessData), [deRwaPoolRows, accessData])
 
   const deRwaHeading = {
-    label: 'Secondary Markets',
+    label: 'DeRWA',
     subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
   }
 
@@ -85,7 +85,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
         >
-          Your Positions
+          Access & Positions
         </Tabs.Trigger>
         <Tabs.Trigger
           value={POOL_TABLE_TABS.funds}
