@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { firstValueFrom } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
 import { queryKeys } from './queries/queryKeys'
+import { firstValueWithTimeout } from './utils'
 
 export interface Blockchain {
   explorer: string | null
@@ -17,7 +17,7 @@ export function useBlockchains() {
   const centrifuge = useCentrifuge()
   return useQuery({
     queryKey: queryKeys.blockchains(),
-    queryFn: () => firstValueFrom(centrifuge.blockchains()),
+    queryFn: () => firstValueWithTimeout(centrifuge.blockchains()),
     staleTime: Infinity,
   })
 }

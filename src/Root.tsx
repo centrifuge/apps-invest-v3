@@ -80,14 +80,27 @@ function RootProviders() {
   )
 }
 
-// Remove all queries when the connected wallet address changes
+// Remove user-specific queries when the connected wallet address changes.
+// Funds pools, blockchain, and vault data is not wallet-dependent and is preserved.
+const USER_QUERY_KEYS = [
+  'investment',
+  'holdings',
+  'investor',
+  'portfolio',
+  'isMember',
+  'investmentsPerVaults',
+  'poolsAccessStatus',
+]
+
 function WalletInvalidator() {
   const { address } = useAddress()
   const prevAddressRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
     if (prevAddressRef.current !== address) {
-      queryClient.removeQueries()
+      queryClient.removeQueries({
+        predicate: (query) => USER_QUERY_KEYS.includes(query.queryKey[0] as string),
+      })
     }
     prevAddressRef.current = address
   }, [address])

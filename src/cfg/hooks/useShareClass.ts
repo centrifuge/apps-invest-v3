@@ -1,7 +1,7 @@
 import { ShareClass } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
-import { firstValueFrom } from 'rxjs'
 import { queryKeys } from './queries/queryKeys'
+import { firstValueWithTimeout } from './utils'
 
 const HOLDINGS_REFETCH_INTERVAL = 60_000
 
@@ -9,9 +9,10 @@ export function useHoldings(shareClass?: ShareClass, options?: { enabled?: boole
   const enabled = options?.enabled ?? true
   return useQuery({
     queryKey: queryKeys.holdings(shareClass?.id?.toString() ?? ''),
-    queryFn: () => firstValueFrom(shareClass!.balances()),
+    queryFn: () => firstValueWithTimeout(shareClass!.balances()),
     enabled: !!shareClass && enabled,
     refetchInterval: HOLDINGS_REFETCH_INTERVAL,
+    refetchIntervalInBackground: false,
   })
 }
 
@@ -19,7 +20,7 @@ export function useShareClassDetails(shareClass: ShareClass | undefined, options
   const enabled = options?.enabled ?? true
   return useQuery({
     queryKey: queryKeys.shareClassDetails(shareClass?.id?.toString() ?? ''),
-    queryFn: () => firstValueFrom(shareClass!.details()),
+    queryFn: () => firstValueWithTimeout(shareClass!.details()),
     enabled: !!shareClass && enabled,
   })
 }

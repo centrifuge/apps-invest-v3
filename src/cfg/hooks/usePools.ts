@@ -1,8 +1,9 @@
 import { PoolId } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
-import { combineLatest, firstValueFrom, of, switchMap } from 'rxjs'
+import { combineLatest, of, switchMap } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
 import { queryKeys } from './queries/queryKeys'
+import { firstValueWithTimeout } from './utils'
 
 const POOL_STALE_TIME = 5 * 60 * 1000 // 5 minutes
 
@@ -14,7 +15,7 @@ export function usePools() {
   const centrifuge = useCentrifuge()
   return useQuery({
     queryKey: queryKeys.pools(),
-    queryFn: () => firstValueFrom(centrifuge.pools()),
+    queryFn: () => firstValueWithTimeout(centrifuge.pools()),
     staleTime: POOL_STALE_TIME,
   })
 }
@@ -24,7 +25,7 @@ export function usePool(poolId?: PoolId, options?: Options) {
   const enabled = options?.enabled ?? true
   return useQuery({
     queryKey: queryKeys.pool(poolId?.toString() ?? ''),
-    queryFn: () => firstValueFrom(centrifuge.pool(poolId!)),
+    queryFn: () => firstValueWithTimeout(centrifuge.pool(poolId!)),
     enabled: !!poolId && enabled,
     staleTime: POOL_STALE_TIME,
   })
@@ -36,7 +37,7 @@ export function usePoolDetails(poolId?: PoolId, options?: Options) {
   return useQuery({
     queryKey: queryKeys.poolDetails(poolId?.toString() ?? ''),
     queryFn: () =>
-      firstValueFrom(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))),
+      firstValueWithTimeout(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))),
     enabled: !!poolId && enabled,
     staleTime: POOL_STALE_TIME,
   })
@@ -53,7 +54,7 @@ export function useAllPoolDetails(poolIds: PoolId[], options?: Options) {
   return useQuery({
     queryKey: queryKeys.allPoolDetails(poolIdsKey),
     queryFn: () =>
-      firstValueFrom(combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))),
+      firstValueWithTimeout(combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))),
     enabled: !!poolIds?.length && enabled,
     staleTime: POOL_STALE_TIME,
   })
@@ -65,7 +66,7 @@ export function usePoolActiveNetworks(poolId?: PoolId, options?: Options) {
   return useQuery({
     queryKey: queryKeys.poolActiveNetworks(poolId?.toString() ?? ''),
     queryFn: () =>
-      firstValueFrom(
+      firstValueWithTimeout(
         centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
       ),
     enabled: !!poolId && enabled,
@@ -78,7 +79,7 @@ export function usePoolNetworks(poolId?: PoolId) {
   return useQuery({
     queryKey: queryKeys.poolNetworks(poolId?.toString() ?? ''),
     queryFn: () =>
-      firstValueFrom(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))),
+      firstValueWithTimeout(centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))),
     enabled: !!poolId,
     staleTime: POOL_STALE_TIME,
   })
