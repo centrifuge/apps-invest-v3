@@ -47,7 +47,9 @@ export function RedeemAmount({
       if (!inputStringValue || inputStringValue === '0' || !redeemInputAmount || !pricePerShare) return
 
       const assetDecimals = vaultDetails?.asset.decimals ?? 6
-      const calculatedReceiveAmount = balanceToString(scaleBalanceDecimals(redeemInputAmount.mul(pricePerShare), assetDecimals))
+      const calculatedReceiveAmount = balanceToString(
+        scaleBalanceDecimals(redeemInputAmount.mul(pricePerShare), assetDecimals)
+      )
       setValue('receiveAmount', calculatedReceiveAmount)
     },
     [pricePerShare]
@@ -73,7 +75,9 @@ export function RedeemAmount({
     if (!maxRedeemAmount || !pricePerShare || !hasRedeemableShares || maxRedeemBalance === 0) return
 
     const assetDecimals = vaultDetails?.asset.decimals ?? 6
-    const calculatedReceiveAmount = balanceToString(scaleBalanceDecimals(maxRedeemBalance.mul(pricePerShare), assetDecimals))
+    const calculatedReceiveAmount = balanceToString(
+      scaleBalanceDecimals(maxRedeemBalance.mul(pricePerShare), assetDecimals)
+    )
 
     setValue('redeemAmount', maxRedeemAmount, { shouldValidate: true })
     setValue('receiveAmount', calculatedReceiveAmount, { shouldValidate: true })

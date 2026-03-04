@@ -17,8 +17,7 @@ export function useInvestmentsPerVaultsQuery(vaults?: Vault[]) {
 
   return useQuery({
     queryKey: investmentsPerVaultsQueryKey(vaultAddressesKey),
-    queryFn: () =>
-      firstValueFrom(combineLatest(vaults!.map((v) => v.investment(address! as HexString)))),
+    queryFn: () => firstValueFrom(combineLatest(vaults!.map((v) => v.investment(address! as HexString)))),
     enabled: !!address && !!vaults && vaults.length > 0,
     placeholderData: [] as Investment[],
     staleTime: 60000,
