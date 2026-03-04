@@ -109,6 +109,13 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isDeRwa: false,
     isRestricted: false,
   },
+  '281474976711006': {
+    name: 'poduction coin one',
+    isProduction: false,
+    isRwa: true,
+    isDeRwa: false,
+    isRestricted: false,
+  },
 
   // ===== Test deRWA Pools =====
   '562949953421313': {

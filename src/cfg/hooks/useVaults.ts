@@ -4,7 +4,6 @@ import { type Observable, combineLatest } from 'rxjs'
 import { useQuery } from '@tanstack/react-query'
 import { firstValueFrom } from 'rxjs'
 import type { Investment } from '../types'
-import { useObservable } from './useObservable'
 import { useAddress } from './useAddress'
 import { queryKeys } from './queries/queryKeys'
 
@@ -50,11 +49,12 @@ export function useVaultsDetails(vaults?: Vault[], options?: Options) {
 export function useInvestment(vault?: Vault, options?: Options) {
   const enabled = options?.enabled ?? true
   const { address } = useAddress()
-  const investment$ = useMemo(
-    () => (vault && address && enabled ? vault.investment(address) : undefined),
-    [vault?.address, address, enabled]
-  )
-  return useObservable(investment$)
+  return useQuery({
+    queryKey: queryKeys.investment(vault?.address ?? '', address ?? ''),
+    queryFn: () => firstValueFrom(vault!.investment(address!)),
+    enabled: !!vault && !!address && enabled,
+    refetchInterval: 60000,
+  })
 }
 
 export function createInvestmentsPerVaults$(vaults: Vault[], address: HexString): Observable<Investment[]> {

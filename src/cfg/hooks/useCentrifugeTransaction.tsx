@@ -50,6 +50,7 @@ export function useCentrifugeTransaction() {
                 // Centralized cache invalidation after any successful transaction.
                 // Only add queries here that need to be refetched after any transaction.
                 // Avoid adding queries that can be refetched by specific components to prevent unnecessary refetches.
+                queryClient.invalidateQueries({ queryKey: ['investment'] })
                 queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
                 queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
                 queryClient.invalidateQueries({ queryKey: ['portfolio'] })
