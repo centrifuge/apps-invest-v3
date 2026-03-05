@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
@@ -6,6 +6,7 @@ import {
   CentrifugeProvider,
   DebugFlags,
   TransactionProvider,
+  useAddress,
   useDebugFlags,
   ALL_CHAINS,
   MAINNET_RPC_URLS,
@@ -14,9 +15,15 @@ import {
 import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
-import { VaultsProvider } from '@contexts/VaultsContext'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 600000,
+      gcTime: 600000,
+    },
+  },
+})
 
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
@@ -37,7 +44,7 @@ function RootProviders() {
       environment: isMainnet ? 'mainnet' : 'testnet',
       indexerUrl,
       rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
-      pollingInterval: 60000,
+      disableRepeatOnEvents: true,
     })
   }, [showMainnet])
 
@@ -46,29 +53,59 @@ function RootProviders() {
    * because AppKit cannot dynamically update networks after initialization.
    * The actual environment switching (mainnet vs testnet) is handled by the Centrifuge SDK above.
    *
-   * IMPORTANT: We use static chain imports from wagmi/chains (ALL_CHAINS) instead of
-   * creating and importing from extra Centrifuge SDK instances (getChainConfig()), as each
-   * instance creates its own viem publicClient per chain with independent event watchers and polling,
-   * which would multiply RPC requests unnecessarily.
+   * ALL_CHAINS is built from the static `chains` export of @centrifuge/sdk — a plain array
+   * of chain definition objects, equivalent to importing from viem/chains. No SDK instance
+   * is created here, so there are no extra publicClients, event watchers, or polling.
    */
 
   return (
     <QueryClientProvider client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider projectId={import.meta.env.VITE_REOWN_APP_ID!} networks={ALL_CHAINS}>
+        <WalletProvider
+          projectId={import.meta.env.VITE_REOWN_APP_ID!}
+          networks={ALL_CHAINS}
+          rpcUrls={{ ...MAINNET_RPC_URLS, ...TESTNET_RPC_URLS }}
+        >
+          <WalletInvalidator />
           <TransactionProvider>
             <PoolProvider>
-              <VaultsProvider>
-                <LoadingProvider>
-                  <Outlet />
-                </LoadingProvider>
-              </VaultsProvider>
+              <LoadingProvider>
+                <Outlet />
+              </LoadingProvider>
             </PoolProvider>
           </TransactionProvider>
         </WalletProvider>
       </CentrifugeProvider>
     </QueryClientProvider>
   )
+}
+
+// Remove user-specific queries when the connected wallet address changes.
+// Funds pools, blockchain, and vault data is not wallet-dependent and is preserved.
+const USER_QUERY_KEYS = [
+  'investment',
+  'holdings',
+  'investor',
+  'portfolio',
+  'isMember',
+  'investmentsPerVaults',
+  'poolsAccessStatus',
+]
+
+function WalletInvalidator() {
+  const { address } = useAddress()
+  const prevAddressRef = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (prevAddressRef.current !== address) {
+      queryClient.removeQueries({
+        predicate: (query) => USER_QUERY_KEYS.includes(query.queryKey[0] as string),
+      })
+    }
+    prevAddressRef.current = address
+  }, [address])
+
+  return null
 }
 
 export default function Root() {

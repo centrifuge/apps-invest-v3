@@ -28,15 +28,12 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
 
   const formattedMaxInvestAmount = useMemo(() => {
     if (!portfolioBalance) return '0'
-    return formatBalance(portfolioBalance, investment?.asset.symbol, 0)
+    return formatBalance(portfolioBalance, { currency: investment?.asset.symbol, precision: 0 })
   }, [portfolioBalance])
 
   function invest(amount: Balance) {
-    if (investment?.isSyncDeposit) {
-      execute(vault.syncDeposit(amount))
-    } else {
-      execute(vault.asyncDeposit(amount))
-    }
+    const tx = investment?.isSyncDeposit ? vault.syncDeposit(amount) : vault.asyncDeposit(amount)
+    execute(tx)
   }
 
   const schema = z.object({

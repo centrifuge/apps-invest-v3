@@ -1,6 +1,6 @@
 import type { EffectCallback, ReactNode } from 'react'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { Box, Spinner } from '@chakra-ui/react'
+import { Flex, Spinner } from '@chakra-ui/react'
 
 export interface LoadingBoundaryContextValues {
   fallback: ReactNode
@@ -29,9 +29,9 @@ export function LoadingProvider({ children }: LoadingProviderProps) {
   const fallback = isLoading ? (
     <FirstLoadFallback onUnmount={hideLoading} />
   ) : (
-    <Box p={3}>
+    <Flex minH="100vh" alignItems="center" justifyContent="center">
       <Spinner size="lg" colorPalette="black" />
-    </Box>
+    </Flex>
   )
 
   return (

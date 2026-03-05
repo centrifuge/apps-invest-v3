@@ -1,22 +1,29 @@
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { useChainId } from 'wagmi'
 import { Pool, PoolId, PoolNetwork, ShareClassId } from '@centrifuge/sdk'
 import {
+  getNetworkSlug,
   Holdings,
+  isValidNetworkSlug,
+  NetworkSlug,
   PoolDetails,
   ShareClassWithDetails,
+  useBlockchainsMapByCentrifugeId,
   useBlockchainsMapByChainId,
   useHoldings,
   usePool,
   usePoolActiveNetworks,
   usePoolDetails,
-  usePoolsQuery,
+  usePools,
 } from '@cfg'
-import { useParams } from 'react-router-dom'
+import { type ActiveTab, POOL_TABLE_TABS } from '@components/pools/poolTable/types'
 import { getPoolTVL } from '@utils/getPoolTVL'
-import { useChainId } from 'wagmi'
 
 const PoolContext = createContext<
   | {
+      activeHomeTab: ActiveTab
+      assetFromUrl: string | undefined
       connectedChainId: number | undefined
       holdings?: Holdings
       isLoading: boolean
@@ -26,6 +33,7 @@ const PoolContext = createContext<
       isPoolDetailsLoading: boolean
       isHoldingsLoading: boolean
       network: PoolNetwork | undefined
+      networkFromUrl: NetworkSlug | undefined
       networks: PoolNetwork[] | undefined
       pool: Pool | undefined
       poolId: string | undefined
@@ -35,17 +43,20 @@ const PoolContext = createContext<
       selectedPoolId: PoolId | undefined
       shareClass: ShareClassWithDetails | undefined
       shareClassId: ShareClassId | undefined
+      setActiveHomeTab: (tab: ActiveTab) => void
       setSelectedPoolId: (poolId: PoolId) => void
     }
   | undefined
 >(undefined)
 
 export const PoolProvider = ({ children }: { children: ReactNode }) => {
-  const { data: pools, isLoading: isPoolsLoading } = usePoolsQuery()
-  const { data: blockchainsMap } = useBlockchainsMapByChainId()
+  const { data: pools, isLoading: isPoolsLoading } = usePools()
+  const { data: blockchainsMapByChainId } = useBlockchainsMapByChainId()
+  const { data: blockchainsMapByCentrifugeId } = useBlockchainsMapByCentrifugeId()
   const connectedChainId = useChainId()
   const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
+  const [activeHomeTab, setActiveHomeTab] = useState<ActiveTab>(POOL_TABLE_TABS.access)
 
   const { data: pool, isLoading: isPoolLoading } = usePool(selectedPoolId, { enabled: !!selectedPoolId })
 
@@ -56,15 +67,25 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
     enabled: !!selectedPoolId,
   })
 
-  // In MVP we assume one share class per pool
   const shareClass = poolDetails?.shareClasses?.[0]
   const shareClassId = shareClass?.shareClass.id
   const { data: holdings, isLoading: isHoldingsLoading } = useHoldings(shareClass?.shareClass, {
     enabled: !!selectedPoolId,
   })
 
-  const { poolId } = useParams()
+  const { poolId, network: networkParam, asset: assetParam } = useParams()
   const currentPagePoolId = pools?.find((pool) => pool.id.toString() === poolId)?.id
+
+  const networkFromUrl = useMemo((): NetworkSlug | undefined => {
+    if (!networkParam) return undefined
+    const normalizedNetwork = networkParam.toLowerCase()
+    return isValidNetworkSlug(normalizedNetwork) ? normalizedNetwork : undefined
+  }, [networkParam])
+
+  const assetFromUrl = useMemo((): string | undefined => {
+    return assetParam?.toLowerCase()
+  }, [assetParam])
+
   // Checks that both selectedPoolId and network.pool have been updated on pool page load
   const paramsPoolId = BigInt(poolId ?? 0)
   const isPoolDataReady = selectedPoolId?.raw === paramsPoolId && network?.pool.id.raw === paramsPoolId
@@ -72,34 +93,72 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   const poolTVL = getPoolTVL(poolDetails as PoolDetails | undefined)
 
   useEffect(() => {
-    if (networks?.length && connectedChainId && blockchainsMap) {
-      const connectedCentrifugeId = blockchainsMap.get(connectedChainId)?.centrifugeId
-      const currentNetwork = networks.find((n) => n.centrifugeId === connectedCentrifugeId)
-      if (currentNetwork && currentNetwork !== network) {
-        setNetwork(currentNetwork)
+    if (!networks?.length) return
+
+    // Match by URL slug: centrifugeId → (blockchains map) → chainId → (getNetworkSlug) → slug
+    if (networkFromUrl && blockchainsMapByCentrifugeId) {
+      const matchingNetwork = networks.find((n) => {
+        const blockchain = blockchainsMapByCentrifugeId.get(n.centrifugeId)
+        if (!blockchain) return false
+        return getNetworkSlug(blockchain.chainId) === networkFromUrl
+      })
+      if (matchingNetwork) {
+        if (matchingNetwork.centrifugeId !== network?.centrifugeId) {
+          setNetwork(matchingNetwork)
+        }
+        return
       }
     }
-  }, [networks, connectedChainId, blockchainsMap, network])
 
-  // Use a ref to track if we've already set the initial pool ID
-  const hasSetInitialPoolRef = useRef(false)
+    if (connectedChainId && blockchainsMapByChainId) {
+      const connectedCentrifugeId = blockchainsMapByChainId.get(connectedChainId)?.centrifugeId
+      const connectedNetwork = networks.find((n) => n.centrifugeId === connectedCentrifugeId)
+      if (connectedNetwork && connectedNetwork.centrifugeId !== network?.centrifugeId) {
+        setNetwork(connectedNetwork)
+        return
+      }
+    }
+
+    if (!network && networks[0]) {
+      setNetwork(networks[0])
+    }
+  }, [
+    networks,
+    networkFromUrl,
+    connectedChainId,
+    blockchainsMapByChainId,
+    blockchainsMapByCentrifugeId,
+    network?.centrifugeId,
+  ])
+
+  // Track the last poolId from URL to detect navigation between pools
+  const lastPoolIdRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
-    if (!isPoolsLoading && !!pools) {
-      if (pools?.length && !hasSetInitialPoolRef.current) {
-        setSelectedPoolId(currentPagePoolId ?? pools[0].id)
-        hasSetInitialPoolRef.current = true
-      } else {
-        hasSetInitialPoolRef.current = false
+    if (!isPoolsLoading && pools?.length && poolId) {
+      const poolIdChanged = poolId !== lastPoolIdRef.current
+
+      if (poolIdChanged) {
+        setNetwork(undefined)
+        lastPoolIdRef.current = poolId
+      }
+
+      const urlPoolId = currentPagePoolId
+      if (urlPoolId && selectedPoolId?.raw !== urlPoolId.raw) {
+        setSelectedPoolId(urlPoolId)
+      } else if (!selectedPoolId && pools[0]) {
+        setSelectedPoolId(pools[0].id)
       }
     }
-  }, [pools])
+  }, [pools, isPoolsLoading, poolId, currentPagePoolId, selectedPoolId?.raw])
 
   const isLoading = isPoolsLoading || isHoldingsLoading || isPoolLoading || isPoolDetailsLoading || isNetworksLoading
 
   return (
     <PoolContext.Provider
       value={{
+        activeHomeTab,
+        assetFromUrl,
         connectedChainId,
         holdings,
         isHoldingsLoading,
@@ -109,6 +168,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
         isNetworksLoading,
         isPoolDetailsLoading,
         network,
+        networkFromUrl,
         networks,
         pool,
         poolId,
@@ -118,6 +178,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
         selectedPoolId,
         shareClass,
         shareClassId,
+        setActiveHomeTab,
         setSelectedPoolId,
       }}
     >

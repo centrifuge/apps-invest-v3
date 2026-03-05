@@ -19,7 +19,7 @@ export function useGetPendingInvestments() {
     }
 
     const sharesBalance = divideBalanceByPrice(investment.pendingDepositAssets, pricePerShare)
-    return formatBalance(sharesBalance, '', 2)
+    return formatBalance(sharesBalance, { precision: 2 })
   }, [investment?.pendingDepositAssets, pricePerShare])
 
   const calculatedRedeemAmountEstimate = useMemo(() => {
@@ -27,7 +27,7 @@ export function useGetPendingInvestments() {
       return undefined
     }
 
-    return formatBalance(investment.pendingRedeemShares.mul(pricePerShare))
+    return formatBalance(investment.pendingRedeemShares.mul(pricePerShare), {})
   }, [])
 
   return {

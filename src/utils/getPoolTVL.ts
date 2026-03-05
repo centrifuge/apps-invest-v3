@@ -10,5 +10,5 @@ export function getPoolTVL(poolDetails: PoolDetails | undefined): string {
       return acc.add(tvl)
     }, zeroBalance) ?? zeroBalance
 
-  return formatBalance(poolTvlBalance, '', 0)
+  return formatBalance(poolTvlBalance, { precision: 0 })
 }

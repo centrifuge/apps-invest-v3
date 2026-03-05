@@ -1,33 +1,23 @@
-import { useAddress, useBlockchainsMapByChainId } from '@cfg'
+import { useAddress, useBlockchainsMapByChainId, ALL_CHAINS } from '@cfg'
 import { NetworkIcon } from '@ui'
-import { Button, Menu, Stack, Text } from '@chakra-ui/react'
+import { Button, Stack, Text } from '@chakra-ui/react'
 import { useAppKit } from '@reown/appkit/react'
+import { useAppKitNetwork } from '@reown/appkit/react'
 import type { ReactNode } from 'react'
-import { useChains, useSwitchChain } from 'wagmi'
 
 type Props = {
-  networks?: number[]
+  chainId: number
   children: ReactNode
   message?: string
 }
 
-export function ConnectionGuard({ networks, children, message = 'Unsupported network.' }: Props) {
-  const { switchChain } = useSwitchChain()
-  const chains = useChains()
+export function ConnectionGuard({ chainId, children, message = 'Unsupported network.' }: Props) {
+  const { switchNetwork } = useAppKitNetwork()
   const { open } = useAppKit()
-  const { isConnected, chainId } = useAddress()
+  const { isConnected, chainId: connectedChainId } = useAddress()
   const { data: blockchainsMap } = useBlockchainsMapByChainId()
 
-  function getName(chainId: number) {
-    const chain = chains.find((c) => c.id === chainId)
-    return chain?.name || chainId.toString()
-  }
-
-  function getCentrifugeId(chainId: number) {
-    return blockchainsMap?.get(chainId)?.centrifugeId
-  }
-
-  if (!isConnected || !chainId) {
+  if (!isConnected || !connectedChainId) {
     return (
       <Stack gap={2}>
         <Text>Connect to continue</Text>
@@ -36,38 +26,28 @@ export function ConnectionGuard({ networks, children, message = 'Unsupported net
     )
   }
 
-  if (!networks || networks.includes(chainId)) {
+  if (connectedChainId === chainId) {
     return <>{children}</>
+  }
+
+  const blockchain = blockchainsMap?.get(chainId)
+  const networkName = blockchain?.name ?? String(chainId)
+  const centrifugeId = blockchain?.centrifugeId
+
+  const handleSwitch = () => {
+    const targetNetwork = ALL_CHAINS.find((c) => Number(c.id) === chainId)
+    if (targetNetwork) {
+      switchNetwork(targetNetwork)
+    }
   }
 
   return (
     <Stack gap={2}>
       <Text>{message}</Text>
-      {networks.length === 1 ? (
-        <Button onClick={() => switchChain({ chainId: networks[0] })}>Switch to {getName(networks[0])}</Button>
-      ) : (
-        <Menu.Root positioning={{ placement: 'bottom-start' }}>
-          <Menu.Trigger asChild>
-            <Button>Switch network</Button>
-          </Menu.Trigger>
-          <Menu.Positioner>
-            <Menu.Content>
-              {networks.map((network) => (
-                <Menu.Item
-                  key={network}
-                  value={String(network)}
-                  onClick={() => {
-                    switchChain({ chainId: network })
-                  }}
-                >
-                  <NetworkIcon centrifugeId={getCentrifugeId(network)} />
-                  {getName(network)}
-                </Menu.Item>
-              ))}
-            </Menu.Content>
-          </Menu.Positioner>
-        </Menu.Root>
-      )}
+      <Button onClick={handleSwitch} borderRadius="3xl">
+        <NetworkIcon centrifugeId={centrifugeId} />
+        Switch to {networkName}
+      </Button>
     </Stack>
   )
 }

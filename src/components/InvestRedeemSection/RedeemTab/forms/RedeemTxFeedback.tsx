@@ -10,9 +10,9 @@ import { IoClose } from 'react-icons/io5'
 import { IoMdInformationCircleOutline, IoMdTimer } from 'react-icons/io'
 import { useTxStateFeedback } from '@components/InvestRedeemSection/hooks/useTxStateFeedback'
 import { StepIndicator } from '@components/elements/StepIndicator'
+import { useVaultsContext } from '@contexts/VaultsContext'
 
 interface CancelRedeemProps {
-  currencies: { redeemCurrency: string; receiveCurrency: string }
   isDisabled: boolean
   parsedRedeemAmount: 0 | Balance
   parsedReceiveAmount: 0 | Balance
@@ -20,14 +20,16 @@ interface CancelRedeemProps {
 }
 
 export function RedeemTxFeedback({
-  currencies: { redeemCurrency, receiveCurrency },
   isDisabled,
   parsedRedeemAmount,
   parsedReceiveAmount,
   setActionType,
 }: CancelRedeemProps) {
+  const { investment } = useVaultsContext()
   const { txState, resetTxState, isTxInProgress } = useTxStateFeedback({ type: 'redeem' })
   const { reset } = useFormContext()
+  const redeemCurrencySymbol = investment?.share.symbol ?? ''
+  const receiveCurrencySymbol = investment?.asset.symbol ?? ''
 
   const handleClose = () => {
     setActionType(RedeemAction.REDEEM_AMOUNT)
@@ -61,7 +63,7 @@ export function RedeemTxFeedback({
             Redeeming
           </Text>
           <Text fontSize="md" whiteSpace="normal" wordWrap="break-word" textAlign="right">
-            <BalanceDisplay as="span" balance={parsedRedeemAmount} currency={redeemCurrency} />
+            <BalanceDisplay as="span" balance={parsedRedeemAmount} currency={redeemCurrencySymbol} />
           </Text>
         </Flex>
         <Flex mt={4} justify="space-between">
@@ -95,7 +97,7 @@ export function RedeemTxFeedback({
             </Flex>
           </Tooltip>
           <Text fontSize="md" whiteSpace="normal" wordWrap="break-word" textAlign="right">
-            <BalanceDisplay as="span" balance={parsedReceiveAmount} currency={receiveCurrency} />
+            <BalanceDisplay as="span" balance={parsedReceiveAmount} currency={receiveCurrencySymbol} />
           </Text>
         </Flex>
       </Box>

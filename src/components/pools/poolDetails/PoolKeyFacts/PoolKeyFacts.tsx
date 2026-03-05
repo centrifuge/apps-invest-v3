@@ -28,12 +28,14 @@ export function PoolKeyFacts() {
         <Grid templateColumns={{ base: '1fr', md: '1fr 5fr' }} gap={2}>
           <Flex justifyContent="flex-start" alignItems="center" gap={2} flexDirection={{ base: 'column', md: 'row' }}>
             <Box width={20} mb={{ base: 2, md: 0 }}>
-              <Image
-                src={ipfsToHttp(metadata?.pool.issuer.logo?.uri ?? '', pinataGateway)}
-                alt={metadata?.pool.issuer.name}
-                height="2rem"
-                fit="contain"
-              />
+              {metadata?.pool.issuer.logo?.uri && (
+                <Image
+                  src={ipfsToHttp(metadata.pool.issuer.logo.uri, pinataGateway)}
+                  alt={metadata?.pool.issuer.name}
+                  height="2rem"
+                  fit="contain"
+                />
+              )}
             </Box>
           </Flex>
 

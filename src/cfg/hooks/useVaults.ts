@@ -1,8 +1,13 @@
-import type { PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
+import type { HexString, PoolNetwork, ShareClassId, Vault } from '@centrifuge/sdk'
 import { useMemo } from 'react'
-import { combineLatest, of } from 'rxjs'
-import { useObservable } from './useObservable'
+import { combineLatest } from 'rxjs'
+import { useQuery } from '@tanstack/react-query'
 import { useAddress } from './useAddress'
+import { queryKeys } from './queries/queryKeys'
+import { firstValueWithTimeout } from './utils'
+
+const VAULT_STALE_TIME = 5 * 60 * 1000 // 5 minutes
+const INVESTMENT_REFETCH_INTERVAL = 60_000
 
 interface Options {
   enabled?: boolean
@@ -10,49 +15,51 @@ interface Options {
 
 export function useVaults(poolNetwork?: PoolNetwork, scId?: ShareClassId, options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaults$ = useMemo(() => {
-    if (!poolNetwork || !scId || !enabled) return undefined
-    return poolNetwork.vaults(scId)
-  }, [poolNetwork?.centrifugeId, scId?.toString(), enabled])
-  return useObservable(vaults$)
+  return useQuery({
+    queryKey: queryKeys.vaults(poolNetwork?.centrifugeId ?? 0, scId?.toString() ?? ''),
+    queryFn: () => firstValueWithTimeout(poolNetwork!.vaults(scId!)),
+    enabled: !!poolNetwork && !!scId && enabled,
+    staleTime: VAULT_STALE_TIME,
+  })
 }
 
 export function useVaultDetails(vault?: Vault | null, options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaultDetails$ = useMemo(() => (vault && enabled ? vault.details() : undefined), [vault?.address, enabled])
-  return useObservable(vaultDetails$)
+  return useQuery({
+    queryKey: queryKeys.vaultDetails(vault?.address ?? ''),
+    queryFn: () => firstValueWithTimeout(vault!.details()),
+    enabled: !!vault && enabled,
+    staleTime: VAULT_STALE_TIME,
+  })
 }
 
 export function useVaultsDetails(vaults?: Vault[], options?: Options) {
   const enabled = options?.enabled ?? true
-  const vaultsDetails$ = useMemo(() => {
-    if (!vaults || vaults.length === 0 || !enabled) return undefined
-    const vaultDetails$ = vaults.map((vault) => vault.details())
-    return combineLatest(vaultDetails$)
-  }, [vaults, enabled])
-
-  return useObservable(vaultsDetails$)
+  const vaultAddressesKey = useMemo(
+    () =>
+      vaults
+        ?.map((v) => v.address)
+        .sort()
+        .join(',') ?? '',
+    [vaults]
+  )
+  return useQuery({
+    queryKey: queryKeys.vaultsDetails(vaultAddressesKey),
+    queryFn: () => firstValueWithTimeout(combineLatest(vaults!.map((v) => v.details()))),
+    enabled: !!vaults && vaults.length > 0 && enabled,
+    staleTime: VAULT_STALE_TIME,
+  })
 }
 
 export function useInvestment(vault?: Vault, options?: Options) {
   const enabled = options?.enabled ?? true
   const { address } = useAddress()
-  const investment$ = useMemo(
-    () => (vault && address && enabled ? vault.investment(address) : undefined),
-    [vault?.address, address, enabled]
-  )
-  return useObservable(investment$)
-}
-
-export function useInvestmentsPerVaults(vaults?: Vault[], options?: Options) {
-  const enabled = options?.enabled ?? true
-  const { address } = useAddress()
-  const investmentsPerVaults$ = useMemo(() => {
-    if (!vaults || !vaults.length || !address || !enabled) return of([])
-
-    const investment$ = vaults.map((vault) => vault.investment(address))
-    return combineLatest(investment$)
-  }, [vaults, address, enabled])
-
-  return useObservable(investmentsPerVaults$)
+  return useQuery({
+    queryKey: queryKeys.investment(vault?.address ?? '', address ?? ''),
+    queryFn: () => firstValueWithTimeout(vault!.investment(address! as HexString)),
+    enabled: !!vault && !!address && enabled,
+    staleTime: 0,
+    refetchInterval: INVESTMENT_REFETCH_INTERVAL,
+    refetchIntervalInBackground: false,
+  })
 }

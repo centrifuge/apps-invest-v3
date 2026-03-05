@@ -12,6 +12,7 @@ import PlumeLogo from '../assets/logos/plume.svg'
 export interface WalletProviderProps {
   projectId: string
   networks: AppKitNetwork[]
+  rpcUrls?: Record<number, string[]>
   children: ReactNode
 }
 
@@ -30,13 +31,23 @@ const adapterCache = new Map<string, WagmiAdapter>()
  * - Wagmi config changes cause disconnect: https://github.com/rainbow-me/rainbowkit/issues/1839
  * - AppKit reconnection after reload: https://github.com/reown-com/appkit/issues/3223
  */
-function getOrCreateAdapter(projectId: string, networks: AppKitNetwork[]): WagmiAdapter {
+function getOrCreateAdapter(
+  projectId: string,
+  networks: AppKitNetwork[],
+  rpcUrls?: Record<number, string[]>
+): WagmiAdapter {
   const cacheKey = `${projectId}-${networks.map((n) => n.id).join(',')}`
 
   if (!adapterCache.has(cacheKey)) {
     const connectors = [safe({ allowedDomains: [/app\.safe\.global$/, /gnosis-safe\.io$/] }), injected()]
 
-    const transports = Object.fromEntries(networks.map((chain) => [chain.id, http()]))
+    const transports = Object.fromEntries(
+      networks.map((chain) => {
+        const chainId = Number(chain.id)
+        const urls = rpcUrls?.[chainId]
+        return [chainId, urls?.[0] ? http(urls[0]) : http()]
+      })
+    )
 
     const adapter = new WagmiAdapter({
       networks,
@@ -87,12 +98,12 @@ function getOrCreateAdapter(projectId: string, networks: AppKitNetwork[]): Wagmi
   return adapterCache.get(cacheKey)!
 }
 
-export function WalletProvider({ projectId, networks, children }: WalletProviderProps) {
+export function WalletProvider({ projectId, networks, rpcUrls, children }: WalletProviderProps) {
   if (networks.length === 0) {
     throw new Error('Networks array cannot be empty')
   }
 
-  const wagmiAdapter = getOrCreateAdapter(projectId, networks)
+  const wagmiAdapter = getOrCreateAdapter(projectId, networks, rpcUrls)
 
   return <WagmiProvider config={wagmiAdapter.wagmiConfig}>{children}</WagmiProvider>
 }

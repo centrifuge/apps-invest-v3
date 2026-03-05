@@ -1,8 +1,11 @@
 import { PoolId } from '@centrifuge/sdk'
-import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { combineLatest, of, switchMap } from 'rxjs'
-import { useObservable } from './useObservable'
 import { useCentrifuge } from './CentrifugeContext'
+import { queryKeys } from './queries/queryKeys'
+import { firstValueWithTimeout } from './utils'
+
+const POOL_STALE_TIME = 5 * 60 * 1000 // 5 minutes
 
 interface Options {
   enabled?: boolean
@@ -10,72 +13,80 @@ interface Options {
 
 export function usePools() {
   const centrifuge = useCentrifuge()
-
-  const pools$ = useMemo(() => {
-    return centrifuge.pools()
-  }, [centrifuge])
-
-  return useObservable(pools$)
+  return useQuery({
+    queryKey: queryKeys.pools(),
+    queryFn: () => firstValueWithTimeout(centrifuge.pools()),
+    staleTime: POOL_STALE_TIME,
+  })
 }
 
 export function usePool(poolId?: PoolId, options?: Options) {
   const centrifuge = useCentrifuge()
   const enabled = options?.enabled ?? true
-  const pool$ = useMemo(() => {
-    if (!poolId || !enabled) return undefined
-    return centrifuge.pool(poolId)
-  }, [poolId?.toString(), enabled])
-
-  return useObservable(pool$)
+  return useQuery({
+    queryKey: queryKeys.pool(poolId?.toString() ?? ''),
+    queryFn: () => firstValueWithTimeout(centrifuge.pool(poolId!)),
+    enabled: !!poolId && enabled,
+    staleTime: POOL_STALE_TIME,
+  })
 }
 
 export function usePoolDetails(poolId?: PoolId, options?: Options) {
   const centrifuge = useCentrifuge()
   const enabled = options?.enabled ?? true
-
-  const details$ = useMemo(() => {
-    if (!enabled || !poolId) return undefined
-    return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))
-  }, [poolId?.toString(), centrifuge, enabled])
-
-  return useObservable(details$)
+  return useQuery({
+    queryKey: queryKeys.poolDetails(poolId?.toString() ?? ''),
+    queryFn: () =>
+      firstValueWithTimeout(
+        centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.details() : of(undefined))))
+      ),
+    enabled: !!poolId && enabled,
+    staleTime: POOL_STALE_TIME,
+  })
 }
 
 export function useAllPoolDetails(poolIds: PoolId[], options?: Options) {
   const centrifuge = useCentrifuge()
   const enabled = options?.enabled ?? true
-
-  const details$ = useMemo(() => {
-    if (!enabled || !poolIds?.length) {
-      return of([])
-    }
-
-    const poolDetailObservables$ = poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details())))
-
-    return combineLatest(poolDetailObservables$)
-  }, [poolIds, centrifuge, enabled])
-
-  return useObservable(details$)
+  const poolIdsKey =
+    poolIds
+      ?.map((id) => id.toString())
+      .sort()
+      .join(',') ?? ''
+  return useQuery({
+    queryKey: queryKeys.allPoolDetails(poolIdsKey),
+    queryFn: () =>
+      firstValueWithTimeout(
+        combineLatest(poolIds.map((id) => centrifuge.pool(id).pipe(switchMap((pool) => pool.details()))))
+      ),
+    enabled: !!poolIds?.length && enabled,
+    staleTime: POOL_STALE_TIME,
+  })
 }
 
 export function usePoolActiveNetworks(poolId?: PoolId, options?: Options) {
   const centrifuge = useCentrifuge()
   const enabled = options?.enabled ?? true
-
-  const vaults$ = useMemo(() => {
-    if (!enabled || !poolId) return undefined
-    return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
-  }, [poolId?.toString(), centrifuge])
-
-  return useObservable(vaults$)
+  return useQuery({
+    queryKey: queryKeys.poolActiveNetworks(poolId?.toString() ?? ''),
+    queryFn: () =>
+      firstValueWithTimeout(
+        centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.activeNetworks() : of(undefined))))
+      ),
+    enabled: !!poolId && enabled,
+    staleTime: POOL_STALE_TIME,
+  })
 }
 
 export function usePoolNetworks(poolId?: PoolId) {
   const centrifuge = useCentrifuge()
-  const networks$ = useMemo(() => {
-    if (!poolId) return undefined
-    return centrifuge.pool(poolId).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))
-  }, [poolId?.toString(), centrifuge])
-
-  return useObservable(networks$)
+  return useQuery({
+    queryKey: queryKeys.poolNetworks(poolId?.toString() ?? ''),
+    queryFn: () =>
+      firstValueWithTimeout(
+        centrifuge.pool(poolId!).pipe(switchMap((pool) => (pool ? pool.networks() : of(undefined))))
+      ),
+    enabled: !!poolId,
+    staleTime: POOL_STALE_TIME,
+  })
 }

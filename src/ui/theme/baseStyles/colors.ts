@@ -15,7 +15,7 @@ export const blueScale = {
 
 export const charcoalScale = {
   100: '#E9EAEB',
-  200: '#CED8E2',
+  200: '#E2E8EE',
   300: '#7C8085',
   400: '#3B4048',
   500: '#252B34',
@@ -27,7 +27,7 @@ export const charcoalScale = {
 
 export const grayScale = {
   100: '#FFFFFF',
-  200: '#F9F9F9',
+  200: '#F8F8F8',
   300: '#F5F5F5',
   400: '#E9EAEB',
   500: '#D5D7DA',
@@ -74,7 +74,7 @@ export const redScale = {
 }
 
 export const yellowScale = {
-  100: '#FFF9E7',
+  100: '#FFF8E7',
   200: '#FFF2D0',
   300: '#FFE6A0',
   400: '#FFD971',
@@ -270,7 +270,7 @@ export const colorTokens = {
     solid: { value: yellowScale[500] },
     contrast: { value: charcoalScale[800] },
     fg: { value: yellowScale[500] },
-    subtle: { value: yellowScale[200] },
+    subtle: { value: yellowScale[100] },
     muted: { value: yellowScale[300] },
     emphasized: { value: yellowScale[800] },
     focusRing: { value: yellowScale[400] },
@@ -334,6 +334,9 @@ export const colorTokens = {
   'border.dark-muted': {
     value: { _light: charcoalScale[300] },
   },
+  'border.muted': {
+    value: { _light: charcoalScale[200] },
+  },
   'border.subtle': {
     value: { _light: grayScale[200] },
   },
@@ -383,7 +386,7 @@ export const colorTokens = {
     value: { _light: redScale[500] },
   },
   'fg.info': {
-    value: { _light: yellowScale[700] },
+    value: { _light: grayScale[800] },
   },
   'fg.success': {
     value: { _light: greenScale[500] },

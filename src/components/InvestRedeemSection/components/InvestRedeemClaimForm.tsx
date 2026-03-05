@@ -28,7 +28,13 @@ export function InvestRedeemClaimForm({
 }: InvestRedeemClaimFormProps) {
   const { execute, isPending } = useCentrifugeTransaction()
 
-  const claim = useCallback(() => execute(vault.claim()).then(() => setIsClaimFormDisplayed(false)), [vault, execute])
+  const claim = useCallback(
+    () =>
+      execute(vault.claim()).then(() => {
+        setIsClaimFormDisplayed(false)
+      }),
+    [vault, execute, setIsClaimFormDisplayed]
+  )
   const shareCurrencySymbol = share?.symbol ?? ''
   const investmentCurrencySymbol = asset?.symbol ?? ''
 
@@ -46,7 +52,9 @@ export function InvestRedeemClaimForm({
             <Box mt={6}>
               <Text fontWeight={500}>Claimable shares</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">{formatBalance(claimableDepositShares, shareCurrencySymbol, 2)}</Heading>
+                <Heading fontSize="xl">
+                  {formatBalance(claimableDepositShares, { currency: shareCurrencySymbol, precision: 2 })}
+                </Heading>
               </Flex>
             </Box>
           )}
@@ -55,7 +63,7 @@ export function InvestRedeemClaimForm({
               <Text fontWeight={500}>Claimable invest currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableDepositAssetEquivalent, investmentCurrencySymbol, 2)}
+                  {formatBalance(claimableDepositAssetEquivalent, { currency: investmentCurrencySymbol, precision: 2 })}
                 </Heading>
               </Flex>
             </Box>
@@ -65,7 +73,7 @@ export function InvestRedeemClaimForm({
               <Text fontWeight={500}>Claimable redeem amount</Text>
               <Flex alignItems="center" justifyContent="flex-start">
                 <Heading fontSize="xl">
-                  {formatBalance(claimableRedeemSharesEquivalent, shareCurrencySymbol, 2)}
+                  {formatBalance(claimableRedeemSharesEquivalent, { currency: shareCurrencySymbol, precision: 2 })}
                 </Heading>
               </Flex>
             </Box>
@@ -74,7 +82,9 @@ export function InvestRedeemClaimForm({
             <Box mt={3}>
               <Text fontWeight={500}>Claimable redeem currency equivalent</Text>
               <Flex alignItems="center" justifyContent="flex-start">
-                <Heading fontSize="xl">{formatBalance(claimableRedeemAssets, investmentCurrencySymbol, 2)}</Heading>
+                <Heading fontSize="xl">
+                  {formatBalance(claimableRedeemAssets, { currency: investmentCurrencySymbol, precision: 2 })}
+                </Heading>
               </Flex>
             </Box>
           )}
