@@ -61,7 +61,8 @@ export function InvestAmount({
     setValue('receiveAmount', balanceToString(receiveBalance))
   }, [portfolioBalance, maxInvestAmount, pricePerShare, setValue])
 
-  const isDepositDisabled = !hasInvestmentCurrency || portfolioBalance?.isZero() || !isDepositAllowed || isDisabled
+  const isDepositDisabled =
+    !hasInvestmentCurrency || !portfolioBalance || portfolioBalance?.isZero() || !isDepositAllowed || isDisabled
 
   return (
     <Box height="100%">
