@@ -1,7 +1,7 @@
 ---
 name: frontend-design
 description: Provides guidance on frontend design decisions, component patterns, and UI best practices for this project. Use when designing new components, reviewing UI patterns, making styling decisions, or implementing Chakra UI v3 components.
-user-invokable: true
+user-invocable: true
 disable-model-invocation: false
 ---
 

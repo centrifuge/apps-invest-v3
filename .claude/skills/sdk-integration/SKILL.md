@@ -1,7 +1,7 @@
 ---
 name: sdk-integration
-description: Guide for working with the Centrifuge SDK including observable patterns, data fetching hooks, and SDK configuration. Use when adding new SDK queries, creating data hooks, or understanding SDK data flow.
-user-invokable: true
+description: Guide for working with the Centrifuge SDK including React Query data fetching hooks, query keys, and SDK configuration. Use when adding new SDK queries, creating data hooks, or understanding SDK data flow.
+user-invocable: true
 disable-model-invocation: false
 ---
 
@@ -11,7 +11,7 @@ Use this skill when working with the Centrifuge SDK, creating data fetching hook
 
 ## SDK Overview
 
-The app uses `@centrifuge/sdk` which provides RxJS observables for all data queries. These are wrapped with React hooks using a custom `useObservable` pattern.
+The app uses `@centrifuge/sdk` which provides RxJS observables for all data queries. These are wrapped with **TanStack React Query** using `firstValueWithTimeout` to convert observables to promises.
 
 ### SDK Configuration
 
@@ -19,12 +19,10 @@ Located in `src/Root.tsx`:
 
 ```typescript
 const centrifuge = new Centrifuge({
-  environment: import.meta.env.VITE_CENTRIFUGE_ENV, // 'mainnet' | 'testnet'
-  rpcUrls: {
-    // Multi-chain RPC URLs for Ethereum, Base, Arbitrum, etc.
-  },
+  environment: isMainnet ? 'mainnet' : 'testnet',
+  rpcUrls: { /* Multi-chain RPC URLs */ },
   indexerUrl: import.meta.env.VITE_INDEXER_URL,
-  pollingInterval: 15000,
+  disableRepeatOnEvents: true,  // Prevents duplicate re-emissions for React Query
 })
 ```
 
@@ -45,119 +43,116 @@ All SDK hooks follow this pattern in `src/cfg/hooks/`:
 ### Basic Pattern
 
 ```typescript
-import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useCentrifuge } from './CentrifugeContext'
-import { useObservable } from './useObservable'
+import { firstValueWithTimeout } from './utils'
+import { queryKeys } from './queries/queryKeys'
 
-export function usePoolDetails(poolId: PoolId, options?: { enabled?: boolean }) {
+export function usePoolDetails(poolId: string, options?: { enabled?: boolean }) {
   const centrifuge = useCentrifuge()
 
-  // CRITICAL: Always memoize the observable
-  const details$ = useMemo(
-    () => (options?.enabled !== false && poolId
-      ? centrifuge.poolDetails(poolId)
-      : undefined),
-    [centrifuge, poolId, options?.enabled]
-  )
-
-  return useObservable(details$)
+  return useQuery({
+    queryKey: queryKeys.poolDetails(poolId),
+    queryFn: () => firstValueWithTimeout(centrifuge.poolDetails(poolId)),
+    enabled: !!poolId && (options?.enabled ?? true),
+    staleTime: 5 * 60 * 1000,
+  })
 }
 ```
 
 ### Key Rules
 
-1. **Always memoize observables** - Use `useMemo` to prevent re-subscriptions
-2. **Handle `enabled` option** - Return `undefined` when disabled
-3. **Include all dependencies** - Missing deps cause stale data
-4. **Use `useObservable`** - Don't manually subscribe
+1. **Register query keys** - Add to `src/cfg/hooks/queries/queryKeys.ts`
+2. **Use `firstValueWithTimeout`** - Bridges SDK observables to React Query promises
+3. **Guard with `enabled`** - Prevent queries when params are missing
+4. **Set appropriate `staleTime`** - Default is 10 minutes, override if needed
+5. **Use `useQuery`** - Don't manually subscribe to observables
 
 ### Return Value
 
-`useObservable` returns:
+`useQuery` returns standard React Query state:
 
 ```typescript
 {
-  data: T | undefined,      // The data when available
-  error: unknown | undefined, // Error if query failed
-  status: 'idle' | 'loading' | 'success' | 'error',
-  isIdle: boolean,
-  isLoading: boolean,
+  data: T | undefined,
+  error: unknown | undefined,
+  status: 'pending' | 'success' | 'error',
+  isLoading: boolean,    // True on first load
+  isPending: boolean,    // True when no cached data
   isSuccess: boolean,
   isError: boolean,
-  retry: () => void,        // Retry failed queries
+  isFetching: boolean,   // True during any fetch (including background)
 }
 ```
 
-## Combining Observables
+### Query Keys
 
-### Parallel Queries (combineLatest)
+Centralized in `src/cfg/hooks/queries/queryKeys.ts`:
 
 ```typescript
-import { combineLatest } from 'rxjs'
-import { map } from 'rxjs/operators'
-
-export function usePoolAndVaultDetails(poolId: PoolId, vaultAddress: string) {
-  const centrifuge = useCentrifuge()
-
-  const combined$ = useMemo(() => {
-    if (!poolId || !vaultAddress) return undefined
-
-    return combineLatest([
-      centrifuge.poolDetails(poolId),
-      centrifuge.vaultDetails(vaultAddress)
-    ]).pipe(
-      map(([pool, vault]) => ({ pool, vault }))
-    )
-  }, [centrifuge, poolId, vaultAddress])
-
-  return useObservable(combined$)
+export const queryKeys = {
+  pools: () => ['pools'] as const,
+  pool: (poolId: string) => ['pool', poolId] as const,
+  poolDetails: (poolId: string) => ['poolDetails', poolId] as const,
+  allPoolDetails: (poolIdsKey: string) => ['allPoolDetails', poolIdsKey] as const,
+  vaults: (centrifugeId: number, scId: string) => ['vaults', centrifugeId, scId] as const,
+  investor: (address: string) => ['investor', address] as const,
+  portfolio: (address: string) => ['portfolio', address] as const,
+  isMember: (address: string, scId: string, centrifugeId: number) => [...] as const,
+  allPoolsVaults: (poolIdsKey: string) => ['allPoolsVaults', poolIdsKey] as const,
+  investmentsPerVaults: (key: string) => ['investmentsPerVaults', key] as const,
+  poolsAccessStatus: (key: string) => ['poolsAccessStatus', key] as const,
 }
 ```
 
-### Sequential Queries (switchMap)
+## Batch Query Hooks
+
+For fetching data across multiple pools/vaults, use batch query hooks in `src/cfg/hooks/queries/`:
+
+### useAllPoolsVaultsQuery
+
+Fetches all pools, their networks, vaults, and vault details in one query:
 
 ```typescript
-import { switchMap } from 'rxjs/operators'
-
-export function useVaultFromPool(poolId: PoolId) {
-  const centrifuge = useCentrifuge()
-
-  const vault$ = useMemo(() => {
-    if (!poolId) return undefined
-
-    return centrifuge.pool(poolId).pipe(
-      switchMap(pool => centrifuge.vaults(pool.network, pool.shareClassId))
-    )
-  }, [centrifuge, poolId])
-
-  return useObservable(vault$)
-}
+const { data: allPoolsVaults, isLoading } = useAllPoolsVaultsQuery(pools)
 ```
 
-## Handling UI Flickering
+### useInvestmentsPerVaultsQuery
 
-The SDK may temporarily emit `undefined` during re-subscriptions. Use the `usePoolsQuery` pattern:
+Fetches user investments across multiple vaults:
 
 ```typescript
-export function useMyQueryWithFlickerPrevention() {
-  const centrifuge = useCentrifuge()
-  const lastValidData = useRef<MyDataType>()
+const { data: investments } = useInvestmentsPerVaultsQuery(vaults, address)
+```
 
-  const data$ = useMemo(() => centrifuge.myQuery(), [centrifuge])
-  const query = useObservable(data$)
+### usePoolsAccessStatusQuery
 
-  // Preserve last valid data
-  if (query.data) {
-    lastValidData.current = query.data
-  }
+Checks user membership/access status across pools:
 
-  return {
-    ...query,
-    data: query.data ?? lastValidData.current,
-    isLoading: query.isLoading && !lastValidData.current,
-  }
+```typescript
+const { data: accessStatus } = usePoolsAccessStatusQuery(pools, address)
+```
+
+These hooks use RxJS `combineLatest` internally to batch multiple SDK calls, then wrap with `firstValueWithTimeout`.
+
+## The Bridge: firstValueWithTimeout
+
+Located in `src/cfg/hooks/utils.ts`:
+
+```typescript
+import { firstValueFrom } from 'rxjs'
+import { timeout } from 'rxjs/operators'
+
+const SDK_QUERY_TIMEOUT = 30_000
+
+export function firstValueWithTimeout<T>(observable: Observable<T>): Promise<T> {
+  return firstValueFrom(observable.pipe(timeout(SDK_QUERY_TIMEOUT)))
 }
 ```
+
+- Converts SDK observable to a Promise for React Query's `queryFn`
+- 30-second timeout prevents hanging queries
+- Errors propagate to React Query for automatic retry (3 retries by default)
 
 ## Common SDK Methods
 
@@ -173,17 +168,44 @@ centrifuge.poolActiveNetworks(poolId) // Networks where pool is deployed
 ### Vault Queries
 
 ```typescript
-centrifuge.vaults(network, shareClassId)  // Vaults for a share class
-centrifuge.vaultDetails(vault)            // Vault details
-centrifuge.investment(vault)              // User's investment in vault
+poolNetwork.vaults(shareClassId)     // Vaults for a share class on a network
+vault.vaultDetails()                 // Vault details
+vault.investment(address)            // User's investment in vault
 ```
 
 ### Holdings & Balances
 
 ```typescript
-centrifuge.holdings(shareClass)           // User's holdings
-centrifuge.balances(address)              // Token balances
+shareClass.holdings(address)         // User's holdings
+centrifuge.balances(address)         // Token balances
 ```
+
+## Cache Invalidation
+
+### After Transactions
+
+`useCentrifugeTransaction` automatically invalidates user-specific queries:
+
+```typescript
+function invalidateTransactionQueries() {
+  centrifuge.clearQueryCache()
+  queryClient.invalidateQueries({ queryKey: ['poolsAccessStatus'] })
+  queryClient.invalidateQueries({ queryKey: ['portfolio'] })
+  queryClient.invalidateQueries({ queryKey: ['investor'] })
+  queryClient.invalidateQueries({ queryKey: ['isMember'] })
+  queryClient.invalidateQueries({ queryKey: ['investment'] })
+  queryClient.invalidateQueries({ queryKey: ['holdings'] })
+  queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
+}
+```
+
+### On Wallet Change
+
+`WalletInvalidator` in Root.tsx removes user-specific queries when address changes.
+
+### On Environment Switch
+
+`queryClient.clear()` clears ALL cache when switching mainnet/testnet.
 
 ## Executing Transactions
 
@@ -197,7 +219,7 @@ const { execute, isPending } = useCentrifugeTransaction()
 const handleDeposit = async (amount: Balance) => {
   try {
     await execute(vault.asyncDeposit(amount))
-    // Success
+    // Success - cache invalidation happens automatically
   } catch {
     // Error handled by TransactionProvider
   }
@@ -224,21 +246,28 @@ import type {
 ## File Organization
 
 - `src/cfg/hooks/` - All SDK data hooks
-- `src/cfg/types.ts` - Re-exported SDK types
+- `src/cfg/hooks/queries/` - React Query hooks and centralized query keys
+- `src/cfg/hooks/utils.ts` - `firstValueWithTimeout` utility
+- `src/cfg/types/` - SDK type re-exports and custom types
 - `src/cfg/index.ts` - Public exports (use `@cfg` alias)
 - `src/cfg/hooks/CentrifugeContext.tsx` - SDK provider and hook
+- `src/cfg/utils/networkUtils.ts` - Network slug utilities for URL-safe chain names
 
 ## Best Practices
 
 1. **Create specific hooks** - Don't expose raw SDK methods to components
 2. **Handle loading states** - Always check `isLoading` before rendering
 3. **Use enabled option** - Prevent unnecessary queries
-4. **Transform in observable** - Use `.pipe(map(...))` not post-processing in React
+4. **Register query keys** - Always add to `queryKeys.ts`
 5. **Export from @cfg** - Add new hooks/types to `src/cfg/index.ts`
+6. **Add to invalidation lists** - User-specific queries need wallet-change and post-transaction invalidation
 
-## Debug Tips
+## Adding a New SDK Query (Step by Step)
 
-- Check console for "observable is not stable" warnings
-- Use React DevTools to verify hook re-renders
-- SDK polling interval is 15 seconds - data refreshes automatically
-- Use `retry()` from useObservable to manually refetch
+1. Add query key to `src/cfg/hooks/queries/queryKeys.ts`
+2. Create hook in `src/cfg/hooks/` using `useQuery` + `firstValueWithTimeout`
+3. Set `enabled` to guard against missing params
+4. Set appropriate `staleTime`
+5. Export from `src/cfg/index.ts`
+6. If user-specific: add key to `USER_QUERY_KEYS` in Root.tsx
+7. If transaction-affected: add to `invalidateTransactionQueries()` in useCentrifugeTransaction
