@@ -23,7 +23,7 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
     )
   }
 
-  if ((!investment || (!calculatedInvestSharesEstimate && !calculatedRedeemAmountEstimate)) && !isTabLoading) {
+  if (!investment || (!calculatedInvestSharesEstimate && !calculatedRedeemAmountEstimate)) {
     return (
       <Box height="100%" minH="182px">
         <Heading fontSize="lg" mt={2}>
@@ -42,43 +42,51 @@ export function PendingTab({ isLoading: isTabLoading }: TabProps) {
         </Icon>
       </Flex>
 
-      <Text fontSize="md">Investments</Text>
-      <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-        <Box>
-          <Text fontSize="sm" mt={2} fontWeight="bold">
-            {asset?.symbol}
-          </Text>
-          <BalanceDisplay balance={pendingDepositAssets} fontSize="sm" />
-        </Box>
-        <Box textAlign={'right'}>
-          <Text fontSize="sm" fontWeight="bold">
-            Est. {share?.symbol}
-          </Text>
-          <Text fontSize="sm" mt={2}>
-            {calculatedInvestSharesEstimate ?? '0.00'}
-          </Text>
-        </Box>
-      </Grid>
+      {calculatedInvestSharesEstimate && (
+        <>
+          <Text fontSize="md">Investments</Text>
+          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+            <Box>
+              <Text fontSize="sm" mt={2} fontWeight="bold">
+                {asset?.symbol}
+              </Text>
+              <BalanceDisplay balance={pendingDepositAssets} fontSize="sm" />
+            </Box>
+            <Box textAlign={'right'}>
+              <Text fontSize="sm" fontWeight="bold">
+                Est. {share?.symbol}
+              </Text>
+              <Text fontSize="sm" mt={2}>
+                {calculatedInvestSharesEstimate ?? '0.00'}
+              </Text>
+            </Box>
+          </Grid>
+        </>
+      )}
 
-      <Text fontSize="md" mt={8}>
-        Redemptions
-      </Text>
-      <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-        <Box>
-          <Text fontSize="sm" mt={2} fontWeight="bold">
-            {share?.symbol}
+      {calculatedRedeemAmountEstimate && (
+        <>
+          <Text fontSize="md" mt={8}>
+            Redemptions
           </Text>
-          <BalanceDisplay balance={pendingRedeemShares} fontSize="sm" />
-        </Box>
-        <Box textAlign={'right'}>
-          <Text fontSize="sm" fontWeight="bold">
-            Est. {asset?.symbol}
-          </Text>
-          <Text fontSize="sm" mt={2}>
-            {calculatedRedeemAmountEstimate ?? '0.00'}
-          </Text>
-        </Box>
-      </Grid>
+          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+            <Box>
+              <Text fontSize="sm" mt={2} fontWeight="bold">
+                {share?.symbol}
+              </Text>
+              <BalanceDisplay balance={pendingRedeemShares} fontSize="sm" />
+            </Box>
+            <Box textAlign={'right'}>
+              <Text fontSize="sm" fontWeight="bold">
+                Est. {asset?.symbol}
+              </Text>
+              <Text fontSize="sm" mt={2}>
+                {calculatedRedeemAmountEstimate ?? '0.00'}
+              </Text>
+            </Box>
+          </Grid>
+        </>
+      )}
     </Box>
   )
 }

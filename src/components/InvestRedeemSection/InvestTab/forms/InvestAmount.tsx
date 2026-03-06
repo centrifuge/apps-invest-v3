@@ -4,7 +4,7 @@ import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce } from '@cfg'
 import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
-import { BalanceDisplay, NetworkIcon } from '@ui'
+import { NetworkIcon } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
@@ -19,7 +19,6 @@ interface InvestAmountProps {
   maxInvestAmount: string
   networs?: PoolNetwork[]
   parsedInvestAmount: 0 | Balance
-  parsedReceiveAmount: 0 | Balance
 }
 
 export function InvestAmount({
@@ -27,7 +26,6 @@ export function InvestAmount({
   formattedMaxInvestAmount,
   maxInvestAmount,
   parsedInvestAmount,
-  parsedReceiveAmount,
 }: InvestAmountProps) {
   const { poolDetails, network } = usePoolContext()
   const { investment, vaultDetails } = useVaultsContext()
@@ -58,12 +56,12 @@ export function InvestAmount({
 
   const setMaxInvestAmount = useCallback(() => {
     if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
-    setValue('investAmount', maxInvestAmount)
-    const calculatedReceiveAmount = balanceToString(portfolioBalance.mul(pricePerShare))
-    setValue('receiveAmount', calculatedReceiveAmount)
-  }, [maxInvestAmount])
+    setValue('investAmount', maxInvestAmount, { shouldValidate: true })
+    const receiveBalance = divideBalanceByPrice(portfolioBalance, pricePerShare)
+    setValue('receiveAmount', balanceToString(receiveBalance))
+  }, [portfolioBalance, maxInvestAmount, pricePerShare, setValue])
 
-  const isDepositDisabled = !hasInvestmentCurrency || !isDepositAllowed || isDisabled
+  const isDepositDisabled = !hasInvestmentCurrency || portfolioBalance?.isZero() || !isDepositAllowed || isDisabled
 
   return (
     <Box height="100%">
@@ -76,19 +74,7 @@ export function InvestAmount({
           />
         ) : null}
         <Box>
-          <Flex alignItems="center" justifyContent="space-between">
-            <Text fontWeight={500}>You pay</Text>
-            {parsedInvestAmount !== 0 ? (
-              <BalanceDisplay
-                balance={parsedInvestAmount}
-                currency={vaultDetails?.asset.symbol}
-                precision={2}
-                ml={4}
-                fontSize="xs"
-                color="fg.muted"
-              />
-            ) : null}
-          </Flex>
+          <Text fontWeight={500}>You pay</Text>
           <BalanceInput
             name="investAmount"
             decimals={vaultDetails?.asset.decimals}
@@ -106,10 +92,10 @@ export function InvestAmount({
                 borderRadius={10}
                 px={3}
                 h="24px"
-                onClick={setMaxInvestAmount}
                 borderColor="border.dark-muted !important"
                 border="1px solid"
-                cursor="pointer"
+                cursor={isDepositDisabled ? 'not-allowed' : 'pointer'}
+                onClick={isDepositDisabled ? undefined : setMaxInvestAmount}
               >
                 MAX
               </Badge>
@@ -121,19 +107,9 @@ export function InvestAmount({
           </Flex>
           {parsedInvestAmount !== 0 && (
             <>
-              <Flex alignItems="center" justifyContent="space-between">
-                <Text fontWeight={500} mt={6}>
-                  Estimated tokens received
-                </Text>
-                <BalanceDisplay
-                  balance={parsedReceiveAmount}
-                  currency={vaultDetails?.share.symbol}
-                  precision={2}
-                  mt={6}
-                  fontSize="xs"
-                  color="fg.muted"
-                />
-              </Flex>
+              <Text fontWeight={500} mt={6}>
+                Estimated tokens received
+              </Text>
               <BalanceInput
                 name="receiveAmount"
                 decimals={vaultDetails?.share.decimals}
