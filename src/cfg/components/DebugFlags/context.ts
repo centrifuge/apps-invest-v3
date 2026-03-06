@@ -32,17 +32,12 @@ try {
   console.error(e)
 }
 const flagKeys = Object.keys(flagsConfig)
-export const initialFlagsState: Flags = persistedState
-  ? Object.entries(persistedState)
-      .filter(([k]) => flagKeys.includes(k))
-      .reduce((obj, [k, v]) => {
-        Reflect.set(obj, k, v)
-        return obj
-      }, {} as Flags)
-  : Object.entries(flagsConfig).reduce((obj, [k, v]) => {
-      Reflect.set(obj, k, v.default)
-      return obj
-    }, {} as Flags)
+export const initialFlagsState: Flags = Object.entries(flagsConfig).reduce((obj, [k, v]) => {
+  // Start with defaults, then overlay any persisted values for known keys
+  const persisted = persistedState && flagKeys.includes(k) ? persistedState[k as Key] : undefined
+  Reflect.set(obj, k, persisted !== undefined ? persisted : v.default)
+  return obj
+}, {} as Flags)
 
 export const DebugFlagsContext = React.createContext<Context>({ flags: defaultFlags, register() {}, unregister() {} })
 
