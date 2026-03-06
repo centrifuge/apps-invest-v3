@@ -1,7 +1,7 @@
 ---
 name: context-architecture
 description: Understanding the provider stack and context relationships including PoolContext, VaultsContext, and TransactionProvider. Use when deciding where state should live or adding new shared data.
-user-invokable: true
+user-invocable: true
 disable-model-invocation: false
 ---
 
@@ -15,17 +15,32 @@ The app uses a deeply nested provider architecture. Entry point: `src/main.tsx` 
 
 ```
 DebugFlags (Development debugging - MUST be outermost)
-  -> QueryClientProvider (TanStack Query)
+  -> QueryClientProvider (TanStack Query - primary data caching layer)
     -> CentrifugeProvider (SDK instance)
       -> WalletProvider (Wagmi + Reown AppKit)
-        -> TransactionProvider (Transaction lifecycle)
-          -> PoolProvider (Pool data context)
-            -> VaultsProvider (Vaults data context)
+        -> WalletInvalidator (Clears user-specific query cache on wallet change)
+          -> TransactionProvider (Transaction lifecycle)
+            -> PoolProvider (Pool data context)
               -> LoadingProvider (Global loading boundaries)
                 -> <Outlet /> (React Router)
 ```
 
 **Critical**: DebugFlags must wrap all other providers so `useDebugFlags()` can be called during provider initialization.
+
+**NOTE**: VaultsProvider is NOT in Root.tsx. It wraps only the pool detail route in `src/routes/router.tsx`.
+
+### WalletInvalidator
+
+A component in Root.tsx that handles cache management when wallet address changes:
+
+```typescript
+const USER_QUERY_KEYS = [
+  'investment', 'holdings', 'investor', 'portfolio', 'isMember',
+  'investmentsPerVaults', 'poolsAccessStatus',
+]
+```
+
+When wallet address changes, all user-specific queries are removed from cache. Global data (pools, blockchains) is preserved.
 
 ## The Three Business Contexts
 
@@ -42,10 +57,13 @@ DebugFlags (Development debugging - MUST be outermost)
   // Pool data
   pools: Pool[] | undefined
   pool: Pool | undefined
-  poolId: string | undefined
-  selectedPoolId: PoolId | undefined
+  poolId: string | undefined        // From URL params
   poolDetails: PoolDetails | undefined
   poolTVL: string | undefined
+
+  // URL params
+  networkFromUrl: string | undefined  // Network slug from URL
+  assetFromUrl: string | undefined    // Asset symbol from URL
 
   // Network
   network: PoolNetwork | undefined
@@ -65,16 +83,14 @@ DebugFlags (Development debugging - MUST be outermost)
   isPoolDetailsLoading: boolean
   isHoldingsLoading: boolean
   isPoolDataReady: boolean
-
-  // Actions
-  setSelectedPoolId: (poolId: PoolId) => void
 }
 ```
 
 **Key behaviors**:
-- Pool selected from URL params (`/pool/:poolId`)
+- Pool selected from URL params (`/pool/:poolId/:network/:asset`)
 - Network auto-selected based on connected wallet's chain
-- `isPoolDataReady` checks both selectedPoolId and network.pool are synced
+- URL params (`networkFromUrl`, `assetFromUrl`) passed to VaultsContext for vault selection
+- `isPoolDataReady` checks both poolId and network are available
 
 **Usage**:
 ```typescript
@@ -87,6 +103,8 @@ const { pool, poolDetails, network, isLoading } = usePoolContext()
 
 **Purpose**: Manages vault selection and vault-level data. **Depends on PoolContext**.
 
+**Important**: Only wraps the pool detail route, NOT the entire app.
+
 **Data provided**:
 ```typescript
 {
@@ -98,7 +116,6 @@ const { pool, poolDetails, network, isLoading } = usePoolContext()
 
   // Investment data
   investment: Investment | undefined
-  investmentsPerVaults: Investment[] | undefined
 
   // Loading states
   isLoading: boolean
@@ -113,8 +130,9 @@ const { pool, poolDetails, network, isLoading } = usePoolContext()
 
 **Key behaviors**:
 - Depends on `isPoolDataReady` from PoolContext
-- Auto-selects first vault when pool changes
-- Auto-selects vault with claimable assets if any
+- URL-based vault selection using `networkFromUrl` and `assetFromUrl`
+- Falls back to first vault if no URL match
+- Simplified compared to previous version (no `investmentsPerVaults`)
 
 **Usage**:
 ```typescript
@@ -155,10 +173,10 @@ const tx = useTransaction(txId)
 ## Context Relationships
 
 ```
-PoolContext
+PoolContext (in Root.tsx)
     |
     v
-VaultsContext (depends on PoolContext)
+VaultsContext (in router.tsx, pool detail route only)
     |
     v
 Components (consume both contexts)
@@ -167,8 +185,8 @@ Components (consume both contexts)
 VaultsContext MUST be rendered inside PoolContext. It uses:
 - `isPoolDataReady` to enable queries
 - `network` to fetch vaults for correct chain
-- `selectedPoolId` to reset vault selection
 - `shareClassId` to fetch correct vaults
+- `networkFromUrl` and `assetFromUrl` for vault selection
 
 ## When to Use Each Context
 
@@ -183,7 +201,7 @@ VaultsContext MUST be rendered inside PoolContext. It uses:
 - Displaying vault options
 - Working with specific vault details
 - Handling investments/deposits/redemptions
-- Showing claimable assets
+- Note: Only available on pool detail route
 
 ### Use TransactionProvider when:
 - Executing SDK transactions (via `useCentrifugeTransaction`)
@@ -199,7 +217,7 @@ VaultsContext MUST be rendered inside PoolContext. It uses:
 
 2. **Is it pool-related data?**
    - Add to PoolContext
-   - Use existing SDK hooks pattern
+   - Use React Query hooks pattern
 
 3. **Is it vault-related data?**
    - Add to VaultsContext
@@ -216,9 +234,11 @@ VaultsContext MUST be rendered inside PoolContext. It uses:
 ### Adding to Existing Context
 
 ```typescript
-// 1. Add hook for data fetching
-const { data: newData, isLoading: isNewDataLoading } = useNewDataHook(poolId, {
-  enabled: !!selectedPoolId,
+// 1. Add React Query hook for data fetching
+const { data: newData, isLoading: isNewDataLoading } = useQuery({
+  queryKey: queryKeys.myNewData(poolId),
+  queryFn: () => firstValueWithTimeout(centrifuge.myNewQuery(poolId)),
+  enabled: !!poolId,
 })
 
 // 2. Add to context value
@@ -237,8 +257,8 @@ const PoolContext = createContext<{
   isNewDataLoading: boolean
 } | undefined>(undefined)
 
-// 4. Update composite isLoading if relevant
-const isLoading = isPoolsLoading || isNewDataLoading || ...
+// 4. If user-specific, add query key to USER_QUERY_KEYS in Root.tsx
+// 5. If transaction-affected, add to invalidateTransactionQueries()
 ```
 
 ## Common Patterns
@@ -279,30 +299,14 @@ useEffect(() => {
 }, [selectedPoolId])
 ```
 
-### Ref-based One-time Actions
-
-```typescript
-// Auto-select vault with claimable assets (once per pool)
-const hasAutoSelectedRef = useRef(false)
-
-useEffect(() => {
-  if (hasAutoSelectedRef.current) return
-
-  const vaultWithClaimable = findVaultWithClaimable()
-  if (vaultWithClaimable) {
-    setVault(vaultWithClaimable)
-    hasAutoSelectedRef.current = true
-  }
-}, [investments])
-```
-
 ## File Locations
 
 - `src/contexts/PoolContext.tsx` - Pool state management
 - `src/contexts/VaultsContext.tsx` - Vault state management
 - `src/cfg/hooks/TransactionProvider.tsx` - Transaction lifecycle
 - `src/cfg/hooks/CentrifugeContext.tsx` - SDK provider
-- `src/Root.tsx` - Provider stack assembly
+- `src/Root.tsx` - Provider stack assembly (includes WalletInvalidator)
+- `src/routes/router.tsx` - VaultsProvider placement
 
 ## Best Practices
 
@@ -311,12 +315,13 @@ useEffect(() => {
 3. **Track loading states** - Composite `isLoading` for UI feedback
 4. **Reset on dependency change** - Use refs to track and reset state
 5. **Throw on missing provider** - Help catch incorrect usage early
-6. **Memoize context values** - Prevent unnecessary re-renders
+6. **Register new query keys** - Add to `queryKeys.ts` and invalidation lists as needed
 
 ## Anti-patterns to Avoid
 
 1. **Don't bypass context hierarchy** - VaultsContext needs PoolContext
-2. **Don't duplicate SDK data** - Use hooks, don't cache in state
+2. **Don't duplicate SDK data** - Use React Query hooks, don't cache in state
 3. **Don't mix concerns** - Keep pool/vault/transaction domains separate
 4. **Don't use context for derived data** - Compute in components or hooks
 5. **Don't forget `enabled`** - Causes unnecessary/failed queries
+6. **Don't forget cache invalidation** - User-specific queries need wallet-change and post-transaction invalidation

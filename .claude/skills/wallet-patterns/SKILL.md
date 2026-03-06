@@ -1,7 +1,7 @@
 ---
 name: wallet-patterns
 description: Guide for wallet connection, Web3 integration, and network handling using Wagmi, Reown AppKit, and Viem. Use when working with wallet connections, network switching, or transaction signing.
-user-invokable: true
+user-invocable: true
 disable-model-invocation: false
 ---
 
@@ -42,6 +42,19 @@ export function WalletProvider({ children }) {
 ```
 
 **Key Architecture Note**: WagmiAdapter and AppKit are initialized OUTSIDE the React component to prevent wallet disconnections during re-renders.
+
+## WalletInvalidator
+
+Located in `src/Root.tsx`, the `WalletInvalidator` component clears user-specific React Query cache when the wallet address changes:
+
+```typescript
+const USER_QUERY_KEYS = [
+  'investment', 'holdings', 'investor', 'portfolio', 'isMember',
+  'investmentsPerVaults', 'poolsAccessStatus',
+]
+```
+
+This ensures users don't see stale data from a previous wallet connection. Global data (pools, blockchains) is preserved.
 
 ## Essential Wagmi Hooks
 
@@ -139,9 +152,19 @@ useEffect(() => {
 }, [networks, connectedChainId])
 ```
 
+### Network Utilities
+
+`src/cfg/utils/networkUtils.ts` provides URL-safe network slug utilities:
+
+```typescript
+// EVM Chain ID <-> Network Slug conversions
+getNetworkSlug(chainId)       // e.g., 8453 -> "base"
+getChainIdFromSlug(slug)      // e.g., "base" -> 8453
+```
+
 ### Debug Flag: showMainnet
 
-In development, the `showMainnet` debug flag switches between mainnet/testnet data while keeping all networks available to AppKit.
+In development, the `showMainnet` debug flag switches between mainnet/testnet data while keeping all networks available to AppKit. ConnectionGuard filters which networks are displayed.
 
 ## Safe.global Support
 
@@ -210,23 +233,6 @@ export function useNetworkCheck(requiredChainId: number) {
 }
 ```
 
-### Display Connected Address
-
-```typescript
-import { useAccount } from 'wagmi'
-
-export function WalletAddress() {
-  const { address } = useAccount()
-
-  if (!address) return null
-
-  // Truncate address for display
-  const truncated = `${address.slice(0, 6)}...${address.slice(-4)}`
-
-  return <Text>{truncated}</Text>
-}
-```
-
 ### Transaction Button Pattern
 
 ```typescript
@@ -271,9 +277,12 @@ import { WalletProvider } from '@wallet/WalletProvider'
 ## Key Files
 
 - `src/wallet/WalletProvider.tsx` - Provider setup and configuration
-- `src/cfg/hooks/useCentrifugeTransaction.tsx` - Transaction execution with signer
+- `src/wallet/WalletButton.tsx` - Wallet connection button
+- `src/cfg/hooks/useCentrifugeTransaction.tsx` - Transaction execution with signer and cache invalidation
 - `src/contexts/PoolContext.tsx` - Network auto-selection logic
-- `src/components/NetworkButton/` - Network display and switching UI
+- `src/components/elements/ConnectionGuard.tsx` - Network filtering and connection state display
+- `src/cfg/utils/networkUtils.ts` - Network slug utilities
+- `src/Root.tsx` - WalletInvalidator for cache management on wallet change
 
 ## Best Practices
 
@@ -283,6 +292,7 @@ import { WalletProvider } from '@wallet/WalletProvider'
 4. **Disable actions during `isPending`** states
 5. **Don't store wallet state** - use Wagmi hooks as source of truth
 6. **Initialize outside React** - WagmiAdapter must be module-level
+7. **Let WalletInvalidator handle cache** - Don't manually clear user queries on wallet change
 
 ## Common Issues
 
@@ -298,3 +308,7 @@ import { WalletProvider } from '@wallet/WalletProvider'
 - Check wallet connection with `useAccount`
 - Verify signer setup with `useConnectorClient`
 - Check TransactionProvider is in component tree
+
+### Stale Data After Wallet Switch
+- WalletInvalidator should clear user-specific queries
+- If a new user-specific query is added, ensure its key is in `USER_QUERY_KEYS`
