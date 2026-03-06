@@ -46,7 +46,17 @@ function RootProviders() {
       rpcUrls: isMainnet ? MAINNET_RPC_URLS : TESTNET_RPC_URLS,
       disableRepeatOnEvents: true,
     })
-  }, [showMainnet])
+  }, [isMainnet])
+
+  // Clear all React Query cache when the environment switches so stale
+  // data from the previous environment is never served.
+  const prevIsMainnetRef = useRef(isMainnet)
+  useEffect(() => {
+    if (prevIsMainnetRef.current !== isMainnet) {
+      queryClient.clear()
+      prevIsMainnetRef.current = isMainnet
+    }
+  }, [isMainnet])
 
   /**
    * For WalletProvider networks, we include ALL possible networks (mainnet + testnet)

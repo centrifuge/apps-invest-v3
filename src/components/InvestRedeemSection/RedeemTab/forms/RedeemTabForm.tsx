@@ -29,7 +29,6 @@ export function RedeemTabForm({
           isDisabled={isDisabled}
           maxRedeemAmount={maxRedeemAmount}
           parsedRedeemAmount={parsedRedeemAmount}
-          parsedReceiveAmount={parsedReceiveAmount}
         />
       )
     case RedeemAction.CONFIRM:

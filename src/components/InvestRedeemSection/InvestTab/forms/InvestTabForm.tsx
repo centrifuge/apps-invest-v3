@@ -31,7 +31,6 @@ export function InvestTabForm({
           formattedMaxInvestAmount={formattedMaxInvestAmount}
           maxInvestAmount={maxInvestAmount}
           parsedInvestAmount={parsedInvestAmount}
-          parsedReceiveAmount={parsedReceiveAmount}
           isDisabled={isDisabled}
         />
       )

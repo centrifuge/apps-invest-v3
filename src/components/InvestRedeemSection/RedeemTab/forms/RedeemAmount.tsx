@@ -4,7 +4,7 @@ import { Badge, Box, Flex, Text } from '@chakra-ui/react'
 import { debounce, formatBalance } from '@cfg'
 import { balanceToString, divideBalanceByPrice, scaleBalanceDecimals } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
-import { BalanceDisplay, NetworkIcon } from '@ui'
+import { NetworkIcon } from '@ui'
 import { InfoWrapper } from '@components/InvestRedeemSection/components/InfoWrapper'
 import { PendingInvestmentBanner } from '@components/InvestRedeemSection/components/PendingInvestmentBanner'
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
@@ -15,15 +15,9 @@ interface RedeemAmountProps {
   isDisabled: boolean
   maxRedeemAmount: string
   parsedRedeemAmount: 0 | Balance
-  parsedReceiveAmount: 0 | Balance
 }
 
-export function RedeemAmount({
-  isDisabled,
-  maxRedeemAmount,
-  parsedRedeemAmount,
-  parsedReceiveAmount,
-}: RedeemAmountProps) {
+export function RedeemAmount({ isDisabled, maxRedeemAmount, parsedRedeemAmount }: RedeemAmountProps) {
   const { network, poolDetails } = usePoolContext()
   const { investment, vaultDetails } = useVaultsContext()
   const { hasPendingRedeems, pendingRedeemShares, share } = useGetPendingInvestments()
@@ -35,7 +29,6 @@ export function RedeemAmount({
     (sc) => sc.shareClass.id.toString() === vaultDetails?.shareClass.id.toString()
   )
   const pricePerShare = poolShareClass?.details.pricePerShare
-  const investCurrencySymbol = investment?.asset.symbol ?? ''
 
   // Get info on the users shares holdings in their wallet
   const shareCurrencySymbol = investment?.share.symbol ?? ''
@@ -83,6 +76,8 @@ export function RedeemAmount({
     setValue('receiveAmount', calculatedReceiveAmount, { shouldValidate: true })
   }, [maxRedeemAmount, pricePerShare])
 
+  const isRedeemDisabled = !hasRedeemableShares || !isAllowedToRedeem
+
   return (
     <Box height="100%">
       <Flex justify="space-between" flexDirection="column" height="100%">
@@ -94,26 +89,14 @@ export function RedeemAmount({
           />
         )}
         <Box>
-          <Flex alignItems="center" justifyContent="space-between">
-            <Text fontWeight={500}>Redeem</Text>
-            {parsedRedeemAmount !== 0 && (
-              <BalanceDisplay
-                balance={parsedRedeemAmount}
-                currency={shareCurrencySymbol}
-                precision={2}
-                ml={4}
-                fontSize="xs"
-                color="fg.muted"
-              />
-            )}
-          </Flex>
+          <Text fontWeight={500}>Redeem</Text>
           <BalanceInput
             name="redeemAmount"
             decimals={vaultDetails?.share.decimals}
             placeholder="0.00"
             onChange={debouncedCalculateReceiveAmount}
             currency={shareCurrencySymbol}
-            disabled={!hasRedeemableShares || !isAllowedToRedeem}
+            disabled={isRedeemDisabled}
           />
           <Flex mt={2} justify="space-between">
             <Flex>
@@ -126,8 +109,8 @@ export function RedeemAmount({
                 h="24px"
                 borderColor="border.dark-muted !important"
                 border="1px solid"
-                cursor="pointer"
-                onClick={setMaxRedeemAmount}
+                cursor={isRedeemDisabled ? 'not-allowed' : 'pointer'}
+                onClick={isRedeemDisabled ? undefined : setMaxRedeemAmount}
               >
                 MAX
               </Badge>
@@ -139,17 +122,7 @@ export function RedeemAmount({
           </Flex>
           {parsedRedeemAmount !== 0 && (
             <>
-              <Flex alignItems="center" justifyContent="space-between" mt={6}>
-                <Text fontWeight={500}>Estimated receive amount</Text>
-                <BalanceDisplay
-                  balance={parsedReceiveAmount}
-                  currency={investCurrencySymbol}
-                  precision={2}
-                  ml={4}
-                  fontSize="xs"
-                  color="fg.muted"
-                />
-              </Flex>
+              <Text fontWeight={500}>Estimated receive amount</Text>
               <BalanceInput
                 name="receiveAmount"
                 placeholder="0.00"
