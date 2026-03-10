@@ -19,5 +19,6 @@ export function useAllPoolsVaultsQuery(poolIds: PoolId[]) {
     queryFn: () => firstValueWithTimeout(createAllPoolsVaults$(centrifuge, poolIds)),
     enabled: poolIds.length > 0,
     staleTime: Infinity,
+    gcTime: Infinity,
   })
 }
