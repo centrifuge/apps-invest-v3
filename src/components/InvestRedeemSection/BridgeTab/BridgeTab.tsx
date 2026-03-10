@@ -38,9 +38,9 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
     onSubmit: (values) => {
       if (!shareClass?.shareClass || !address) return
 
-      const receiver = (values.sendToDifferentAddress && values.recipientAddress
-        ? values.recipientAddress
-        : address) as HexString
+      const receiver = (
+        values.sendToDifferentAddress && values.recipientAddress ? values.recipientAddress : address
+      ) as HexString
 
       const tx = shareClass.shareClass.crosschainTransferShares(
         Number(values.fromChain),
