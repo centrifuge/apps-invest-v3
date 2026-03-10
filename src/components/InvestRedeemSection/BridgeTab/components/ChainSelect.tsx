@@ -117,7 +117,6 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
             position="absolute"
             top="100%"
             left={0}
-            right={0}
             mt={1}
             bg="white"
             border="1px solid"
@@ -126,6 +125,8 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
             shadow="md"
             zIndex={10}
             overflow="hidden"
+            minW="100%"
+            w="max-content"
           >
             {variant === 'from' && (
               <>
@@ -169,7 +170,7 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
                 </Box>
               </>
             )}
-            <Box overflowY="auto">
+            <Box overflowY="auto" w="100%">
               {filteredOptions.map((option) => (
                 <Flex
                   key={option.centrifugeId}
@@ -186,14 +187,14 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
                   borderBottom={variant === 'to' ? '1px solid' : 'none'}
                   borderColor="border.input"
                 >
-                  <Flex alignItems="center" gap={2}>
+                  <Flex alignItems="center" gap={2} flexShrink={0}>
                     <NetworkIcon centrifugeId={option.centrifugeId} boxSize="24px" />
-                    <Text fontSize="sm" fontWeight={500}>
+                    <Text fontSize="sm" fontWeight={500} whiteSpace="nowrap">
                       {option.name}
                     </Text>
                   </Flex>
                   {variant === 'from' && option.balanceLabel && (
-                    <Text fontSize="sm" color="fg.muted">
+                    <Text fontSize="sm" color="fg.muted" whiteSpace="nowrap">
                       {option.balanceLabel}
                     </Text>
                   )}
