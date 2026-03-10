@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
+import { type HexString } from '@centrifuge/sdk'
+import { useAddress, useCentrifugeTransaction } from '@cfg'
 import {
   type BridgeActionType,
   BridgeAction,
@@ -10,11 +12,15 @@ import { BridgeForm } from '@components/InvestRedeemSection/BridgeTab/forms/Brid
 import { BridgeInProgress } from '@components/InvestRedeemSection/BridgeTab/forms/BridgeInProgress'
 import { BridgeSuccess } from '@components/InvestRedeemSection/BridgeTab/forms/BridgeSuccess'
 import { TabProps } from '@components/InvestRedeemSection'
+import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { Form, useForm, addressInput, createBalanceSchema } from '@forms'
 
 export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
   const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
+  const { shareClass } = usePoolContext()
+  const { address } = useAddress()
+  const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<BridgeActionType>(BridgeAction.BRIDGE_FORM)
 
   const schema = z.object({
@@ -29,15 +35,28 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
     schema,
     defaultValues: BridgeFormDefaultValues,
     mode: 'onChange',
-    onSubmit: () => {
-      // TODO: Bridge submission logic.
+    onSubmit: (values) => {
+      if (!shareClass?.shareClass || !address) return
+
+      const receiver = (values.sendToDifferentAddress && values.recipientAddress
+        ? values.recipientAddress
+        : address) as HexString
+
+      const tx = shareClass.shareClass.crosschainTransferShares(
+        Number(values.fromChain),
+        Number(values.toChain),
+        receiver,
+        values.amount.toBigInt()
+      )
+
+      execute(tx)
       setActionType(BridgeAction.IN_PROGRESS)
     },
     onSubmitError: (error) => console.error('Bridge form submission error:', error),
   })
 
   const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading
-  const isDisabled = !investment || !vaultDetails
+  const isDisabled = isPending || !investment || !vaultDetails || !shareClass?.shareClass
 
   if (isLoading) {
     return (
