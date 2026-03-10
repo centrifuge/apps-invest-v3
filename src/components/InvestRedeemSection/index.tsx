@@ -9,9 +9,7 @@ import { InvestRedeemClaimForm } from '@components/InvestRedeemSection/component
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { InvestorOnboardingFeedback } from '@components/InvestRedeemSection/components/InvestorOnboardingFeedback'
 import { PendingTab } from '@components/InvestRedeemSection/PendingTab/PendingTab'
-import { useGeolocation } from '@hooks/useGeolocation'
-import { useGetPoolRestrictedCountries } from '@hooks/useGetPoolRestrictedCountries'
-import { useGetPoolsByIds } from '@hooks/useGetPoolsByIds'
+import { useIsRestrictedCountry } from '@hooks/useIsRestrictedCountry'
 import { useChainId } from 'wagmi'
 import {
   type PoolDetails,
@@ -23,6 +21,7 @@ import {
 } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
 import { Tabs } from '@ui'
+import { BridgeTab } from '@components/InvestRedeemSection/BridgeTab/BridgeTab'
 
 export interface TabProps {
   isLoading: boolean
@@ -55,20 +54,8 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     enabled: isPoolDataReady && !!shareClassId && !!network?.centrifugeId,
   })
 
-  // Handle check restricted countries
-  const { getIsDeRwaPool } = useGetPoolsByIds()
   const isLocationQueryReady = isPoolDataReady && !isPoolContextLoading && !isVaultsContextLoading
-  const { data: location } = useGeolocation({
-    enabled: isLocationQueryReady,
-  })
-  const poolRestrictedCountries = useGetPoolRestrictedCountries(
-    poolDetails?.id.toString(),
-    getIsDeRwaPool(poolDetails?.id.toString())
-  )
-  const kycCountries = poolDetails?.metadata?.onboarding?.kycRestrictedCountries ?? []
-  const kybCountries = poolDetails?.metadata?.onboarding?.kybRestrictedCountries ?? []
-  const restrictedCountries = [...kycCountries, ...kybCountries, ...poolRestrictedCountries]
-  const isRestrictedCountry = restrictedCountries.includes(location?.country_code ?? '')
+  const isRestrictedCountry = useIsRestrictedCountry(poolDetails, isLocationQueryReady)
 
   // Find if invest and redeem is possible
   const isInvestableChain = useMemo(() => {
@@ -77,6 +64,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     return networks.some((n) => n.centrifugeId === connectedCentrifugeId)
   }, [networks, connectedChain, blockchainsMapByChainId])
   const isInvestorWhiteListed = useMemo(() => !!isMember, [isMember, vault, connectedChain])
+
   // Account for leftover dust that is technically claimable but not worth claiming
   const oneUSDC = 10n ** 6n
   const hasClaimableAssets = useMemo(
@@ -99,6 +87,19 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
 
   if (!poolDetails) return null
 
+  const tabBody = (Tab: ComponentType<TabProps>) =>
+    isRestrictedCountry ? (
+      <RestrictedCountry />
+    ) : (
+      <VaultGuard
+        isClaimFormDisplayed={isClaimFormDisplayed}
+        isInvestorWhiteListed={isInvestorWhiteListed}
+        isLoading={isTabLoading}
+        tab={Tab}
+        setIsClaimFormDisplayed={setIsClaimFormDisplayed}
+      />
+    )
+
   return (
     <Flex
       direction="column"
@@ -116,49 +117,25 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
             label: 'Invest',
             value: 'tab-invest',
             disabled: isTabDisabled,
-            body: isRestrictedCountry ? (
-              <RestrictedCountry />
-            ) : (
-              <VaultGuard
-                isClaimFormDisplayed={isClaimFormDisplayed}
-                isInvestorWhiteListed={isInvestorWhiteListed}
-                isLoading={isTabLoading}
-                tab={InvestTab}
-                setIsClaimFormDisplayed={setIsClaimFormDisplayed}
-              />
-            ),
+            body: tabBody(InvestTab),
           },
           {
             label: 'Redeem',
             value: 'tab-redeem',
             disabled: isTabDisabled,
-            body: isRestrictedCountry ? (
-              <RestrictedCountry />
-            ) : (
-              <VaultGuard
-                isClaimFormDisplayed={isClaimFormDisplayed}
-                isInvestorWhiteListed={isInvestorWhiteListed}
-                isLoading={isTabLoading}
-                tab={RedeemTab}
-                setIsClaimFormDisplayed={setIsClaimFormDisplayed}
-              />
-            ),
+            body: tabBody(RedeemTab),
+          },
+          {
+            label: 'Bridge',
+            value: 'tab-bridge',
+            disabled: isTabDisabled,
+            body: tabBody(BridgeTab),
           },
           {
             label: 'Pending',
             value: 'tab-pending',
             disabled: isTabDisabled,
-            body: isRestrictedCountry ? (
-              <RestrictedCountry />
-            ) : (
-              <VaultGuard
-                isClaimFormDisplayed={isClaimFormDisplayed}
-                isInvestorWhiteListed={isInvestorWhiteListed}
-                isLoading={isTabLoading}
-                tab={PendingTab}
-                setIsClaimFormDisplayed={setIsClaimFormDisplayed}
-              />
-            ),
+            body: tabBody(PendingTab),
           },
         ]}
       />
