@@ -1,16 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
-import { Box, Flex, Text, Input, Field } from '@chakra-ui/react'
-import { Checkbox as ChakraCheckbox } from '@chakra-ui/react'
-import { RiArrowDownSLine, RiSearchLine } from 'react-icons/ri'
-import { NetworkIcon } from '@ui'
 import { useController, type FieldPath, type FieldValues } from 'react-hook-form'
-import { useFormContext } from '@forms'
-import { useGetFormError } from '../../../../forms/hooks/useGetFormError'
+import { RiArrowDownSLine, RiSearchLine } from 'react-icons/ri'
+import { Box, Checkbox as ChakraCheckbox, Flex, Text, Input, Field } from '@chakra-ui/react'
+import { useFormContext, useGetFormError } from '@forms'
+import { NetworkIcon } from '@ui'
 
 export interface ChainOption {
   centrifugeId: number
   name: string
-  balance?: string
+  hasBalance?: boolean
   balanceLabel?: string
 }
 
@@ -58,7 +56,7 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
 
   const filteredOptions = options.filter((o) => {
     if (search && !o.name.toLowerCase().includes(search.toLowerCase())) return false
-    if (showOnlyWithBalance && (!o.balance || o.balance === '0')) return false
+    if (showOnlyWithBalance && !o.hasBalance) return false
     return true
   })
 
@@ -72,14 +70,17 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
   }
 
   return (
-    <Field.Root invalid={isError} disabled={isDisabled}>
-      <Field.Label fontSize="sm" fontWeight={500}>
-        {label}
-      </Field.Label>
-      <Box position="relative" ref={containerRef} w="100%">
+    <Box position="relative" ref={containerRef} w="100%">
+      <Field.Root invalid={isError} disabled={isDisabled}>
+        <Field.Label fontSize="sm" fontWeight={500}>
+          {label}
+        </Field.Label>
         <Flex
           as="button"
-          onClick={() => !isDisabled && setIsOpen(!isOpen)}
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault()
+            if (!isDisabled) setIsOpen(!isOpen)
+          }}
           alignItems="center"
           gap={2}
           px={2.5}
@@ -111,107 +112,112 @@ export function ChainSelect<TFieldValues extends FieldValues = FieldValues>({
             <RiArrowDownSLine size={20} />
           </Box>
         </Flex>
+        {isError && <Field.ErrorText>{errorMessage}</Field.ErrorText>}
+      </Field.Root>
 
-        {isOpen && (
-          <Box
-            position="absolute"
-            top="100%"
-            left={0}
-            mt={1}
-            bg="white"
-            border="1px solid"
-            borderColor="border.solid"
-            borderRadius="lg"
-            shadow="md"
-            zIndex={10}
-            overflow="hidden"
-            minW="100%"
-            w="max-content"
-          >
-            {variant === 'from' && (
-              <>
-                <Box p={3}>
-                  <Flex
-                    alignItems="center"
-                    gap={2}
-                    px={3}
-                    border="1px solid"
-                    borderColor="border.input"
-                    borderRadius="md"
-                    bg="bg.input"
-                  >
-                    <RiSearchLine size={20} color="var(--chakra-colors-fg-muted)" />
-                    <Input
-                      placeholder="Type here...."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      variant="subtle"
-                      size="sm"
-                      px={0}
-                      _focus={{ boxShadow: 'none' }}
-                    />
-                  </Flex>
-                </Box>
-                <Box borderBottom="1px solid" borderColor="border.solid" />
-                <Box px={4} py={2}>
-                  <ChakraCheckbox.Root
-                    size="sm"
-                    checked={showOnlyWithBalance}
-                    onCheckedChange={(details) => setShowOnlyWithBalance(!!details.checked)}
-                  >
-                    <ChakraCheckbox.HiddenInput />
-                    <ChakraCheckbox.Control />
-                    <ChakraCheckbox.Label>
-                      <Text fontSize="sm" color="fg.muted">
-                        Show only assets with balance {'>'} 0
-                      </Text>
-                    </ChakraCheckbox.Label>
-                  </ChakraCheckbox.Root>
-                </Box>
-              </>
-            )}
-            <Box overflowY="auto" w="100%">
-              {filteredOptions.map((option) => (
+      {isOpen && (
+        <Box
+          position="absolute"
+          top="100%"
+          left={0}
+          mt={1}
+          bg="white"
+          border="1px solid"
+          borderColor="border.solid"
+          borderRadius="lg"
+          shadow="md"
+          zIndex={10}
+          overflow="hidden"
+          minW="100%"
+          w="max-content"
+        >
+          {variant === 'from' && (
+            <>
+              <Box p={3}>
                 <Flex
-                  key={option.centrifugeId}
-                  as="button"
-                  onClick={() => handleSelect(option.centrifugeId)}
                   alignItems="center"
-                  justifyContent="space-between"
-                  w="100%"
-                  px={4}
-                  py={3}
-                  cursor="pointer"
-                  _hover={{ bg: 'bg.subtle' }}
-                  transition="background 0.15s"
-                  borderBottom={variant === 'to' ? '1px solid' : 'none'}
+                  gap={2}
+                  px={3}
+                  border="1px solid"
                   borderColor="border.input"
+                  borderRadius="md"
+                  bg="bg.input"
                 >
-                  <Flex alignItems="center" gap={2} flexShrink={0}>
-                    <NetworkIcon centrifugeId={option.centrifugeId} boxSize="24px" />
-                    <Text fontSize="sm" fontWeight={500} whiteSpace="nowrap">
-                      {option.name}
-                    </Text>
-                  </Flex>
-                  {variant === 'from' && option.balanceLabel && (
-                    <Text fontSize="sm" color="fg.muted" whiteSpace="nowrap">
-                      {option.balanceLabel}
-                    </Text>
-                  )}
+                  <RiSearchLine size={20} color="var(--chakra-colors-fg-muted)" />
+                  <Input
+                    placeholder="Type here...."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    variant="subtle"
+                    size="sm"
+                    px={0}
+                    _focus={{ boxShadow: 'none', border: 'none' }}
+                    _focusVisible={{ border: 'none' }}
+                    focusRing="none"
+                  />
                 </Flex>
-              ))}
-              {filteredOptions.length === 0 && (
-                <Box px={4} py={3}>
-                  <Text fontSize="sm" color="fg.muted">
-                    No chains found
+              </Box>
+              <Box borderBottom="1px solid" borderColor="border.solid" />
+              <Box px={4} py={2}>
+                <ChakraCheckbox.Root
+                  size="sm"
+                  checked={showOnlyWithBalance}
+                  onCheckedChange={(details) => setShowOnlyWithBalance(!!details.checked)}
+                >
+                  <ChakraCheckbox.HiddenInput />
+                  <ChakraCheckbox.Control />
+                  <ChakraCheckbox.Label>
+                    <Text fontSize="sm" color="fg.muted">
+                      Show only assets with balance {'>'} 0
+                    </Text>
+                  </ChakraCheckbox.Label>
+                </ChakraCheckbox.Root>
+              </Box>
+            </>
+          )}
+          <Box overflowY="auto" w="100%">
+            {filteredOptions.map((option) => (
+              <Flex
+                key={option.centrifugeId}
+                as="button"
+                onClick={(e: React.MouseEvent) => {
+                  e.preventDefault()
+                  handleSelect(option.centrifugeId)
+                }}
+                alignItems="center"
+                justifyContent="space-between"
+                w="100%"
+                px={4}
+                py={3}
+                cursor="pointer"
+                _hover={{ bg: 'bg.subtle' }}
+                transition="background 0.15s"
+                borderBottom={variant === 'to' ? '1px solid' : 'none'}
+                borderColor="border.input"
+              >
+                <Flex alignItems="center" gap={2} flexShrink={0}>
+                  <NetworkIcon centrifugeId={option.centrifugeId} boxSize="24px" />
+                  <Text fontSize="sm" fontWeight={500} whiteSpace="nowrap">
+                    {option.name}
                   </Text>
-                </Box>
-              )}
-            </Box>
+                </Flex>
+                {variant === 'from' && option.balanceLabel && (
+                  <Text fontSize="sm" color="fg.muted" whiteSpace="nowrap">
+                    {option.balanceLabel}
+                  </Text>
+                )}
+              </Flex>
+            ))}
+            {filteredOptions.length === 0 && (
+              <Box px={4} py={3}>
+                <Text fontSize="sm" color="fg.muted">
+                  No chains found
+                </Text>
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
-      {isError && <Field.ErrorText>{errorMessage}</Field.ErrorText>}
-    </Field.Root>
+        </Box>
+      )}
+    </Box>
   )
 }
