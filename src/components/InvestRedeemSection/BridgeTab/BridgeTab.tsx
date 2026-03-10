@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { z } from 'zod'
 import { Box, Spinner } from '@chakra-ui/react'
-import { Form, useForm, addressInput, createBalanceSchema } from '@forms'
 import {
   type BridgeActionType,
   BridgeAction,
@@ -12,6 +11,7 @@ import { BridgeInProgress } from '@components/InvestRedeemSection/BridgeTab/form
 import { BridgeSuccess } from '@components/InvestRedeemSection/BridgeTab/forms/BridgeSuccess'
 import { TabProps } from '@components/InvestRedeemSection'
 import { useVaultsContext } from '@contexts/VaultsContext'
+import { Form, useForm, addressInput, createBalanceSchema } from '@forms'
 
 export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
   const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
@@ -30,8 +30,7 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
     defaultValues: BridgeFormDefaultValues,
     mode: 'onChange',
     onSubmit: () => {
-      // Bridge submission will be implemented later
-      // For now, just show the in-progress view
+      // TODO: Bridge submission logic.
       setActionType(BridgeAction.IN_PROGRESS)
     },
     onSubmitError: (error) => console.error('Bridge form submission error:', error),

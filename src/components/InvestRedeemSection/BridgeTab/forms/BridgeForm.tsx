@@ -1,12 +1,21 @@
 import { useCallback, useMemo, type Dispatch, type SetStateAction } from 'react'
+import { RiFileCopyLine } from 'react-icons/ri'
+import { HexString } from '@centrifuge/sdk'
+import {
+  allPoolsVaultsQueryKey,
+  formatBalance,
+  useBlockchainsMapByCentrifugeId,
+  usePoolsAccessStatusQuery,
+  type Investment,
+  type PoolNetworkVaultData,
+} from '@cfg'
 import { Badge, Box, Button, Flex, Input, Separator, Text } from '@chakra-ui/react'
-import { BalanceInput, Checkbox, SubmitButton, useFormContext, useWatch } from '@forms'
-import { formatBalance, useBlockchainsMapByCentrifugeId } from '@cfg'
+import type { BridgeActionType } from '@components/InvestRedeemSection/components/defaults'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
+import { BalanceInput, Checkbox, SubmitButton, useFormContext, useWatch } from '@forms'
+import { useQueryClient } from '@tanstack/react-query'
 import { ChainSelect, type ChainOption } from '../components/ChainSelect'
-import { type BridgeActionType } from '@components/InvestRedeemSection/components/defaults'
-import { RiFileCopyLine } from 'react-icons/ri'
 
 interface BridgeFormProps {
   isDisabled: boolean
@@ -14,10 +23,15 @@ interface BridgeFormProps {
 }
 
 export function BridgeForm({ isDisabled }: BridgeFormProps) {
-  const { networks } = usePoolContext()
+  const { networks, selectedPoolId, pools } = usePoolContext()
   const { vaultDetails, investment } = useVaultsContext()
   const { data: blockchainsMap } = useBlockchainsMapByCentrifugeId()
   const { setValue, control } = useFormContext()
+  const queryClient = useQueryClient()
+
+  const poolIds = useMemo(() => pools?.map((p) => p.id) ?? [], [pools])
+  const { data: accessStatus } = usePoolsAccessStatusQuery(poolIds)
+  const memberNetworkIds = selectedPoolId ? accessStatus?.get(selectedPoolId.toString())?.memberNetworkIds : undefined
 
   const fromChain = useWatch({ control, name: 'fromChain' })
   const toChain = useWatch({ control, name: 'toChain' })
@@ -26,22 +40,73 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
 
   const shareSymbol = vaultDetails?.share.symbol ?? ''
 
+  // Read cached vault and investment data (already fetched by PoolTable)
+  const shareBalanceByChain = useMemo(() => {
+    const map = new Map<number, string>()
+    if (!pools || !selectedPoolId) return map
+
+    const poolIdsKey = pools
+      .map((p) => p.id.toString())
+      .sort()
+      .join(',')
+    const allPoolVaults = queryClient.getQueryData<PoolNetworkVaultData[]>(allPoolsVaultsQueryKey(poolIdsKey))
+    if (!allPoolVaults) return map
+
+    // Filter to current pool and pick one vault per network
+    const vaultsForPool: PoolNetworkVaultData[] = []
+    const cachedAllPoolVaults = new Set<number>()
+    for (const v of allPoolVaults) {
+      if (v.poolId !== selectedPoolId.toString() || cachedAllPoolVaults.has(v.centrifugeId)) continue
+      cachedAllPoolVaults.add(v.centrifugeId)
+      vaultsForPool.push(v)
+    }
+
+    // Look up cached investments — PoolTable caches all vaults' investments as a single batch,
+    // so search by key prefix and build a vault address -> investment map
+    const vaultAddresses = new Set(vaultsForPool.map((v) => v.vault.address))
+    const cachedInvestmentsPerVaults = queryClient.getQueriesData<Investment[]>({ queryKey: ['investmentsPerVaults'] })
+    const investmentByAddress = new Map<string, Investment>()
+
+    for (const [key, investments] of cachedInvestmentsPerVaults) {
+      if (!investments) continue
+      const addressesStr = key[1] as string
+      const addresses = addressesStr.split(',') as HexString[]
+      addresses.forEach((addr, i) => {
+        if (vaultAddresses.has(addr) && investments[i]) {
+          investmentByAddress.set(addr, investments[i])
+        }
+      })
+    }
+
+    const fallback = `0.00 ${shareSymbol}`.trim()
+    for (const v of vaultsForPool) {
+      const inv = investmentByAddress.get(v.vault.address)
+      map.set(
+        v.centrifugeId,
+        inv?.shareBalance ? formatBalance(inv.shareBalance, { currency: shareSymbol, precision: 2 }) : fallback
+      )
+    }
+
+    return map
+  }, [pools, selectedPoolId, queryClient, shareSymbol])
+
   const chainOptions: ChainOption[] = useMemo(() => {
     if (!networks || !blockchainsMap) return []
     return networks
+      .filter((n) => !memberNetworkIds || memberNetworkIds.has(n.centrifugeId))
       .map((n) => {
         const blockchain = blockchainsMap.get(n.centrifugeId)
         if (!blockchain) return null
+        const balanceLabel = shareBalanceByChain.get(n.centrifugeId)
         return {
           centrifugeId: n.centrifugeId,
           name: blockchain.name,
-          // TODO: Balance per chain would come from holdings data — placeholder for now
-          balance: undefined,
-          balanceLabel: undefined,
+          hasBalance: !!balanceLabel && !balanceLabel.startsWith('0.00'),
+          balanceLabel,
         }
       })
       .filter(Boolean) as ChainOption[]
-  }, [networks, blockchainsMap])
+  }, [networks, blockchainsMap, shareBalanceByChain, memberNetworkIds])
 
   const toChainOptions = useMemo(
     () => chainOptions.filter((o) => o.centrifugeId !== Number(fromChain)),
@@ -57,6 +122,9 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
     () => chainOptions.find((o) => o.centrifugeId === Number(toChain)),
     [chainOptions, toChain]
   )
+
+  const hasNoSharesOnAnyChain = chainOptions.length > 0 && chainOptions.every((o) => !o.hasBalance)
+  const isBridgeDisabled = isDisabled || chainOptions.length <= 1 || hasNoSharesOnAnyChain
 
   const maxAmount = useMemo(() => {
     return investment?.shareBalance
@@ -115,7 +183,7 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
               decimals={vaultDetails?.share.decimals}
               placeholder="0.00"
               currency={shareSymbol}
-              disabled={isDisabled}
+              disabled={isBridgeDisabled}
             />
             <Flex mt={2} alignItems="center" gap={2}>
               <Badge
@@ -127,8 +195,8 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
                 h="24px"
                 borderColor="border.dark-muted !important"
                 border="1px solid"
-                cursor={isDisabled ? 'not-allowed' : 'pointer'}
-                onClick={isDisabled ? undefined : setMaxAmount}
+                cursor={isBridgeDisabled ? 'not-allowed' : 'pointer'}
+                onClick={isBridgeDisabled ? undefined : setMaxAmount}
               >
                 MAX
               </Badge>
@@ -145,6 +213,7 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
               name="sendToDifferentAddress"
               label={<Text fontSize="sm">Sending to a different address?</Text>}
               labelStart={false}
+              disabled={isBridgeDisabled}
             />
             {sendToDifferentAddress && (
               <Flex mt={2} gap={2.5} alignItems="stretch">

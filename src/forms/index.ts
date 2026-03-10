@@ -11,6 +11,7 @@ export { SwitchControl } from './components/Switch'
 // hooks
 export { useForm } from './hooks/useForm'
 export { useFormContext } from './hooks/useFormContext'
+export { useGetFormError } from './hooks/useGetFormError'
 export { useWatch } from 'react-hook-form'
 
 // utils
