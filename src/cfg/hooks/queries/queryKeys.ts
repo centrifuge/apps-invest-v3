@@ -30,6 +30,10 @@ export const queryKeys = {
 
   // Token instance keys
   tokenInstances: (addresses: string[]) => ['tokenInstances', ...addresses] as const,
+  // Bridge validation keys
+  shareClassDeployments: (shareClassId: string) => ['shareClassDeployments', shareClassId] as const,
+  bridgeTransferRestrictions: (fromCentrifugeId: number, receiverAddress: string, destinationIdsKey: string) =>
+    ['bridgeTransferRestrictions', fromCentrifugeId, receiverAddress, destinationIdsKey] as const,
 
   // Batch query keys
   allPoolsVaults: (poolIdsKey: string) => ['allPoolsVaults', poolIdsKey] as const,
