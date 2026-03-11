@@ -35,7 +35,7 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
     schema,
     defaultValues: BridgeFormDefaultValues,
     mode: 'onChange',
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       if (!shareClass?.shareClass || !address) return
 
       const receiver = (
@@ -49,8 +49,13 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
         values.amount.toBigInt()
       )
 
-      execute(tx)
       setActionType(BridgeAction.IN_PROGRESS)
+      try {
+        await execute(tx)
+      } catch {
+        form.reset()
+        setActionType(BridgeAction.BRIDGE_FORM)
+      }
     },
     onSubmitError: (error) => console.error('Bridge form submission error:', error),
   })
