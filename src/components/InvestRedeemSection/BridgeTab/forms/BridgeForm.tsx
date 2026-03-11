@@ -1,11 +1,14 @@
-import { useCallback, useMemo, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, type Dispatch, type SetStateAction } from 'react'
 import { RiFileCopyLine } from 'react-icons/ri'
 import { HexString } from '@centrifuge/sdk'
 import {
-  allPoolsVaultsQueryKey,
   formatBalance,
+  useAddress,
   useBlockchainsMapByCentrifugeId,
-  usePoolsAccessStatusQuery,
+  useAllowedBridgeDestinations,
+  useShareClassDeployments,
+  useAllPoolsVaultsQuery,
+  useInvestmentsPerVaultsQuery,
   type Investment,
   type PoolNetworkVaultData,
 } from '@cfg'
@@ -14,7 +17,6 @@ import type { BridgeActionType } from '@components/InvestRedeemSection/component
 import { usePoolContext } from '@contexts/PoolContext'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { BalanceInput, Checkbox, SubmitButton, useFormContext, useWatch } from '@forms'
-import { useQueryClient } from '@tanstack/react-query'
 import { ChainSelect, type ChainOption } from '../components/ChainSelect'
 
 interface BridgeFormProps {
@@ -23,95 +25,123 @@ interface BridgeFormProps {
 }
 
 export function BridgeForm({ isDisabled }: BridgeFormProps) {
-  const { networks, selectedPoolId, pools } = usePoolContext()
-  const { vaultDetails, investment } = useVaultsContext()
+  const { selectedPoolId, pools, shareClass } = usePoolContext()
+  const { vaultDetails } = useVaultsContext()
   const { data: blockchainsMap } = useBlockchainsMapByCentrifugeId()
-  const { setValue, control } = useFormContext()
-  const queryClient = useQueryClient()
-
-  const poolIds = useMemo(() => pools?.map((p) => p.id) ?? [], [pools])
-  const { data: accessStatus } = usePoolsAccessStatusQuery(poolIds)
-  const memberNetworkIds = selectedPoolId ? accessStatus?.get(selectedPoolId.toString())?.memberNetworkIds : undefined
+  const { setValue, control, clearErrors } = useFormContext()
+  const { address } = useAddress()
 
   const fromChain = useWatch({ control, name: 'fromChain' })
   const toChain = useWatch({ control, name: 'toChain' })
+  const amount = useWatch({ control, name: 'amount' })
   const sendToDifferentAddress = useWatch({ control, name: 'sendToDifferentAddress' })
   const recipientAddress = useWatch({ control, name: 'recipientAddress' })
 
   const shareSymbol = vaultDetails?.share.symbol ?? ''
 
-  // Read cached vault and investment data (already fetched by PoolTable)
-  const shareBalanceByChain = useMemo(() => {
-    const map = new Map<number, string>()
-    if (!pools || !selectedPoolId) return map
+  // Criteria 1, 2, 4: Fetch all networks where the share token AND its hook (restriction manager) are deployed
+  const { data: deployments } = useShareClassDeployments(shareClass?.shareClass, {
+    enabled: !!shareClass?.shareClass,
+  })
 
-    const poolIdsKey = pools
-      .map((p) => p.id.toString())
-      .sort()
-      .join(',')
-    const allPoolVaults = queryClient.getQueryData<PoolNetworkVaultData[]>(allPoolsVaultsQueryKey(poolIdsKey))
-    if (!allPoolVaults) return map
+  // Set of centrifugeIds that have a valid share token + hook deployment
+  const deployedCentrifugeIds = useMemo(() => new Set(deployments?.map((d) => d.centrifugeId) ?? []), [deployments])
 
-    // Filter to current pool and pick one vault per network
-    const vaultsForPool: PoolNetworkVaultData[] = []
-    const cachedAllPoolVaults = new Set<number>()
+  // The receiver for transfer restriction checks — use custom recipient if set, otherwise connected wallet
+  const effectiveReceiver = useMemo(
+    () => (sendToDifferentAddress && recipientAddress ? recipientAddress : address) as HexString | undefined,
+    [sendToDifferentAddress, recipientAddress, address]
+  )
+
+  // Criteria 3 & 5: Validate transfer restrictions for all potential destination chains
+  // given the selected source chain and receiver address
+  const { data: allowedDestinations } = useAllowedBridgeDestinations(
+    shareClass?.shareClass,
+    fromChain ? Number(fromChain) : undefined,
+    effectiveReceiver,
+    { enabled: !!fromChain && !!effectiveReceiver }
+  )
+
+  // Reactively fetch vault data for all pools (same data PoolTable fetches)
+  const poolIds = useMemo(() => pools?.map((p) => p.id) ?? [], [pools])
+  const { data: allPoolVaults } = useAllPoolsVaultsQuery(poolIds)
+
+  // Filter to current pool and pick one vault per network
+  const vaultsForPool = useMemo(() => {
+    if (!allPoolVaults || !selectedPoolId) return []
+    const seen = new Set<number>()
+    const result: PoolNetworkVaultData[] = []
     for (const v of allPoolVaults) {
-      if (v.poolId !== selectedPoolId.toString() || cachedAllPoolVaults.has(v.centrifugeId)) continue
-      cachedAllPoolVaults.add(v.centrifugeId)
-      vaultsForPool.push(v)
+      if (v.poolId !== selectedPoolId.toString() || seen.has(v.centrifugeId)) continue
+      seen.add(v.centrifugeId)
+      result.push(v)
     }
+    return result
+  }, [allPoolVaults, selectedPoolId])
 
-    // Look up cached investments — PoolTable caches all vaults' investments as a single batch,
-    // so search by key prefix and build a vault address -> investment map
-    const vaultAddresses = new Set(vaultsForPool.map((v) => v.vault.address))
-    const cachedInvestmentsPerVaults = queryClient.getQueriesData<Investment[]>({ queryKey: ['investmentsPerVaults'] })
-    const investmentByAddress = new Map<string, Investment>()
+  const vaultObjects = useMemo(() => vaultsForPool.map((v) => v.vault), [vaultsForPool])
+  const { data: investments } = useInvestmentsPerVaultsQuery(vaultObjects)
 
-    for (const [key, investments] of cachedInvestmentsPerVaults) {
-      if (!investments) continue
-      const addressesStr = key[1] as string
-      const addresses = addressesStr.split(',') as HexString[]
-      addresses.forEach((addr, i) => {
-        if (vaultAddresses.has(addr) && investments[i]) {
-          investmentByAddress.set(addr, investments[i])
-        }
-      })
-    }
-
+  const { shareBalanceByChain, investmentByChain } = useMemo(() => {
+    const balanceMap = new Map<number, string>()
+    const investmentMap = new Map<number, Investment>()
     const fallback = `0.00 ${shareSymbol}`.trim()
-    for (const v of vaultsForPool) {
-      const inv = investmentByAddress.get(v.vault.address)
-      map.set(
+
+    for (let i = 0; i < vaultsForPool.length; i++) {
+      const v = vaultsForPool[i]
+      const inv = investments?.[i]
+      balanceMap.set(
         v.centrifugeId,
         inv?.shareBalance ? formatBalance(inv.shareBalance, { currency: shareSymbol, precision: 2 }) : fallback
       )
+      if (inv) investmentMap.set(v.centrifugeId, inv)
     }
 
-    return map
-  }, [pools, selectedPoolId, queryClient, shareSymbol])
+    return { shareBalanceByChain: balanceMap, investmentByChain: investmentMap }
+  }, [vaultsForPool, investments, shareSymbol])
 
+  // Chain options filtered by deployment (criteria 1, 2, 4): only show chains where
+  // the share token AND hook (restriction manager) are deployed
   const chainOptions: ChainOption[] = useMemo(() => {
-    if (!networks || !blockchainsMap) return []
-    return networks
-      .filter((n) => !memberNetworkIds || memberNetworkIds.has(n.centrifugeId))
-      .map((n) => {
-        const blockchain = blockchainsMap.get(n.centrifugeId)
+    if (!blockchainsMap || deployedCentrifugeIds.size === 0) return []
+    return Array.from(deployedCentrifugeIds)
+      .map((centrifugeId) => {
+        const blockchain = blockchainsMap.get(centrifugeId)
         if (!blockchain) return null
-        const balanceLabel = shareBalanceByChain.get(n.centrifugeId)
+        const balanceLabel = shareBalanceByChain.get(centrifugeId)
         return {
-          centrifugeId: n.centrifugeId,
+          centrifugeId,
           name: blockchain.name,
           hasBalance: !!balanceLabel && !balanceLabel.startsWith('0.00'),
           balanceLabel,
         }
       })
       .filter(Boolean) as ChainOption[]
-  }, [networks, blockchainsMap, shareBalanceByChain, memberNetworkIds])
+  }, [blockchainsMap, shareBalanceByChain, deployedCentrifugeIds])
 
-  const toChainOptions = useMemo(
-    () => chainOptions.filter((o) => o.centrifugeId !== Number(fromChain)),
-    [chainOptions, fromChain]
-  )
+  // "To" chain options: exclude selected fromChain and filter by transfer restrictions (criteria 3 & 5)
+  const toChainOptions = useMemo(() => {
+    const fromId = Number(fromChain)
+    return chainOptions.filter((o) => {
+      if (o.centrifugeId === fromId) return false
+      // If restrictions haven't loaded yet, show all options (they'll be validated on submit)
+      if (!allowedDestinations || allowedDestinations.size === 0) return true
+      return allowedDestinations.get(o.centrifugeId) === true
+    })
+  }, [chainOptions, fromChain, allowedDestinations])
+
+  // Clear toChain if it's no longer in the valid options (e.g., transfer restrictions loaded)
+  useEffect(() => {
+    if (toChain && toChainOptions.length > 0 && !toChainOptions.some((o) => String(o.centrifugeId) === toChain)) {
+      setValue('toChain', '', { shouldValidate: true })
+    }
+  }, [toChain, toChainOptions, setValue])
+
+  // Reset amount and clear errors when fromChain changes
+  useEffect(() => {
+    setValue('amount', '', { shouldValidate: false })
+    clearErrors('amount')
+  }, [fromChain, setValue, clearErrors])
 
   const selectedFromChain = useMemo(
     () => chainOptions.find((o) => o.centrifugeId === Number(fromChain)),
@@ -123,19 +153,23 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
     [chainOptions, toChain]
   )
 
+  // Use the selected fromChain's investment data for max amount
+  const fromChainInvestment = fromChain ? investmentByChain.get(Number(fromChain)) : undefined
+
   const hasNoSharesOnAnyChain = chainOptions.length > 0 && chainOptions.every((o) => !o.hasBalance)
-  const isBridgeDisabled = isDisabled || chainOptions.length <= 1 || hasNoSharesOnAnyChain
+  const hasNoSharesOnFromChain = !fromChainInvestment?.shareBalance || fromChainInvestment.shareBalance.isZero()
+  const isBridgeDisabled = isDisabled || chainOptions.length <= 1 || hasNoSharesOnAnyChain || hasNoSharesOnFromChain
 
   const maxAmount = useMemo(() => {
-    return investment?.shareBalance
-      ? formatBalance(investment.shareBalance, { currency: shareSymbol, precision: 2 })
+    return fromChainInvestment?.shareBalance
+      ? formatBalance(fromChainInvestment.shareBalance, { currency: shareSymbol, precision: 2 })
       : `0.00 ${shareSymbol}`
-  }, [investment?.shareBalance, shareSymbol])
+  }, [fromChainInvestment?.shareBalance, shareSymbol])
 
   const setMaxAmount = useCallback(() => {
-    if (!investment?.shareBalance) return
-    setValue('amount', investment.shareBalance.toDecimal().toString(), { shouldValidate: true })
-  }, [investment?.shareBalance, setValue])
+    if (!fromChainInvestment?.shareBalance) return
+    setValue('amount', fromChainInvestment.shareBalance.toDecimal().toString(), { shouldValidate: true })
+  }, [fromChainInvestment?.shareBalance, setValue])
 
   const handlePaste = async () => {
     try {
@@ -175,7 +209,6 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
             </Box>
           </Flex>
 
-          {/* Amount input */}
           <Box mt={5}>
             <BalanceInput
               name="amount"
@@ -246,7 +279,7 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
           <Separator my={6} borderColor="border.input" />
 
           <Box px={1}>
-            <SummaryRow label="Asset amount" value={shareSymbol ? `— ${shareSymbol}` : '—'} />
+            <SummaryRow label="Asset amount" value={amount ? `${amount} ${shareSymbol}` : '—'} />
             <SummaryRow label="From chain" value={selectedFromChain?.name ?? '—'} />
             <SummaryRow label="To chain" value={selectedToChain?.name ?? '—'} />
             <SummaryRow label="Bridge fee" value="—" />

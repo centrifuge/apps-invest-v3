@@ -17,7 +17,7 @@ import { useVaultsContext } from '@contexts/VaultsContext'
 import { Form, useForm, addressInput, createBalanceSchema } from '@forms'
 
 export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
-  const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
+  const { vaultDetails, isVaultDetailsLoading } = useVaultsContext()
   const { shareClass } = usePoolContext()
   const { address } = useAddress()
   const { execute, isPending } = useCentrifugeTransaction()
@@ -28,7 +28,7 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
     toChain: z.string().min(1, 'Select a destination chain'),
     amount: createBalanceSchema(vaultDetails?.share.decimals ?? 18, { min: 1 }),
     sendToDifferentAddress: z.boolean(),
-    recipientAddress: addressInput(),
+    recipientAddress: addressInput().or(z.literal('')),
   })
 
   const form = useForm({
@@ -55,8 +55,8 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
     onSubmitError: (error) => console.error('Bridge form submission error:', error),
   })
 
-  const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading
-  const isDisabled = isPending || !investment || !vaultDetails || !shareClass?.shareClass
+  const isLoading = isTabLoading || isVaultDetailsLoading
+  const isDisabled = isPending || !vaultDetails || !shareClass?.shareClass
 
   if (isLoading) {
     return (
