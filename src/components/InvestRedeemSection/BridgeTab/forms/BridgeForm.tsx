@@ -39,12 +39,11 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
 
   const shareSymbol = vaultDetails?.share.symbol ?? ''
 
-  // Criteria 1, 2, 4: Fetch all networks where the share token AND its hook (restriction manager) are deployed
+  // Bridge validation criteria 1, 2, 4: Fetch all networks where the share token AND its hook (restriction manager) are deployed
   const { data: deployments } = useShareClassDeployments(shareClass?.shareClass, {
     enabled: !!shareClass?.shareClass,
   })
 
-  // Set of centrifugeIds that have a valid share token + hook deployment
   const deployedCentrifugeIds = useMemo(() => new Set(deployments?.map((d) => d.centrifugeId) ?? []), [deployments])
 
   // The receiver for transfer restriction checks — use custom recipient if set, otherwise connected wallet
@@ -62,7 +61,6 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
     { enabled: !!fromChain && !!effectiveReceiver }
   )
 
-  // Reactively fetch vault data for all pools (same data PoolTable fetches)
   const poolIds = useMemo(() => pools?.map((p) => p.id) ?? [], [pools])
   const { data: allPoolVaults } = useAllPoolsVaultsQuery(poolIds)
 
