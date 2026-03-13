@@ -1,10 +1,10 @@
-import { BadgeProps, Box, Heading } from '@chakra-ui/react'
+import { BadgeProps, Box, Flex, IconButton } from '@chakra-ui/react'
+import { IoClose } from 'react-icons/io5'
 
 const colorStatus: Record<string, { backgroundColor: string; color: string; borderColor: string }> = {
-  /// Add more colors
   warning: {
     backgroundColor: 'bg.warning',
-    color: 'fg.warning',
+    color: 'fg.solid',
     borderColor: 'border.warning',
   },
   error: {
@@ -20,29 +20,34 @@ const colorStatus: Record<string, { backgroundColor: string; color: string; bord
 }
 
 export const Banner = ({
-  label,
   status,
-  icon,
+  children,
+  onClose,
   ...rest
-}: { label: string; status: 'warning' | 'error' | 'info'; icon: React.ReactNode } & BadgeProps) => {
+}: {
+  status: 'warning' | 'error' | 'info'
+  children: React.ReactNode
+  onClose?: () => void
+} & BadgeProps) => {
   return (
     <Box
       backgroundColor={colorStatus[status].backgroundColor}
       color={colorStatus[status].color}
-      {...rest}
-      borderRadius="md"
-      border="1px solid"
+      borderBottom="1px solid"
       borderColor={colorStatus[status].borderColor}
-      display="flex"
-      p={2}
-      gap={2}
-      alignItems="center"
-      fontWeight="bold"
+      p={3}
+      {...rest}
     >
-      {icon}
-      <Heading size="xs" fontWeight="bold">
-        {label}
-      </Heading>
+      <Box maxW={{ base: '95vw', xl: '75vw' }} marginInline="auto">
+        <Flex display="flex" gap={2} alignItems="start">
+          <Box>{children}</Box>
+          {onClose && (
+            <IconButton aria-label="Close banner" variant="ghost" size="sm" color="fg.info" onClick={onClose}>
+              <IoClose />
+            </IconButton>
+          )}
+        </Flex>
+      </Box>
     </Box>
   )
 }
