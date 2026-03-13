@@ -50,10 +50,7 @@ export function useCentrifugeTransaction() {
     queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
   }
 
-  function executeWithOptions(
-    observable: Transaction,
-    options?: ExecuteOptions
-  ): Promise<OperationConfirmedStatus> {
+  function executeWithOptions(observable: Transaction, options?: ExecuteOptions): Promise<OperationConfirmedStatus> {
     ensureSigner()
 
     return new Promise<OperationConfirmedStatus>((resolve, reject) => {
