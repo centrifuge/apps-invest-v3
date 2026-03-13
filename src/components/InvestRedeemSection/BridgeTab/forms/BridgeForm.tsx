@@ -54,7 +54,7 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
 
   // Criteria 3 & 5: Validate transfer restrictions for all potential destination chains
   // given the selected source chain and receiver address
-  const { data: allowedDestinations } = useAllowedBridgeDestinations(
+  const { data: allowedDestinations, isLoading: isRestrictionsLoading } = useAllowedBridgeDestinations(
     shareClass?.shareClass,
     fromChain ? Number(fromChain) : undefined,
     effectiveReceiver,
@@ -122,8 +122,8 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
     const fromId = Number(fromChain)
     return chainOptions.filter((o) => {
       if (o.centrifugeId === fromId) return false
-      // If restrictions haven't loaded yet, show all options (they'll be validated on submit)
-      if (!allowedDestinations || allowedDestinations.size === 0) return true
+      // Only show destinations that are confirmed allowed by transfer restrictions
+      if (!allowedDestinations || allowedDestinations.size === 0) return false
       return allowedDestinations.get(o.centrifugeId) === true
     })
   }, [chainOptions, fromChain, allowedDestinations])
@@ -156,7 +156,9 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
 
   const hasNoSharesOnAnyChain = chainOptions.length > 0 && chainOptions.every((o) => !o.hasBalance)
   const hasNoSharesOnFromChain = !fromChainInvestment?.shareBalance || fromChainInvestment.shareBalance.isZero()
-  const isBridgeDisabled = isDisabled || chainOptions.length <= 1 || hasNoSharesOnAnyChain || hasNoSharesOnFromChain
+  const isRestrictionsNotReady = !!fromChain && isRestrictionsLoading
+  const isBridgeDisabled =
+    isDisabled || chainOptions.length <= 1 || hasNoSharesOnAnyChain || hasNoSharesOnFromChain || isRestrictionsNotReady
 
   const maxAmount = useMemo(() => {
     return fromChainInvestment?.shareBalance
