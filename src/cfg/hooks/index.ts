@@ -15,4 +15,4 @@ export * from './useVaults'
 
 export { CentrifugeProvider, useCentrifuge } from './CentrifugeContext'
 export { useObservable } from './useObservable'
-export { useCentrifugeTransaction } from './useCentrifugeTransaction'
+export { useCentrifugeTransaction, type ExecuteOptions } from './useCentrifugeTransaction'
