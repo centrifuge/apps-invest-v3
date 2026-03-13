@@ -38,8 +38,8 @@ export const Banner = ({
       p={3}
       {...rest}
     >
-      <Box maxW={{ base: '95vw', xl: '75vw' }} marginInline="auto">
-        <Flex display="flex" gap={2} alignItems="start">
+      <Box maxW={{ base: '95vw', xl: '75vw' }} mx="auto">
+        <Flex display="flex" gap={2} alignItems="start" px={{ base: 4, md: 8 }}>
           <Box>{children}</Box>
           {onClose && (
             <IconButton aria-label="Close banner" variant="ghost" size="sm" color="fg.info" onClick={onClose}>
