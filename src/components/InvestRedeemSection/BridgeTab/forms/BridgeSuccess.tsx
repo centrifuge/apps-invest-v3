@@ -1,10 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
-import { RiCheckboxCircleLine, RiExternalLinkLine } from 'react-icons/ri'
-import { BridgeAction, type BridgeActionType } from '@components/InvestRedeemSection/components/defaults'
-import { truncateAddress } from '@cfg'
-import { useFormContext } from '@forms'
 import { Link } from 'react-router-dom'
+import { RiCheckboxCircleLine, RiExternalLinkLine } from 'react-icons/ri'
+import { truncateAddress } from '@cfg'
+import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react'
+import { BridgeAction, type BridgeActionType } from '@components/InvestRedeemSection/components/defaults'
+import { useFormContext } from '@forms'
+import { SummaryRow } from '../components/SummaryRow'
 
 export interface BridgeSuccessData {
   asset: string
@@ -101,19 +102,6 @@ export function BridgeSuccess({ setActionType, data }: BridgeSuccessProps) {
         </Box>
       </Flex>
     </Box>
-  )
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <Flex justifyContent="space-between" alignItems="center" mb={1.5}>
-      <Text fontSize="sm" color="fg.muted">
-        {label}
-      </Text>
-      <Text fontSize="sm" fontWeight={500}>
-        {value}
-      </Text>
-    </Flex>
   )
 }
 
