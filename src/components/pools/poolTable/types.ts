@@ -33,7 +33,6 @@ export interface PoolRow {
 
 export type SortField =
   | 'name'
-  | 'type'
   | 'tvl'
   | 'apy'
   | 'totalAssets'

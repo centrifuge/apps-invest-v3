@@ -6,9 +6,9 @@ import { type Investment, useInvestmentsPerVaultsQuery } from '@cfg'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import {
   POOL_COLUMNS_ACCESS,
-  POOL_COLUMNS_FUNDS,
+  POOL_COLUMNS_PRODUCTS,
   VAULT_COLUMNS_ACCESS,
-  VAULT_COLUMNS_FUNDS,
+  VAULT_COLUMNS_PRODUCTS,
 } from '@components/pools/poolTable/columnsConfig'
 import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
 import { getVaultPath } from '@routes/routePaths'
@@ -100,7 +100,7 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
   }, [allInvestments, poolRows, isAccessTable])
 
   const sortedRows = sortPoolRows(poolRows, sortConfig, investmentTotalsMap)
-  const poolColumns = isAccessTable ? POOL_COLUMNS_ACCESS : POOL_COLUMNS_FUNDS
+  const poolColumns = isAccessTable ? POOL_COLUMNS_ACCESS : POOL_COLUMNS_PRODUCTS
 
   if (showSkeleton) {
     return <PoolTableSkeleton columns={poolColumns} />
@@ -203,7 +203,7 @@ function PoolTableRowGroup({
   colSpan: number
 }) {
   const lastVaultIndex = poolRow.vaults.length - 1
-  const vaultColumns = activeTab === POOL_TABLE_TABS.access ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
+  const vaultColumns = activeTab === POOL_TABLE_TABS.access ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_PRODUCTS
 
   return (
     <>
