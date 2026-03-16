@@ -17,7 +17,7 @@ export default function HomePage() {
     )
   }
 
-  const baseHeroHeight = '400px'
+  const baseHeroHeight = '360px'
   const waveHeight = '120px'
   const halfWaveHeight = `calc(${waveHeight} / 2)`
   const totalHeroHeight = `calc(${baseHeroHeight} + ${halfWaveHeight} + 10px)` // add 10px padding to prevent color bleed
