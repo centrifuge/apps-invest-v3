@@ -4,7 +4,7 @@ import type { NetworkSlug, PoolDetails, VaultDetails } from '@cfg'
 
 export const POOL_TABLE_TABS = {
   access: 'access',
-  funds: 'funds',
+  products: 'products',
 } as const
 
 export type ActiveTab = (typeof POOL_TABLE_TABS)[keyof typeof POOL_TABLE_TABS]
