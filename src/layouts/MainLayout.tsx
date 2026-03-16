@@ -9,7 +9,7 @@ export const maxScreenSize = { base: '95vw', xl: '75vw' }
 
 const MainLayout = memo(() => {
   return (
-    <Box minH="100vh" bg="white" overflowX="hidden">
+    <Box minH="100vh" bg="white">
       <Box position="absolute" top={0} left={0} right={0} zIndex={10}>
         <Box maxW={maxScreenSize} mx="auto" py={{ base: 4, md: 8 }}>
           <Flex
