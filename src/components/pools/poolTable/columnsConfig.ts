@@ -44,9 +44,10 @@ export const POOL_COLUMNS_PRODUCTS: PoolTableColumns[] = [
 ]
 
 export const VAULT_COLUMNS_PRODUCTS: VaultColumn[] = [
-  { label: 'Network', width: '24%', align: 'left' },
-  { label: 'Vault', width: '10%', align: 'center' },
+  { label: 'Network', width: '16%', align: 'left' },
+  { label: 'Vault', width: '8%', align: 'center' },
+  { label: 'Asset Balance', width: '16%', align: 'right' },
   { label: 'NAV', width: '16%', align: 'right' },
-  { label: 'Total Issuance', width: '25%', align: 'right' },
-  { label: 'Price/Share', width: '25%', align: 'right' },
+  { label: 'Total Issuance', width: '24%', align: 'right' },
+  { label: 'Price/Share', width: '20%', align: 'right' },
 ]

@@ -61,7 +61,7 @@ export function VaultSubRow({
       {activeTab === POOL_TABLE_TABS.access ? (
         <AccessVaultCells investment={investment} assetSymbol={assetSymbol} isLast={isLast} />
       ) : (
-        <FundsVaultCells vaultRow={vaultRow} isLast={isLast} isDuplicateNav={isDuplicateNav} />
+        <FundsVaultCells vaultRow={vaultRow} investment={investment} isLast={isLast} isDuplicateNav={isDuplicateNav} />
       )}
     </Table.Row>
   )
@@ -111,10 +111,12 @@ function AccessVaultCells({
 
 function FundsVaultCells({
   vaultRow,
+  investment,
   isLast,
   isDuplicateNav,
 }: {
   vaultRow: VaultRow
+  investment?: Investment
   isLast?: boolean
   isDuplicateNav?: boolean
 }) {
@@ -132,21 +134,23 @@ function FundsVaultCells({
         <Text fontSize="xs">{vaultRow.vaultDetails.asset.symbol}</Text>
       </Table.Cell>
       <Table.Cell textAlign={cols[2].align} {...borderBottom} borderColor="charcoal.200">
+        <Text {...numericTextProps}>{fmt(investment?.assetBalance)}</Text>
+      </Table.Cell>
+      <Table.Cell textAlign={cols[3].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps} {...duplicateProps}>
           {fmt(networkData?.nav)}
         </Text>
       </Table.Cell>
-      <Table.Cell textAlign={cols[3].align} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[4].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps} {...duplicateProps}>
           {fmt(networkData?.totalIssuance)}
         </Text>
       </Table.Cell>
-      <Table.Cell textAlign={cols[4].align} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[5].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps} {...duplicateProps}>
           {fmt(networkData?.pricePerShare)}
         </Text>
       </Table.Cell>
-      <Table.Cell {...borderBottom} borderColor="charcoal.200" />
     </>
   )
 }
