@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from 'react-router-dom'
+import { createBrowserRouter, redirect, ScrollRestoration } from 'react-router-dom'
 import { LoadingBoundary } from '@ui'
 import MainLayout from '@layouts/MainLayout'
 import { HomeRoute, PoolRoute, RootRoute } from '@routes/routes'
@@ -11,6 +11,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <>
+        <ScrollRestoration />
         <HashUrlHandler />
         <RootRoute />
       </>
