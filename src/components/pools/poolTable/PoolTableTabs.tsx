@@ -59,6 +59,10 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   const accessRwaPoolRows = useMemo(() => filterByAccess(rwaPoolRows, accessData), [rwaPoolRows, accessData])
   const accessDeRwaPoolRows = useMemo(() => filterByAccess(deRwaPoolRows, accessData), [deRwaPoolRows, accessData])
 
+  const rwaHeading = {
+    label: 'RWA',
+    subtitle: 'Tokenized real-world assets issued under various legal structures. KYB onboarding required.',
+  }
   const deRwaHeading = {
     label: 'DeRWA',
     subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
@@ -124,6 +128,8 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
             ) : (
               <>
                 <PoolTableSection
+                  heading={rwaHeading.label}
+                  subtitle={rwaHeading.subtitle}
                   poolRows={accessRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
                   isLoading={isPoolsVaultsLoading || isAccessLoading}
@@ -143,6 +149,8 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
 
           <Tabs.Content value={POOL_TABLE_TABS.funds} pt={0}>
             <PoolTableSection
+              heading={rwaHeading.label}
+              subtitle={rwaHeading.subtitle}
               poolRows={rwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isPoolsVaultsLoading}
