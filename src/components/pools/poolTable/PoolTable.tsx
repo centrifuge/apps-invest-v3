@@ -6,9 +6,9 @@ import { type Investment, useInvestmentsPerVaultsQuery } from '@cfg'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import {
   POOL_COLUMNS_ACCESS,
-  POOL_COLUMNS_FUNDS,
+  POOL_COLUMNS_PRODUCTS,
   VAULT_COLUMNS_ACCESS,
-  VAULT_COLUMNS_FUNDS,
+  VAULT_COLUMNS_PRODUCTS,
 } from '@components/pools/poolTable/columnsConfig'
 import { PoolTableSkeleton } from '@components/pools/poolTable/PoolTableSkeleton'
 import { getVaultPath } from '@routes/routePaths'
@@ -63,19 +63,17 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
     [navigate, setSelectedPoolId]
   )
 
-  const isAccessTable = activeTab === POOL_TABLE_TABS.access
-
   const showSkeleton = isLoading && poolRows.length === 0
 
   const allVaults = useMemo(
-    () => (isAccessTable && !showSkeleton ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
-    [poolRows, isAccessTable, showSkeleton]
+    () => (!showSkeleton ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
+    [poolRows, showSkeleton]
   )
   const { data: allInvestments } = useInvestmentsPerVaultsQuery(allVaults)
 
   const investmentTotalsMap = useMemo(() => {
     const map = new Map<string, PoolInvestmentTotals>()
-    if (!allInvestments || !isAccessTable) return map
+    if (!allInvestments) return map
 
     let offset = 0
     for (const row of poolRows) {
@@ -86,21 +84,23 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
       if (totals) map.set(row.poolId, totals)
     }
     return map
-  }, [allInvestments, poolRows, isAccessTable])
+  }, [allInvestments, poolRows])
 
   // Build per-vault investment map from the batch query for passing to VaultSubRow
   const vaultInvestmentMap = useMemo(() => {
     const map = new Map<string, Investment>()
-    if (!allInvestments || !isAccessTable) return map
+    if (!allInvestments) return map
     const allVaultsList = poolRows.flatMap((row) => row.vaults)
     allVaultsList.forEach((v, i) => {
       if (allInvestments[i]) map.set(v.vault.address, allInvestments[i])
     })
     return map
-  }, [allInvestments, poolRows, isAccessTable])
+  }, [allInvestments, poolRows])
 
   const sortedRows = sortPoolRows(poolRows, sortConfig, investmentTotalsMap)
-  const poolColumns = isAccessTable ? POOL_COLUMNS_ACCESS : POOL_COLUMNS_FUNDS
+
+  const isAccessTable = activeTab === POOL_TABLE_TABS.access
+  const poolColumns = isAccessTable ? POOL_COLUMNS_ACCESS : POOL_COLUMNS_PRODUCTS
 
   if (showSkeleton) {
     return <PoolTableSkeleton columns={poolColumns} />
@@ -203,7 +203,7 @@ function PoolTableRowGroup({
   colSpan: number
 }) {
   const lastVaultIndex = poolRow.vaults.length - 1
-  const vaultColumns = activeTab === POOL_TABLE_TABS.access ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_FUNDS
+  const vaultColumns = activeTab === POOL_TABLE_TABS.access ? VAULT_COLUMNS_ACCESS : VAULT_COLUMNS_PRODUCTS
 
   return (
     <>

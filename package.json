@@ -33,12 +33,14 @@
       "rollup@>=4 <5": "4.59.0",
       "ajv@<7": "6.14.0",
       "bn.js@>=5 <5.2.3": "5.2.3",
-      "bn.js@<4.12.3": "4.12.3"
+      "bn.js@<4.12.3": "4.12.3",
+      "flatted": ">=3.4.0",
+      "undici": ">=7.24.0"
     }
   },
   "dependencies": {
     "@ark-ui/react": "5.15.1",
-    "@centrifuge/sdk": "1.6.1",
+    "@centrifuge/sdk": "1.6.2",
     "@chakra-ui/react": "3.19.1",
     "@chakra-ui/system": "2.6.2",
     "@chakra-ui/theme": "3.4.6",

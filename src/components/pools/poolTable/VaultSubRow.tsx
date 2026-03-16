@@ -2,6 +2,7 @@ import { Flex, Table, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
 import { formatBalance, useShareClassDetails } from '@cfg'
 import type { FormattableBalance, Investment, PoolDetails } from '@cfg'
+import { VAULT_COLUMNS_ACCESS, VAULT_COLUMNS_PRODUCTS } from '@components/pools/poolTable/columnsConfig'
 import { NetworkIcon } from '@ui'
 import { getVaultPath } from '@routes/routePaths'
 import { useNavigate } from 'react-router-dom'
@@ -60,13 +61,12 @@ export function VaultSubRow({
       {activeTab === POOL_TABLE_TABS.access ? (
         <AccessVaultCells investment={investment} assetSymbol={assetSymbol} isLast={isLast} />
       ) : (
-        <FundsVaultCells vaultRow={vaultRow} isLast={isLast} isDuplicateNav={isDuplicateNav} />
+        <FundsVaultCells vaultRow={vaultRow} investment={investment} isLast={isLast} isDuplicateNav={isDuplicateNav} />
       )}
     </Table.Row>
   )
 }
 
-const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
 function AccessVaultCells({
@@ -78,30 +78,31 @@ function AccessVaultCells({
   assetSymbol: string
   isLast?: boolean
 }) {
+  const cols = VAULT_COLUMNS_ACCESS
   const fmt = (value: unknown) => formatBalance(value as FormattableBalance, { precision: 2 })
   const borderBottom = isLast ? { borderBottomWidth: 0 } : {}
 
   return (
     <>
-      <Table.Cell textAlign="center" {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[1].align} {...borderBottom} borderColor="charcoal.200">
         <Text fontSize="xs">{assetSymbol}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[2].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps}>{fmt(investment?.assetBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[3].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps}>{fmt(investment?.shareBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[4].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps}>{fmt(investment?.pendingDepositAssets)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[5].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps}>{fmt(investment?.pendingRedeemShares)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[6].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps}>{fmt(investment?.claimableDepositShares)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[7].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps}>{fmt(investment?.claimableRedeemAssets)}</Text>
       </Table.Cell>
     </>
@@ -110,13 +111,16 @@ function AccessVaultCells({
 
 function FundsVaultCells({
   vaultRow,
+  investment,
   isLast,
   isDuplicateNav,
 }: {
   vaultRow: VaultRow
+  investment?: Investment
   isLast?: boolean
   isDuplicateNav?: boolean
 }) {
+  const cols = VAULT_COLUMNS_PRODUCTS
   const { data: shareClassDetails } = useShareClassDetails(vaultRow.vault.shareClass)
   const networkData = shareClassDetails?.navPerNetwork.find((n) => n.centrifugeId === vaultRow.centrifugeId)
 
@@ -126,28 +130,27 @@ function FundsVaultCells({
 
   return (
     <>
-      <Table.Cell textAlign="center" {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[1].align} {...borderBottom} borderColor="charcoal.200">
         <Text fontSize="xs">{vaultRow.vaultDetails.asset.symbol}</Text>
       </Table.Cell>
-      <Table.Cell textAlign="center" {...borderBottom} borderColor="charcoal.200">
-        <Text fontSize="xs">{shareClassDetails?.symbol ?? '-'}</Text>
+      <Table.Cell textAlign={cols[2].align} {...borderBottom} borderColor="charcoal.200">
+        <Text {...numericTextProps}>{fmt(investment?.assetBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[3].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps} {...duplicateProps}>
           {fmt(networkData?.nav)}
         </Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[4].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps} {...duplicateProps}>
           {fmt(networkData?.totalIssuance)}
         </Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps} {...borderBottom} borderColor="charcoal.200">
+      <Table.Cell textAlign={cols[5].align} {...borderBottom} borderColor="charcoal.200">
         <Text {...numericTextProps} {...duplicateProps}>
           {fmt(networkData?.pricePerShare)}
         </Text>
       </Table.Cell>
-      <Table.Cell {...borderBottom} borderColor="charcoal.200" />
     </>
   )
 }

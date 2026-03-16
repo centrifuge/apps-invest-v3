@@ -59,6 +59,10 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
   const accessRwaPoolRows = useMemo(() => filterByAccess(rwaPoolRows, accessData), [rwaPoolRows, accessData])
   const accessDeRwaPoolRows = useMemo(() => filterByAccess(deRwaPoolRows, accessData), [deRwaPoolRows, accessData])
 
+  const rwaHeading = {
+    label: 'RWA',
+    subtitle: 'Tokenized real-world assets issued under various legal structures. KYB onboarding required.',
+  }
   const deRwaHeading = {
     label: 'DeRWA',
     subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
@@ -85,10 +89,10 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
         >
-          Access & Positions
+          My Portfolio
         </Tabs.Trigger>
         <Tabs.Trigger
-          value={POOL_TABLE_TABS.funds}
+          value={POOL_TABLE_TABS.products}
           height="44px"
           alignItems="flex-end"
           pb={4}
@@ -98,7 +102,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
           color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
         >
-          Funds
+          Products
         </Tabs.Trigger>
         <Tabs.Indicator bg="fg.emphasized" height="2px" borderRadius="1px" bottom="0" />
       </Tabs.List>
@@ -124,6 +128,8 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
             ) : (
               <>
                 <PoolTableSection
+                  heading={rwaHeading.label}
+                  subtitle={rwaHeading.subtitle}
                   poolRows={accessRwaPoolRows}
                   setSelectedPoolId={setSelectedPoolId}
                   isLoading={isPoolsVaultsLoading || isAccessLoading}
@@ -141,12 +147,14 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
             )}
           </Tabs.Content>
 
-          <Tabs.Content value={POOL_TABLE_TABS.funds} pt={0}>
+          <Tabs.Content value={POOL_TABLE_TABS.products} pt={0}>
             <PoolTableSection
+              heading={rwaHeading.label}
+              subtitle={rwaHeading.subtitle}
               poolRows={rwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isPoolsVaultsLoading}
-              activeTab={POOL_TABLE_TABS.funds}
+              activeTab={POOL_TABLE_TABS.products}
             />
             <PoolTableSection
               heading={deRwaHeading.label}
@@ -154,7 +162,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               poolRows={deRwaPoolRows}
               setSelectedPoolId={setSelectedPoolId}
               isLoading={isPoolsVaultsLoading}
-              activeTab={POOL_TABLE_TABS.funds}
+              activeTab={POOL_TABLE_TABS.products}
             />
           </Tabs.Content>
         </Box>

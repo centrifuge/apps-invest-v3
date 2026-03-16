@@ -17,9 +17,7 @@ export default function HomePage() {
     )
   }
 
-  if (!poolIds?.length) return <h3>Sorry, there are no pools available at this time.</h3>
-
-  const baseHeroHeight = '480px'
+  const baseHeroHeight = '360px'
   const waveHeight = '120px'
   const halfWaveHeight = `calc(${waveHeight} / 2)`
   const totalHeroHeight = `calc(${baseHeroHeight} + ${halfWaveHeight} + 10px)` // add 10px padding to prevent color bleed
@@ -109,11 +107,7 @@ export default function HomePage() {
               lineHeight={{ base: '40px', md: '72px' }}
               letterSpacing="-1.28px"
             >
-              Unlock Yield from Real-World Assets
-            </Text>
-            <Text fontSize="md" fontWeight={400} color="fg.subtle" lineHeight="24px" maxW="531px">
-              Access curated investment opportunities backed by US Treasuries and other high-quality assets. Start
-              growing your portfolio with secure, fully onchain funds.
+              Access Tokenized Assets on Centrifuge
             </Text>
           </Flex>
         </Box>
@@ -121,7 +115,13 @@ export default function HomePage() {
 
       <Box position="relative" px={{ base: 4, md: 16 }} pt="3.5rem">
         <Box maxW={maxScreenSize} mx="auto">
-          <PoolTableTabs poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
+          {!poolIds?.length ? (
+            <Text as="h2" fontSize="2xl" mt={2}>
+              Sorry, there are no pools available at this time.
+            </Text>
+          ) : (
+            <PoolTableTabs poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
+          )}
         </Box>
       </Box>
     </Box>

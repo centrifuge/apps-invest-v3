@@ -1,8 +1,9 @@
 import { MdBrokenImage } from 'react-icons/md'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 import { formatBalance, ipfsToHttp, type FormattableBalance } from '@cfg'
-import { Badge, Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
+import { Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
+import { POOL_COLUMNS_ACCESS, POOL_COLUMNS_PRODUCTS } from '@components/pools/poolTable/columnsConfig'
 import { Tooltip } from '@ui'
 import type { ActiveTab, PoolInvestmentTotals, PoolRow } from './types'
 import { POOL_TABLE_TABS } from './types'
@@ -27,7 +28,6 @@ export function PoolTableRow({
   investmentTotals,
 }: PoolTableRowProps) {
   const isExpandable = poolRow.vaults.length > 1
-  const poolType = poolRow.poolDetails.metadata?.pool?.asset.class ?? ''
 
   const handleClick = () => {
     if (isExpandable) {
@@ -81,14 +81,6 @@ export function PoolTableRow({
         </Flex>
       </Table.Cell>
 
-      <Table.Cell textAlign="center">
-        {poolType ? (
-          <Badge size="sm" variant="solid" colorPalette="yellow">
-            {poolType}
-          </Badge>
-        ) : null}
-      </Table.Cell>
-
       {activeTab === POOL_TABLE_TABS.access ? (
         <AccessPoolCells investmentTotals={investmentTotals} />
       ) : (
@@ -98,13 +90,14 @@ export function PoolTableRow({
   )
 }
 
-const numericCellProps = { textAlign: 'right' as const }
 const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular-nums' as const }
 
 function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
+  const cols = POOL_COLUMNS_PRODUCTS
+
   return (
     <>
-      <Table.Cell textAlign="center">
+      <Table.Cell textAlign={cols[1].align}>
         {poolRow.isRestricted ? (
           <Text fontSize="sm" color="fg.muted">
             --
@@ -116,7 +109,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
         )}
       </Table.Cell>
 
-      <Table.Cell textAlign="right">
+      <Table.Cell textAlign={cols[2].align}>
         {poolRow.isRestricted ? (
           <InvestorsOnlyValueBlock />
         ) : (
@@ -126,7 +119,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
         )}
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell textAlign={cols[3].align}>
         <Tooltip content={poolRow.assetType}>
           <Text fontSize="xs" lineClamp={1}>
             {poolRow.assetType}
@@ -134,7 +127,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
         </Tooltip>
       </Table.Cell>
 
-      <Table.Cell>
+      <Table.Cell textAlign={cols[4].align}>
         <Tooltip content={poolRow.investorType}>
           <Text fontSize="xs" lineClamp={1}>
             {poolRow.investorType}
@@ -142,7 +135,7 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
         </Tooltip>
       </Table.Cell>
 
-      <Table.Cell textAlign="right">
+      <Table.Cell textAlign={cols[5].align}>
         <Text fontSize="sm" fontVariantNumeric="tabular-nums">
           {poolRow.minInvestment}
         </Text>
@@ -153,27 +146,28 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
 
 function AccessPoolCells({ investmentTotals }: { investmentTotals?: PoolInvestmentTotals }) {
   const totals = investmentTotals ?? null
+  const cols = POOL_COLUMNS_ACCESS
 
   const fmt = (value: FormattableBalance | undefined) => formatBalance(value, { precision: 2 })
 
   return (
     <>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell textAlign={cols[1].align}>
         <Text {...numericTextProps}>{fmt(totals?.assetBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell textAlign={cols[2].align}>
         <Text {...numericTextProps}>{fmt(totals?.shareBalance)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell textAlign={cols[3].align}>
         <Text {...numericTextProps}>{fmt(totals?.pendingDepositAssets)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell textAlign={cols[4].align}>
         <Text {...numericTextProps}>{fmt(totals?.pendingRedeemShares)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell textAlign={cols[5].align}>
         <Text {...numericTextProps}>{fmt(totals?.claimableDepositShares)}</Text>
       </Table.Cell>
-      <Table.Cell {...numericCellProps}>
+      <Table.Cell textAlign={cols[6].align}>
         <Text {...numericTextProps}>{fmt(totals?.claimableRedeemAssets)}</Text>
       </Table.Cell>
     </>
