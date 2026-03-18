@@ -16,14 +16,7 @@ interface VaultSubRowProps {
   isDuplicateNav?: boolean
 }
 
-export function VaultSubRow({
-  vaultRow,
-  poolId,
-  activeTab,
-  investment,
-  isLast,
-  isDuplicateNav,
-}: VaultSubRowProps) {
+export function VaultSubRow({ vaultRow, poolId, activeTab, investment, isLast, isDuplicateNav }: VaultSubRowProps) {
   const navigate = useNavigate()
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
 

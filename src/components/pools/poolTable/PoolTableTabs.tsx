@@ -130,7 +130,6 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
                   heading={rwaHeading.label}
                   subtitle={rwaHeading.subtitle}
                   poolRows={accessRwaPoolRows}
-
                   isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={POOL_TABLE_TABS.access}
                 />
@@ -138,7 +137,6 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
                   heading={deRwaHeading.label}
                   subtitle={deRwaHeading.subtitle}
                   poolRows={accessDeRwaPoolRows}
-
                   isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={POOL_TABLE_TABS.access}
                 />
@@ -151,7 +149,6 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
               heading={rwaHeading.label}
               subtitle={rwaHeading.subtitle}
               poolRows={rwaPoolRows}
-
               isLoading={isPoolsVaultsLoading}
               activeTab={POOL_TABLE_TABS.products}
             />
@@ -159,7 +156,6 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
               heading={deRwaHeading.label}
               subtitle={deRwaHeading.subtitle}
               poolRows={deRwaPoolRows}
-
               isLoading={isPoolsVaultsLoading}
               activeTab={POOL_TABLE_TABS.products}
             />

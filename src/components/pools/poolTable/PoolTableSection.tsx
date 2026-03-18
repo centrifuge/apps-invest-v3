@@ -11,13 +11,7 @@ interface PoolTableSectionProps {
   subtitle?: string
 }
 
-export function PoolTableSection({
-  heading,
-  subtitle,
-  poolRows,
-  isLoading,
-  activeTab,
-}: PoolTableSectionProps) {
+export function PoolTableSection({ heading, subtitle, poolRows, isLoading, activeTab }: PoolTableSectionProps) {
   if (!isLoading && poolRows.length === 0) {
     return (
       <Box mb={12}>
@@ -32,11 +26,7 @@ export function PoolTableSection({
   return (
     <Box mb={12}>
       {sectionHeader({ heading, subtitle })}
-      <PoolTable
-        poolRows={poolRows}
-        isLoading={isLoading}
-        activeTab={activeTab}
-      />
+      <PoolTable poolRows={poolRows} isLoading={isLoading} activeTab={activeTab} />
     </Box>
   )
 }
