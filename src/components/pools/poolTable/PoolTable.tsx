@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
-import { PoolId } from '@centrifuge/sdk'
 import { type Investment, useInvestmentsPerVaultsQuery } from '@cfg'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import {
@@ -20,12 +19,11 @@ import { VaultSubRow } from './VaultSubRow'
 
 interface PoolTableProps {
   poolRows: PoolRow[]
-  setSelectedPoolId: (poolId: PoolId) => void
   isLoading?: boolean
   activeTab: ActiveTab
 }
 
-export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }: PoolTableProps) {
+export function PoolTable({ poolRows, isLoading, activeTab }: PoolTableProps) {
   const navigate = useNavigate()
   const [expandedPools, setExpandedPools] = useState<Set<string>>(new Set())
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
@@ -56,11 +54,10 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
     (poolRow: PoolRow) => {
       const vault = poolRow.vaults[0]
       if (!vault) return
-      setSelectedPoolId(poolRow.poolDetails.id)
       const path = getVaultPath(poolRow.poolId, vault.networkName, vault.vaultDetails.asset.symbol)
       navigate(path)
     },
-    [navigate, setSelectedPoolId]
+    [navigate]
   )
 
   const showSkeleton = isLoading && poolRows.length === 0
@@ -167,7 +164,6 @@ export function PoolTable({ poolRows, setSelectedPoolId, isLoading, activeTab }:
                 isExpanded={isExpanded}
                 onToggle={() => togglePool(poolRow.poolId)}
                 onClick={() => handlePoolClick(poolRow)}
-                setSelectedPoolId={setSelectedPoolId}
                 activeTab={activeTab}
                 investmentTotals={investmentTotalsMap.get(poolRow.poolId)}
                 vaultInvestmentMap={vaultInvestmentMap}
@@ -186,7 +182,6 @@ function PoolTableRowGroup({
   isExpanded,
   onToggle,
   onClick,
-  setSelectedPoolId,
   activeTab,
   investmentTotals,
   vaultInvestmentMap,
@@ -196,7 +191,6 @@ function PoolTableRowGroup({
   isExpanded: boolean
   onToggle: () => void
   onClick: () => void
-  setSelectedPoolId: (poolId: PoolId) => void
   activeTab: ActiveTab
   investmentTotals?: PoolInvestmentTotals
   vaultInvestmentMap: Map<string, Investment>
@@ -252,8 +246,6 @@ function PoolTableRowGroup({
                           key={`${vault.centrifugeId}-${vault.vaultDetails.asset.address}`}
                           vaultRow={vault}
                           poolId={poolRow.poolId}
-                          setSelectedPoolId={setSelectedPoolId}
-                          poolDetails={poolRow.poolDetails}
                           activeTab={activeTab}
                           investment={vaultInvestmentMap.get(vault.vault.address)}
                           isLast={i === lastVaultIndex}

@@ -1,7 +1,6 @@
 import { Flex, Table, Text } from '@chakra-ui/react'
-import { PoolId } from '@centrifuge/sdk'
 import { formatBalance, useShareClassDetails } from '@cfg'
-import type { FormattableBalance, Investment, PoolDetails } from '@cfg'
+import type { FormattableBalance, Investment } from '@cfg'
 import { VAULT_COLUMNS_ACCESS, VAULT_COLUMNS_PRODUCTS } from '@components/pools/poolTable/columnsConfig'
 import { NetworkIcon } from '@ui'
 import { getVaultPath } from '@routes/routePaths'
@@ -11,8 +10,6 @@ import { type ActiveTab, type VaultRow, POOL_TABLE_TABS } from './types'
 interface VaultSubRowProps {
   vaultRow: VaultRow
   poolId: string
-  setSelectedPoolId: (poolId: PoolId) => void
-  poolDetails: PoolDetails
   activeTab: ActiveTab
   investment?: Investment
   isLast?: boolean
@@ -22,8 +19,6 @@ interface VaultSubRowProps {
 export function VaultSubRow({
   vaultRow,
   poolId,
-  setSelectedPoolId,
-  poolDetails,
   activeTab,
   investment,
   isLast,
@@ -33,7 +28,6 @@ export function VaultSubRow({
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
 
   const handleClick = () => {
-    setSelectedPoolId(poolDetails.id)
     const path = getVaultPath(poolId, vaultRow.networkName, assetSymbol)
     navigate(path)
   }

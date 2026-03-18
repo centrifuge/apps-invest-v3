@@ -1,5 +1,4 @@
 import { Box, Text } from '@chakra-ui/react'
-import { PoolId } from '@centrifuge/sdk'
 import { Card } from '@ui'
 import { PoolTable } from './PoolTable'
 import type { ActiveTab, PoolRow } from './types'
@@ -8,7 +7,6 @@ interface PoolTableSectionProps {
   activeTab: ActiveTab
   isLoading?: boolean
   poolRows: PoolRow[]
-  setSelectedPoolId: (poolId: PoolId) => void
   heading?: string
   subtitle?: string
 }
@@ -17,7 +15,6 @@ export function PoolTableSection({
   heading,
   subtitle,
   poolRows,
-  setSelectedPoolId,
   isLoading,
   activeTab,
 }: PoolTableSectionProps) {
@@ -37,7 +34,6 @@ export function PoolTableSection({
       {sectionHeader({ heading, subtitle })}
       <PoolTable
         poolRows={poolRows}
-        setSelectedPoolId={setSelectedPoolId}
         isLoading={isLoading}
         activeTab={activeTab}
       />

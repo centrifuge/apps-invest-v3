@@ -17,10 +17,9 @@ import { maxScreenSize } from '@layouts/MainLayout'
 
 interface PoolTableTabsProps {
   poolIds: PoolId[]
-  setSelectedPoolId: (poolId: PoolId) => void
 }
 
-export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps) {
+export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
   const { activeHomeTab, setActiveHomeTab } = usePoolContext()
   const { showMainnet } = useDebugFlags()
   const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaultsQuery(poolIds)
@@ -131,7 +130,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                   heading={rwaHeading.label}
                   subtitle={rwaHeading.subtitle}
                   poolRows={accessRwaPoolRows}
-                  setSelectedPoolId={setSelectedPoolId}
+
                   isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={POOL_TABLE_TABS.access}
                 />
@@ -139,7 +138,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
                   heading={deRwaHeading.label}
                   subtitle={deRwaHeading.subtitle}
                   poolRows={accessDeRwaPoolRows}
-                  setSelectedPoolId={setSelectedPoolId}
+
                   isLoading={isPoolsVaultsLoading || isAccessLoading}
                   activeTab={POOL_TABLE_TABS.access}
                 />
@@ -152,7 +151,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               heading={rwaHeading.label}
               subtitle={rwaHeading.subtitle}
               poolRows={rwaPoolRows}
-              setSelectedPoolId={setSelectedPoolId}
+
               isLoading={isPoolsVaultsLoading}
               activeTab={POOL_TABLE_TABS.products}
             />
@@ -160,7 +159,7 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
               heading={deRwaHeading.label}
               subtitle={deRwaHeading.subtitle}
               poolRows={deRwaPoolRows}
-              setSelectedPoolId={setSelectedPoolId}
+
               isLoading={isPoolsVaultsLoading}
               activeTab={POOL_TABLE_TABS.products}
             />
