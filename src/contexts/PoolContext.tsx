@@ -152,7 +152,18 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [pools, isPoolsLoading, poolId, currentPagePoolId, selectedPoolId?.raw])
 
-  const isLoading = isPoolsLoading || isHoldingsLoading || isPoolLoading || isPoolDetailsLoading || isNetworksLoading
+  // Guard against gaps between query resolution and effect-based state updates.
+  const isAwaitingPoolSelection = !!poolId && !selectedPoolId
+  const isAwaitingNetworkSelection = !!networks?.length && !network
+
+  const isLoading =
+    isPoolsLoading ||
+    isHoldingsLoading ||
+    isPoolLoading ||
+    isPoolDetailsLoading ||
+    isNetworksLoading ||
+    isAwaitingPoolSelection ||
+    isAwaitingNetworkSelection
 
   return (
     <PoolContext.Provider

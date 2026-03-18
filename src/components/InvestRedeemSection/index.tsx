@@ -18,6 +18,7 @@ import {
   useAddress,
   useBlockchainsMapByChainId,
   useBlockchainsMapByCentrifugeId,
+  useInvestor,
   useIsMember,
 } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
@@ -49,6 +50,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
   const { data: blockchainsMapByChainId } = useBlockchainsMapByChainId()
   const { network, networks, isLoading: isPoolContextLoading, isPoolDataReady, shareClassId } = usePoolContext()
   const { investment, isLoading: isVaultsContextLoading, vault } = useVaultsContext()
+  const { isLoading: isInvestorLoading } = useInvestor()
   const { data: isMember, isLoading: isMemberLoading } = useIsMember(shareClassId, network?.centrifugeId, {
     enabled: isPoolDataReady && !!shareClassId && !!network?.centrifugeId,
   })
@@ -89,7 +91,7 @@ export function InvestRedeemSection({ pool: poolDetails }: { pool?: PoolDetails 
     setIsClaimFormDisplayed(hasClaimableAssets)
   }, [hasClaimableAssets])
 
-  const isTabLoading = isVaultsContextLoading || isPoolContextLoading || isMemberLoading
+  const isTabLoading = isVaultsContextLoading || isPoolContextLoading || isInvestorLoading || isMemberLoading
   const isTabDisabled = useMemo(
     () => !isInvestorWhiteListed || !vault || !isInvestableChain || isClaimFormDisplayed,
     [isInvestorWhiteListed, vault, isInvestableChain, isClaimFormDisplayed]
