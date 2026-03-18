@@ -65,6 +65,13 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isDeRwa: true,
     isRestricted: false,
   },
+  '281474976710668': {
+    name: 'DeFi SPXA Token',
+    isProduction: true,
+    isRwa: false,
+    isDeRwa: true,
+    isRestricted: false,
+  },
 
   // ===== Test RWA Pools =====
   '281474976710657': {
@@ -76,13 +83,6 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
   },
   '281474976710658': {
     name: 'Sepolia Anemoy Treasury Fund',
-    isProduction: false,
-    isRwa: true,
-    isDeRwa: false,
-    isRestricted: false,
-  },
-  '281474976710668': {
-    name: 'gSavings',
     isProduction: false,
     isRwa: true,
     isDeRwa: false,
