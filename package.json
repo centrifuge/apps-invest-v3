@@ -46,6 +46,7 @@
     "@chakra-ui/theme": "3.4.6",
     "@cloudflare/vite-plugin": "1.25.0",
     "@emotion/react": "11.14.0",
+    "@kyberswap/widgets": "2.3.0",
     "@reown/appkit": "1.8.18",
     "@reown/appkit-adapter-wagmi": "1.8.18",
     "@safe-global/safe-apps-provider": "~0.18.6",
