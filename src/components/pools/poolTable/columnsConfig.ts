@@ -49,5 +49,5 @@ export const VAULT_COLUMNS_PRODUCTS: VaultColumn[] = [
   { label: 'Asset Balance', width: '16%', align: 'right' },
   { label: 'NAV', width: '16%', align: 'right' },
   { label: 'Total Issuance', width: '24%', align: 'right' },
-  { label: 'Price/Share', width: '20%', align: 'right' },
+  { label: 'Token Price', width: '20%', align: 'right' },
 ]

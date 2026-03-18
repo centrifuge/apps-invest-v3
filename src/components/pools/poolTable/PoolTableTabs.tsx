@@ -61,11 +61,11 @@ export function PoolTableTabs({ poolIds, setSelectedPoolId }: PoolTableTabsProps
 
   const rwaHeading = {
     label: 'RWA',
-    subtitle: 'Tokenized real-world assets issued under various legal structures. KYB onboarding required.',
+    subtitle: 'Tokenized real-world assets issued under various legal structures.',
   }
   const deRwaHeading = {
     label: 'DeRWA',
-    subtitle: 'Freely transferable tokens that can be traded on secondary markets.',
+    subtitle: 'Freely transferable tokenized real-world asset tokens.',
   }
 
   return (
