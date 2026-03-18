@@ -56,7 +56,7 @@ export const PoolProvider = ({ children }: { children: ReactNode }) => {
   const connectedChainId = useChainId()
   const [network, setNetwork] = useState<PoolNetwork | undefined>(undefined)
   const [selectedPoolId, setSelectedPoolId] = useState<PoolId | undefined>(undefined)
-  const [activeHomeTab, setActiveHomeTab] = useState<ActiveTab>(POOL_TABLE_TABS.access)
+  const [activeHomeTab, setActiveHomeTab] = useState<ActiveTab>(POOL_TABLE_TABS.products)
 
   const { data: pool, isLoading: isPoolLoading } = usePool(selectedPoolId, { enabled: !!selectedPoolId })
 
