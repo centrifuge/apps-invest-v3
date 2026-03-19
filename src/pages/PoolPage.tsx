@@ -20,18 +20,15 @@ import { useGetPoolRestrictedCountries } from '@hooks/useGetPoolRestrictedCountr
 import { maxScreenSize } from '@layouts/MainLayout'
 import { PoolPageLayout } from '@layouts/PoolPageLayout'
 
-// TODO: remove deJAAA pool ID after testing
-const KYBERSWAP_POOL_IDS = ['281474976710659', '281474976710668']
-
 export default function PoolPage() {
   const { isLoading: isPoolLoading, poolId, poolDetails, networks, networkFromUrl, shareClass } = usePoolContext()
   const { investment, isLoading: isVaultsLoading } = useVaultsContext()
-  const { getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
+  const { getIsRwaPool, getIsDeRwaPool, getIsTradingWidgetPool } = useGetPoolsByIds()
   const isRwaPool = getIsRwaPool(poolId)
   const poolName = poolDetails?.metadata?.pool?.name ?? ''
 
   const baseSlug = getNetworkSlug(base.id)
-  const isSwapPool = KYBERSWAP_POOL_IDS.includes(poolId ?? '') && networkFromUrl === baseSlug
+  const isSwapPool = getIsTradingWidgetPool(poolId) && networkFromUrl === baseSlug
 
   // Geolocation check for swap pool — block US persons from viewing the page
   const { data: location } = useGeolocation({ enabled: isSwapPool && !isPoolLoading })
