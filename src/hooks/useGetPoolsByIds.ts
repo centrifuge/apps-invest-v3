@@ -8,6 +8,7 @@ interface PoolConfig {
   isDeRwa: boolean
   isRestricted: boolean
   chronicleIpfsUri?: string
+  hasTradingWidget?: boolean
 }
 
 const POOL_REGISTRY: Record<string, PoolConfig> = {
@@ -50,6 +51,7 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isRwa: false,
     isDeRwa: true,
     isRestricted: false,
+    hasTradingWidget: true,
   },
   '281474976710660': {
     name: 'deJTRSY',
@@ -71,6 +73,7 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isRwa: false,
     isDeRwa: true,
     isRestricted: false,
+    hasTradingWidget: true,
   },
 
   // ===== Test RWA Pools =====
@@ -153,6 +156,7 @@ const rwaPoolIds = poolIds.filter((id) => POOL_REGISTRY[id].isRwa)
 const deRwaPoolIds = poolIds.filter((id) => POOL_REGISTRY[id].isDeRwa)
 const restrictedPoolIds = poolIds.filter((id) => POOL_REGISTRY[id].isRestricted)
 const chroniclePoolIds = poolIds.filter((id) => POOL_REGISTRY[id].chronicleIpfsUri)
+const tradingWidgetPoolIds = poolIds.filter((id) => POOL_REGISTRY[id].hasTradingWidget)
 
 export function useGetPoolsByIds() {
   const { poolId } = usePoolContext()
@@ -170,6 +174,8 @@ export function useGetPoolsByIds() {
   const getIsDeRwaPool = (poolId?: string) => (poolId ? (getPoolConfig(poolId)?.isDeRwa ?? false) : false)
   const getIsChroniclePool = (poolId?: string) => (poolId ? chroniclePoolIds.includes(poolId) : false)
   const getChroniclePoolIpfsUri = (poolId: string) => POOL_REGISTRY[poolId]?.chronicleIpfsUri
+  const getIsTradingWidgetPool = (poolId?: string) =>
+    poolId ? (POOL_REGISTRY[poolId].hasTradingWidget ?? false) : false
 
   return {
     chroniclePoolIds,
@@ -177,6 +183,7 @@ export function useGetPoolsByIds() {
     rwaPoolIds,
     productionPoolIds,
     restrictedPoolIds,
+    tradingWidgetPoolIds,
     isRestrictedPool,
     getChroniclePoolIpfsUri,
     getIsChroniclePool,
@@ -184,5 +191,6 @@ export function useGetPoolsByIds() {
     getIsRwaPool,
     getIsProductionPool,
     getIsRestrictedPool,
+    getIsTradingWidgetPool,
   }
 }
