@@ -6,7 +6,7 @@ import heroBg from '@assets/logos/centrifuge-logo-lg.svg'
 import { maxScreenSize } from '@layouts/MainLayout'
 
 export default function HomePage() {
-  const { pools, isPoolsLoading, setSelectedPoolId } = usePoolContext()
+  const { pools, isPoolsLoading } = usePoolContext()
   const poolIds = pools?.map((p) => p.id) ?? []
 
   if (isPoolsLoading) {
@@ -120,7 +120,7 @@ export default function HomePage() {
               Sorry, there are no pools available at this time.
             </Text>
           ) : (
-            <PoolTableTabs poolIds={poolIds} setSelectedPoolId={setSelectedPoolId} />
+            <PoolTableTabs poolIds={poolIds} />
           )}
         </Box>
       </Box>
