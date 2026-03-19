@@ -5,6 +5,21 @@ import { createAppKit } from '@reown/appkit/react'
 import { http } from 'wagmi'
 import { injected, safe } from '@wagmi/connectors'
 import type { AppKitNetwork } from '@reown/appkit/networks'
+import {
+  arbitrum,
+  arbitrumSepolia,
+  avalanche,
+  base,
+  baseSepolia,
+  bsc,
+  bscTestnet,
+  hyperEvm,
+  hyperliquidEvmTestnet,
+  mainnet,
+  monad,
+  optimism,
+  plumeMainnet,
+} from 'viem/chains'
 import ArbitrumLogo from '../assets/logos/arbitrum.svg'
 import BnbLogo from '../assets/logos/bnb.svg'
 import PlumeLogo from '../assets/logos/plume.svg'
@@ -65,19 +80,20 @@ function getOrCreateAdapter(
       features: { email: false, socials: false, swaps: false, send: false },
       themeMode: 'light',
       chainImages: {
-        1: 'https://coin-images.coingecko.com/coins/images/279/large/ethereum.png', // Ethereum mainnet
-        10: 'https://coin-images.coingecko.com/coins/images/25244/large/Optimism.png', // OP Mainnet
-        42161: ArbitrumLogo,
-        8453: 'https://coin-images.coingecko.com/asset_platforms/images/131/large/base.png', // Base mainnet
-        56: BnbLogo,
-        43114: 'https://coin-images.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png', // Avalanche
-        143: 'https://coin-images.coingecko.com/coins/images/38927/large/mon.png', // Monad
-        421614: 'https://coin-images.coingecko.com/coins/images/16547/large/arb.jpg', // Arbitrum Sepolia
-        84532: 'https://coin-images.coingecko.com/asset_platforms/images/131/large/base.png', // Base Sepolia
-        97: 'https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png', // BNB Testnet
-        98866: PlumeLogo,
-        999: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg', // HyperEVM Mainnet
-        998: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg', // Hyperliquid Testnet
+        [mainnet.id]: 'https://coin-images.coingecko.com/coins/images/279/large/ethereum.png',
+        [optimism.id]: 'https://coin-images.coingecko.com/coins/images/25244/large/Optimism.png',
+        [arbitrum.id]: ArbitrumLogo,
+        [base.id]: 'https://coin-images.coingecko.com/asset_platforms/images/131/large/base.png',
+        [bsc.id]: BnbLogo,
+        [avalanche.id]:
+          'https://coin-images.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png',
+        [monad.id]: 'https://coin-images.coingecko.com/coins/images/38927/large/mon.png',
+        [arbitrumSepolia.id]: 'https://coin-images.coingecko.com/coins/images/16547/large/arb.jpg',
+        [baseSepolia.id]: 'https://coin-images.coingecko.com/asset_platforms/images/131/large/base.png',
+        [bscTestnet.id]: 'https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png',
+        [plumeMainnet.id]: PlumeLogo,
+        [hyperEvm.id]: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg',
+        [hyperliquidEvmTestnet.id]: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg',
       },
       featuredWalletIds: [
         'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
