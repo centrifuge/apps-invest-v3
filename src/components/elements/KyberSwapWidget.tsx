@@ -2,8 +2,9 @@ import { useCallback } from 'react'
 import { base } from 'viem/chains'
 import { useWalletClient } from 'wagmi'
 import centrifugeLogo from '@assets/logos/centrifuge-logo-lg.svg'
-import { ALL_CHAINS, useAddress } from '@cfg'
-import { Box, Flex, Heading, Text } from '@chakra-ui/react'
+import { ALL_CHAINS, useAddress, useBlockchainsMapByChainId } from '@cfg'
+import { Box, Button, Flex, Heading, Stack, Text } from '@chakra-ui/react'
+import { NetworkIcon } from '@ui'
 import { Widget, type TxData } from '@kyberswap/widgets'
 import { useAppKit, useAppKitNetwork } from '@reown/appkit/react'
 
@@ -47,7 +48,7 @@ const kyberTheme = {
 }
 
 export function KyberSwapWidget({ poolId }: { poolId: string }) {
-  const { address, chainId: connectedChainId } = useAddress()
+  const { address, isConnected, chainId: connectedChainId } = useAddress()
   const { data: walletClient } = useWalletClient()
   const { open } = useAppKit()
   const { switchNetwork } = useAppKitNetwork()
@@ -104,26 +105,46 @@ export function KyberSwapWidget({ poolId }: { poolId: string }) {
       <Box p={4} borderBottom="1px solid" borderColor="border.solid">
         <Heading size="md">Acquire Tokens</Heading>
         <Text fontSize="sm" color="fg.muted" mt={1}>
-          Acquire pool tokens on the secondary market via Base network.
+          Acquire pool tokens on the secondary market.
         </Text>
       </Box>
-      <Flex p={4} justify="center">
-        <Widget
-          client="centrifuge"
-          tokenList={tokenList}
-          theme={kyberTheme}
-          chainId={BASE_CHAIN_ID}
-          defaultTokenIn={USDC_BASE}
-          defaultTokenOut={defaultTokenOut}
-          connectedAccount={{
-            address,
-            chainId: connectedChainId ?? BASE_CHAIN_ID,
-          }}
-          onSubmitTx={handleSubmitTx}
-          onSwitchChain={handleSwitchChain}
-          enableRoute
-        />
-      </Flex>
+      {isConnected && connectedChainId !== BASE_CHAIN_ID ? (
+        <BaseNetworkGuard onSwitch={handleSwitchChain} />
+      ) : (
+        <Flex p={4} justify="center">
+          <Widget
+            client="centrifuge"
+            tokenList={tokenList}
+            theme={kyberTheme}
+            chainId={BASE_CHAIN_ID}
+            defaultTokenIn={USDC_BASE}
+            defaultTokenOut={defaultTokenOut}
+            connectedAccount={{
+              address,
+              chainId: connectedChainId ?? BASE_CHAIN_ID,
+            }}
+            onSubmitTx={handleSubmitTx}
+            onSwitchChain={handleSwitchChain}
+            enableRoute
+          />
+        </Flex>
+      )}
     </Flex>
+  )
+}
+
+function BaseNetworkGuard({ onSwitch }: { onSwitch: () => void }) {
+  const { data: blockchainsMap } = useBlockchainsMapByChainId()
+  const blockchain = blockchainsMap?.get(BASE_CHAIN_ID)
+  const centrifugeId = blockchain?.centrifugeId
+
+  return (
+    <Stack gap={2} p={4}>
+      <Text>Switch to Base to use the swap widget.</Text>
+      <Button colorPalette="yellow" onClick={onSwitch} borderRadius="3xl">
+        <NetworkIcon centrifugeId={centrifugeId} />
+        Switch to Base
+      </Button>
+    </Stack>
   )
 }
