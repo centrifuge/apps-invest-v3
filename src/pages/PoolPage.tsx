@@ -7,7 +7,8 @@ import { routePaths } from '@routes/routePaths'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
 import { KyberSwapWidget } from '@components/elements/KyberSwapWidget'
 import { PoolMainStats } from '@components/pools/poolDetails/PoolMainStats'
-import { formatBalance, type PoolDetails } from '@cfg'
+import { base } from 'viem/chains'
+import { formatBalance, getNetworkSlug, type PoolDetails } from '@cfg'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
 import { PoolDetailsDeRwa } from '@components/pools/poolDetails/PoolDetailsDeRwa'
@@ -23,13 +24,14 @@ import { PoolPageLayout } from '@layouts/PoolPageLayout'
 const KYBERSWAP_POOL_IDS = ['281474976710659', '281474976710668']
 
 export default function PoolPage() {
-  const { isLoading: isPoolLoading, poolId, poolDetails, networks, shareClass } = usePoolContext()
+  const { isLoading: isPoolLoading, poolId, poolDetails, networks, networkFromUrl, shareClass } = usePoolContext()
   const { investment, isLoading: isVaultsLoading } = useVaultsContext()
   const { getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
   const isRwaPool = getIsRwaPool(poolId)
   const poolName = poolDetails?.metadata?.pool?.name ?? ''
 
-  const isSwapPool = KYBERSWAP_POOL_IDS.includes(poolId ?? '')
+  const baseSlug = getNetworkSlug(base.id)
+  const isSwapPool = KYBERSWAP_POOL_IDS.includes(poolId ?? '') && networkFromUrl === baseSlug
 
   // Geolocation check for swap pool — block US persons from viewing the page
   const { data: location } = useGeolocation({ enabled: isSwapPool && !isPoolLoading })
