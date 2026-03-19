@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IoArrowBack } from 'react-icons/io5'
+import { base } from 'viem/chains'
 import { Box, Button, Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolPageSkeleton } from '@components/skeletons/PoolPageSkeleton'
 import { routePaths } from '@routes/routePaths'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
 import { KyberSwapWidget } from '@components/elements/KyberSwapWidget'
 import { PoolMainStats } from '@components/pools/poolDetails/PoolMainStats'
-import { formatBalance, type PoolDetails } from '@cfg'
+import { ALL_CHAINS, formatBalance, type PoolDetails, useAddress } from '@cfg'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
 import { PoolDetailsDeRwa } from '@components/pools/poolDetails/PoolDetailsDeRwa'
@@ -18,6 +19,7 @@ import { useGeolocation } from '@hooks/useGeolocation'
 import { useGetPoolRestrictedCountries } from '@hooks/useGetPoolRestrictedCountries'
 import { maxScreenSize } from '@layouts/MainLayout'
 import { PoolPageLayout } from '@layouts/PoolPageLayout'
+import { useAppKitNetwork } from '@reown/appkit/react'
 
 // TODO: remove deJAAA pool ID after testing
 const KYBERSWAP_POOL_IDS = ['281474976710659', '281474976710668']
@@ -30,6 +32,18 @@ export default function PoolPage() {
   const poolName = poolDetails?.metadata?.pool?.name ?? ''
 
   const isSwapPool = KYBERSWAP_POOL_IDS.includes(poolId ?? '')
+
+  // Auto-switch to Base mainnet for KyberSwap pools
+  const { isConnected, chainId: connectedChainId } = useAddress()
+  const { switchNetwork } = useAppKitNetwork()
+  useEffect(() => {
+    if (isSwapPool && isConnected && connectedChainId !== base.id) {
+      const baseNetwork = ALL_CHAINS.find((c) => Number(c.id) === base.id)
+      if (baseNetwork) {
+        switchNetwork(baseNetwork)
+      }
+    }
+  }, [isSwapPool, isConnected, connectedChainId, switchNetwork])
 
   // Geolocation check for swap pool — block US persons from viewing the page
   const { data: location } = useGeolocation({ enabled: isSwapPool && !isPoolLoading })
@@ -117,7 +131,7 @@ function SwapPoolSection({ pool, poolId }: { pool: PoolDetails; poolId: string }
       <KyberSwapWidget poolId={poolId} />
       <Box mt={4} textAlign="center">
         <Button variant="plain" size="sm" color="fg.muted" onClick={() => setShowInvestRedeem((prev) => !prev)}>
-          {showInvestRedeem ? 'Hide' : 'Show'} direct invest & redeem
+          {showInvestRedeem ? 'Hide' : 'Show'} Acquire/Redeem directly from the fund
         </Button>
       </Box>
       {showInvestRedeem && (
