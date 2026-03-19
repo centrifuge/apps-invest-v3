@@ -58,7 +58,6 @@ export function useInvestment(vault?: Vault, options?: Options) {
     queryKey: queryKeys.investment(vault?.address ?? '', address ?? ''),
     queryFn: () => firstValueWithTimeout(vault!.investment(address! as HexString)),
     enabled: !!vault && !!address && enabled,
-    staleTime: 0,
     refetchInterval: INVESTMENT_REFETCH_INTERVAL,
     refetchIntervalInBackground: false,
   })

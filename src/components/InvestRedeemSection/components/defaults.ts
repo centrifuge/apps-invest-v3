@@ -48,3 +48,19 @@ export const RedeemFormDefaultValues = {
   redeemAmount: '',
   receiveAmount: '0',
 }
+
+export const BridgeAction = {
+  BRIDGE_FORM: 'BRIDGE_FORM',
+  IN_PROGRESS: 'IN_PROGRESS',
+  SUCCESS: 'SUCCESS',
+} as const
+
+export type BridgeActionType = (typeof BridgeAction)[keyof typeof BridgeAction]
+
+export const BridgeFormDefaultValues = {
+  fromChain: '',
+  toChain: '',
+  amount: '',
+  sendToDifferentAddress: false,
+  recipientAddress: '',
+}
