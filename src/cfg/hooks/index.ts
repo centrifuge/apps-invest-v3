@@ -9,6 +9,7 @@ export * from './useBlockchains'
 export * from './useInvestor'
 export * from './usePools'
 export * from './usePoolsAccessStatus'
+export * from './useHoldingEscrows'
 export * from './useShareClass'
 export * from './useVaults'
 

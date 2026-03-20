@@ -25,6 +25,9 @@ export const queryKeys = {
   isMember: (address: string, scId: string, centrifugeId: number) => ['isMember', address, scId, centrifugeId] as const,
   investment: (vaultAddress: string, walletAddress: string) => ['investment', vaultAddress, walletAddress] as const,
 
+  // Holding escrow keys
+  holdingEscrows: (tokenId: string) => ['holdingEscrows', tokenId] as const,
+
   // Batch query keys
   allPoolsVaults: (poolIdsKey: string) => ['allPoolsVaults', poolIdsKey] as const,
   investmentsPerVaults: (vaultAddressesKey: string) => ['investmentsPerVaults', vaultAddressesKey] as const,

@@ -63,7 +63,7 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
     subtitle: 'Tokenized real-world assets issued under various legal structures.',
   }
   const deRwaHeading = {
-    label: 'DeRWA',
+    label: 'deRWA',
     subtitle: 'Freely transferable tokenized real-world asset tokens.',
   }
 
