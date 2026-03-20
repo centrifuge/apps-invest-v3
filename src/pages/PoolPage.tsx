@@ -5,7 +5,7 @@ import { Box, Button, Flex, Grid, Heading, Text } from '@chakra-ui/react'
 import { PoolPageSkeleton } from '@components/skeletons/PoolPageSkeleton'
 import { routePaths } from '@routes/routePaths'
 import { InvestRedeemSection } from '@components/InvestRedeemSection'
-import { KyberSwapWidget } from '@components/elements/KyberSwapWidget'
+import { AeroSwapWidget } from '@components/elements/AeroSwapWidget'
 import { PoolMainStats } from '@components/pools/poolDetails/PoolMainStats'
 import { base } from 'viem/chains'
 import { formatBalance, getNetworkSlug, type PoolDetails } from '@cfg'
@@ -113,7 +113,7 @@ function SwapPoolSection({ pool, poolId }: { pool: PoolDetails; poolId: string }
 
   return (
     <>
-      <KyberSwapWidget poolId={poolId} />
+      <AeroSwapWidget poolId={poolId} poolIconUri={pool.metadata?.pool?.icon?.uri} />
       <Box mt={4} textAlign="center">
         <Button variant="plain" size="sm" color="fg.muted" onClick={() => setShowInvestRedeem((prev) => !prev)}>
           {showInvestRedeem ? 'Hide' : 'Show'} Acquire/Redeem directly from the fund
