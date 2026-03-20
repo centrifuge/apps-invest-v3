@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
+import { Badge, Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
 import { formatBigintToString, useTokenPrices } from '@cfg'
 import { usePoolContext } from '@contexts/PoolContext'
 import { LineChart } from '@ui'
@@ -119,7 +119,12 @@ export const PoolPerformanceChart = () => {
             <DatePicker label="To" date={toDate} onChange={setToDate} />
           </Flex> */}
           <Heading size="lg">Performance</Heading>
-          <LegendItem color="fg.emphasized" label="Token price" value={currentTokenPrice} />
+          <Flex alignItems="flex-end">
+            <Badge mr={2} pb={2} color="fg.muted">
+              Latest
+            </Badge>
+            <LegendItem color="fg.emphasized" label="Token price" value={currentTokenPrice} />
+          </Flex>
         </Flex>
         <LineChart
           height={260}
