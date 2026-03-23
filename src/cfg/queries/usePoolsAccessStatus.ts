@@ -34,7 +34,7 @@ export function usePoolsAccessStatus(poolIds: PoolId[]) {
   })
 }
 
-export function createPoolsAccessStatus$(
+function createPoolsAccessStatus$(
   centrifuge: Centrifuge,
   address: HexString,
   poolIds: PoolId[]
