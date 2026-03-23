@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useCentrifuge } from './CentrifugeContext'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 
 export interface Blockchain {

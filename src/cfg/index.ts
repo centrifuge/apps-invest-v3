@@ -1,6 +1,5 @@
 export * from './chains'
 export * from './components'
-export * from './hooks'
-export * from './hooks/queries'
+export * from './queries'
 export * from './types'
 export * from './utils'

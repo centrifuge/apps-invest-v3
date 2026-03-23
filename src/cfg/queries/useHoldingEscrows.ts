@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import Decimal from 'decimal.js-light'
 import { isStablecoin, STABLECOIN_PRICE } from '@utils/stableCoins'
 import { useCentrifuge } from './CentrifugeContext'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { useTokenInstances } from './useTokenInstances'
 import { firstValueWithTimeout } from './utils'
 

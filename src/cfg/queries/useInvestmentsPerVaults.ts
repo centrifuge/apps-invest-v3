@@ -1,14 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { combineLatest } from 'rxjs'
 import type { HexString, Vault } from '@centrifuge/sdk'
-import type { Investment } from '../../types'
-import { useAddress } from '../useAddress'
-import { firstValueWithTimeout } from '../utils'
+import type { Investment } from '../types'
+import { queryKeys } from './queryKeys'
+import { useAddress } from './useAddress'
+import { firstValueWithTimeout } from './utils'
 
-export const investmentsPerVaultsQueryKey = (vaultAddressesKey: string) =>
-  ['investmentsPerVaults', vaultAddressesKey] as const
-
-export function useInvestmentsPerVaultsQuery(vaults?: Vault[]) {
+export function useInvestmentsPerVaults(vaults?: Vault[]) {
   const { address } = useAddress()
   const vaultAddressesKey =
     vaults
@@ -17,7 +15,7 @@ export function useInvestmentsPerVaultsQuery(vaults?: Vault[]) {
       .join(',') ?? ''
 
   return useQuery({
-    queryKey: investmentsPerVaultsQueryKey(vaultAddressesKey),
+    queryKey: queryKeys.investmentsPerVaults(vaultAddressesKey),
     queryFn: () => firstValueWithTimeout(combineLatest(vaults!.map((v) => v.investment(address! as HexString)))),
     enabled: !!address && !!vaults && vaults.length > 0,
     placeholderData: [] as Investment[],

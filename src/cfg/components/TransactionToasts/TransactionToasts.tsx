@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { TransactionToaster, toaster } from './TransactionToaster'
-import { useTransactions } from '../../hooks/TransactionProvider'
+import { useTransactions } from '../../queries/TransactionProvider'
 import { useChainId } from 'wagmi'
 import { chainExplorer } from '../../utils'
 

@@ -35,9 +35,12 @@ export const queryKeys = {
   shareClassDeployments: (shareClassId: string) => ['shareClassDeployments', shareClassId] as const,
   bridgeTransferRestrictions: (fromCentrifugeId: number, receiverAddress: string, destinationIdsKey: string) =>
     ['bridgeTransferRestrictions', fromCentrifugeId, receiverAddress, destinationIdsKey] as const,
+  // Report keys
+  sharePrices: (poolId?: string, from?: number, to?: number, groupBy?: string, unit?: string) =>
+    ['sharePrices', poolId, from, to, groupBy, unit] as const,
 
   // Batch query keys
   allPoolsVaults: (poolIdsKey: string) => ['allPoolsVaults', poolIdsKey] as const,
   investmentsPerVaults: (vaultAddressesKey: string) => ['investmentsPerVaults', vaultAddressesKey] as const,
-  poolsAccessStatus: (poolIdsKey: string) => ['poolsAccessStatus', poolIdsKey] as const,
+  poolsAccessStatus: (poolIdsKey: string, address?: string) => ['poolsAccessStatus', poolIdsKey, address] as const,
 } as const

@@ -2,7 +2,7 @@ import { PoolId } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
 import { combineLatest, of, switchMap } from 'rxjs'
 import { useCentrifuge } from './CentrifugeContext'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 
 const POOL_STALE_TIME = 5 * 60 * 1000 // 5 minutes

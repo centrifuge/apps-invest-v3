@@ -1,8 +1,12 @@
 import type { Centrifuge, PoolId, PoolNetwork } from '@centrifuge/sdk'
+import { useQuery } from '@tanstack/react-query'
 import { combineLatest, type Observable, of, switchMap } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { PoolDetails, VaultDetails } from '../types'
 import { NetworkSlug } from '../utils'
+import { useCentrifuge } from './CentrifugeContext'
+import { queryKeys } from './queryKeys'
+import { firstValueWithTimeout } from './utils'
 
 export interface PoolNetworkVaultData {
   poolId: string
@@ -14,7 +18,24 @@ export interface PoolNetworkVaultData {
   vaultDetails: VaultDetails
 }
 
-export function createAllPoolsVaults$(centrifuge: Centrifuge, poolIds: PoolId[]): Observable<PoolNetworkVaultData[]> {
+export function useAllPoolsVaults(poolIds: PoolId[]) {
+  const centrifuge = useCentrifuge()
+  const poolIdsKey =
+    poolIds
+      ?.map((id) => id.toString())
+      .sort()
+      .join(',') ?? ''
+
+  return useQuery({
+    queryKey: queryKeys.allPoolsVaults(poolIdsKey),
+    queryFn: () => firstValueWithTimeout(createAllPoolsVaults$(centrifuge, poolIds)),
+    enabled: poolIds.length > 0,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  })
+}
+
+function createAllPoolsVaults$(centrifuge: Centrifuge, poolIds: PoolId[]): Observable<PoolNetworkVaultData[]> {
   const poolVaultsObservables$ = poolIds.map((poolId) =>
     centrifuge.pool(poolId).pipe(
       switchMap((pool) =>

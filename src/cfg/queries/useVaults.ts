@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { combineLatest } from 'rxjs'
 import { useQuery } from '@tanstack/react-query'
 import { useAddress } from './useAddress'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 
 const VAULT_STALE_TIME = 5 * 60 * 1000 // 5 minutes

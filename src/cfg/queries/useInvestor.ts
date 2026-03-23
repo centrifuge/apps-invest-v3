@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useCentrifuge } from './CentrifugeContext'
 import { useAddress } from './useAddress'
 import { ShareClassId } from '@centrifuge/sdk'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 
 interface Options {
