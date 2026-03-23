@@ -1,13 +1,7 @@
 import { useMemo } from 'react'
 import { Box, Tabs, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import {
-  type PoolAccessStatus,
-  useAddress,
-  useAllPoolsVaults,
-  useDebugFlags,
-  usePoolsAccessStatus,
-} from '@cfg'
+import { type PoolAccessStatus, useAddress, useAllPoolsVaults, useDebugFlags, usePoolsAccessStatus } from '@cfg'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
 import { type ActiveTab, type PoolRow, POOL_TABLE_TABS } from '@components/pools/poolTable//types'
 import { usePoolContext } from '@contexts/PoolContext'
