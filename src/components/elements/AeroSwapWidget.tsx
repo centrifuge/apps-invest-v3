@@ -1,27 +1,28 @@
 import { useState } from 'react'
-import { base } from 'viem/chains'
 import { type Address } from 'viem'
-import { Box, Flex, Heading, Image, Spinner, Stack, Text } from '@chakra-ui/react'
-import { Button } from '@ui'
-import { formatBalance } from '@cfg'
+import { formatBalance, ipfsToHttp } from '@cfg'
+import { Box, Flex, Heading, Image, Input, Spinner, Stack, Text } from '@chakra-ui/react'
 import { ConnectionGuard } from '@components/elements/ConnectionGuard'
 import { StepIndicator } from '@components/elements/StepIndicator'
 import { SlippageSelector } from '@components/elements/SlippageSelector'
 import { TransactionOverlay } from '@components/elements/TransactionOverlay'
-import { useAeroSwap, type TokenDef } from '@hooks/useAeroSwap'
-import { ipfsToHttp } from '../../cfg/utils/formatting'
-import { Input } from '@chakra-ui/react'
+import { useAeroSwap, BASE_CHAIN_ID, type TokenDef } from '@hooks/useAeroSwap'
+import { Button } from '@ui'
 import centrifugeIcon from '../../assets/logos/centrifuge-logo-lg.svg'
 import aerodromeLogo from '../../assets/logos/aerodrome-logo.svg'
-
-const BASE_CHAIN_ID = base.id
 
 const DESPXA_BASE = '0x9c5C365e764829876243d0b289733B9D2b729685' as Address
 const DEJAA_BASE = '0xaaa0008c8cf3a7dca931adaf04336a5d808c82cc' as Address
 
 const POOL_TOKENS: Record<string, TokenDef> = {
   '281474976710659': { name: 'deJAAA', symbol: 'deJAAA', address: DEJAA_BASE, decimals: 18, icon: centrifugeIcon },
-  '281474976710668': { name: 'deSPXA Token', symbol: 'deSPXA', address: DESPXA_BASE, decimals: 18, icon: centrifugeIcon },
+  '281474976710668': {
+    name: 'deSPXA Token',
+    symbol: 'deSPXA',
+    address: DESPXA_BASE,
+    decimals: 18,
+    icon: centrifugeIcon,
+  },
 }
 
 const DEFAULT_SLIPPAGE = 0.01
@@ -85,6 +86,7 @@ function SwapForm({ poolToken }: { poolToken: TokenDef }) {
     minReceived,
     priceImpact,
     tokenPrice,
+    needsApproval,
     insufficientBalance,
     isPending,
     canSwap,
@@ -128,15 +130,7 @@ function SwapForm({ poolToken }: { poolToken: TokenDef }) {
               : '—'}
           </Text>
         </Flex>
-        <Flex
-          align="center"
-          border="1px solid"
-          borderColor="border.solid"
-          borderRadius="lg"
-          px={3}
-          py={2}
-          gap={2}
-        >
+        <Flex align="center" border="1px solid" borderColor="border.solid" borderRadius="lg" px={3} py={2} gap={2}>
           <Input
             flex={1}
             variant="flushed"
@@ -255,7 +249,9 @@ function SwapForm({ poolToken }: { poolToken: TokenDef }) {
               1 {fromTokenDef.symbol}
             </Text>
           </Flex>
-          <Text fontSize="xs" color="fg.muted">=</Text>
+          <Text fontSize="xs" color="fg.muted">
+            =
+          </Text>
           <Flex align="center" gap={1}>
             <Text fontSize="xs" fontWeight="medium">
               {rate}
@@ -308,8 +304,8 @@ function SwapForm({ poolToken }: { poolToken: TokenDef }) {
         </Box>
       )}
 
-      {/* Step indicator — shown during approve+swap flow */}
-      {swapStep !== 'idle' && (
+      {/* Step indicator — only shown during approve+swap flow when approval is needed */}
+      {swapStep !== 'idle' && needsApproval && (
         <StepIndicator
           action="Swap"
           isFailed={swapStep === 'error'}

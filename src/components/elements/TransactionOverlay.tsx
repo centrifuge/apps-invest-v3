@@ -1,10 +1,9 @@
-import { Flex, Heading, Image, Spinner, Stack, Text } from '@chakra-ui/react'
-import { Button } from '@ui'
-import { formatBalance } from '@cfg'
-import { chainExplorer } from '../../cfg/utils/chainExplorer'
-import aerodromeLogo from '../../assets/logos/aerodrome-logo.svg'
 import { base } from 'viem/chains'
+import { chainExplorer, formatBalance } from '@cfg'
+import { Flex, Heading, Image, Link, Spinner, Stack, Text } from '@chakra-ui/react'
 import type { SwapStep, TokenDef } from '@hooks/useAeroSwap'
+import { Button } from '@ui'
+import aerodromeLogo from '../../assets/logos/aerodrome-logo.svg'
 
 const BASE_EXPLORER = chainExplorer[base.id]
 
@@ -91,14 +90,15 @@ export function TransactionOverlay({
       <Stack gap={2} width="100%" mt={4}>
         {swapTxHash && (
           <Flex justify="flex-end">
-            <a
+            <Link
               href={`${BASE_EXPLORER}/tx/${swapTxHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: '14px', color: '#B8860B' }}
+              fontSize="sm"
+              color="yellow.700"
             >
               View transaction &#8599;
-            </a>
+            </Link>
           </Flex>
         )}
         <Button

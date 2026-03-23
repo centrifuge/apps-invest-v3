@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Box, Flex, Text } from '@chakra-ui/react'
-import { Input } from '@chakra-ui/react'
+import { Box, Flex, Input, Text } from '@chakra-ui/react'
 
 const SLIPPAGE_PRESETS = [0.005, 0.01, 0.05]
 

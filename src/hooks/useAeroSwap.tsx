@@ -1,23 +1,17 @@
 import { useState, useMemo, useCallback } from 'react'
-import { base } from 'viem/chains'
-import { erc20Abi, formatUnits, parseUnits, type Address } from 'viem'
-import { useWalletClient, useReadContract, usePublicClient } from 'wagmi'
-import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from 'use-debounce'
-import {
-  getDefaultConfig,
-  getQuoteForSwap,
-  swap,
-  type SugarWagmiConfig,
-  type Token,
-  type Quote,
-} from '@dromos-labs/sdk.js'
-import { useAddress, formatBalance } from '@cfg'
-import { toaster } from '../cfg/components/TransactionToasts/TransactionToaster'
-import { chainExplorer } from '../cfg/utils/chainExplorer'
+import { erc20Abi, formatUnits, parseUnits, type Address } from 'viem'
+import { base } from 'viem/chains'
+import { useWalletClient, useReadContract, usePublicClient } from 'wagmi'
+import { chainExplorer, useAddress, formatBalance, toaster } from '@cfg'
+import { getDefaultConfig, getQuoteForSwap, swap, type SugarWagmiConfig, type Token } from '@dromos-labs/sdk.js'
+import { useQuery } from '@tanstack/react-query'
 import usdcIcon from '../ui/assets/logos/usdc.svg'
 
-const BASE_CHAIN_ID = base.id
+// Docs found here:
+// https://github.com/velodrome-finance/sdk.js/blob/main/packages/demo-web/src/components/Swapper.tsx
+
+export const BASE_CHAIN_ID = base.id
 const BASE_EXPLORER = chainExplorer[BASE_CHAIN_ID]
 const USDC_BASE = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913' as Address
 const USDC_DECIMALS = 6
@@ -44,6 +38,10 @@ export type SwapStep = 'idle' | 'approving' | 'approved' | 'swapping' | 'success
 const ALCHEMY_KEY = import.meta.env.VITE_ALCHEMY_KEY
 const BASE_RPC_URL = `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
 
+// Separate Wagmi config for the Dromos/Aerodrome SDK. This is needed because the SDK
+// requires its own config with chain-specific Sugar contract addresses. We sign transactions
+// manually via `unsignedTransactionOnly: true` using the app's own wallet client, so the
+// SDK never needs access to the connected wallet state from the app's Wagmi provider.
 let aeroConfig: SugarWagmiConfig | null = null
 function getAeroConfig(): SugarWagmiConfig {
   if (!aeroConfig) {
@@ -188,7 +186,7 @@ export function useAeroSwap(poolToken: TokenDef, slippage: number) {
   }, [amountIn, fromBalanceRaw])
 
   const isPending = swapStep === 'approving' || swapStep === 'swapping'
-  const canSwap = !!quote && !insufficientBalance && !isPending && !!walletClient
+  const canSwap = !!quote && !insufficientBalance && !isPending && !!walletClient && !!publicClient
 
   const refetchBalances = useCallback(() => {
     refetchUsdcBalance()
@@ -242,9 +240,21 @@ export function useAeroSwap(poolToken: TokenDef, slippage: number) {
         setSwapStep('approved')
       }
 
+      // Re-fetch quote after approval to avoid executing a stale quote.
+      // Approval can take 30-60s+ (user signing + on-chain confirmation),
+      // during which prices may have moved.
+      const config = getAeroConfig()
+      const freshQuote = needsApproval
+        ? await getQuoteForSwap({ config, fromToken: fromSdkToken, toToken: toSdkToken, amountIn })
+        : quote
+
+      if (!freshQuote) {
+        throw new Error('Failed to get an updated quote. Please try again.')
+      }
+
       setSubmittedSwap({
         fromAmount: formatUnits(amountIn, fromTokenDef.decimals),
-        toAmount: formatUnits(quote.amountOut, toTokenDef.decimals),
+        toAmount: formatUnits(freshQuote.amountOut, toTokenDef.decimals),
       })
       setSwapTxHash(null)
       setSwapStep('swapping')
@@ -257,10 +267,9 @@ export function useAeroSwap(poolToken: TokenDef, slippage: number) {
         closable: true,
       })
 
-      const config = getAeroConfig()
       const unsignedTx = await swap({
         config,
-        quote,
+        quote: freshQuote,
         slippage,
         unsignedTransactionOnly: true,
         account: address as Address,
@@ -324,6 +333,8 @@ export function useAeroSwap(poolToken: TokenDef, slippage: number) {
     needsApproval,
     fromTokenDef,
     toTokenDef,
+    fromSdkToken,
+    toSdkToken,
     refetchAllowance,
     refetchBalances,
   ])
@@ -351,12 +362,10 @@ export function useAeroSwap(poolToken: TokenDef, slippage: number) {
       : null
 
   const minReceived = quote
-    ? formatBalance(
-        Number(formatUnits(quote.amountOut, toTokenDef.decimals)) * (1 - slippage),
-        { precision: 6 }
-      )
+    ? formatBalance(Number(formatUnits(quote.amountOut, toTokenDef.decimals)) * (1 - slippage), { precision: 6 })
     : null
 
+  // Dromos SDK returns priceImpact in basis points (e.g. 150 = 1.5%)
   const priceImpact = quote ? Number(quote.priceImpact) / 100 : null
 
   const tokenPrice =
