@@ -85,9 +85,7 @@ export const stableCoins = [
   },
 ]
 
-const STABLECOIN_ADDRESSES = new Set(
-  stableCoins.filter((c) => c.address !== null).map((c) => c.address!.toLowerCase())
-)
+const STABLECOIN_ADDRESSES = new Set(stableCoins.filter((c) => c.address !== null).map((c) => c.address!.toLowerCase()))
 
 export function isStablecoin(address: string): boolean {
   return STABLECOIN_ADDRESSES.has(address.toLowerCase())
