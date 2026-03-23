@@ -1,8 +1,10 @@
 import { Balance, type HexString, Price } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
 import Decimal from 'decimal.js-light'
+import { isStablecoin, STABLECOIN_PRICE } from '@utils/stableCoins'
 import { useCentrifuge } from './CentrifugeContext'
 import { queryKeys } from './queries/queryKeys'
+import { useTokenInstances } from './useTokenInstances'
 import { firstValueWithTimeout } from './utils'
 
 const ESCROW_STALE_TIME = 5 * 60 * 1000
@@ -99,26 +101,46 @@ export function useHoldingEscrows(tokenId: string | undefined) {
 }
 
 export function useHoldingEscrowBalances(tokenId: string | undefined) {
-  const { data, isLoading } = useHoldingEscrows(tokenId)
+  const { data: escrows, isLoading: escrowsLoading } = useHoldingEscrows(tokenId)
 
-  return {
-    data: data ? buildBalances(data) : undefined,
-    isLoading,
-  }
+  const nonStablecoinAddresses = (escrows ?? [])
+    .filter((escrow) => !isStablecoin(escrow.assetAddress))
+    .map((escrow) => escrow.assetAddress)
+    .filter((addr, i, arr) => arr.indexOf(addr) === i)
+
+  const { data: tokenInstances, isLoading: tokenInstancesLoading } = useTokenInstances(nonStablecoinAddresses)
+
+  const priceMap = new Map<string, Price>()
+  tokenInstances?.forEach((ti) => {
+    priceMap.set(ti.address.toLowerCase(), ti.tokenPrice)
+  })
+
+  const isLoading = escrowsLoading || (nonStablecoinAddresses.length > 0 && tokenInstancesLoading)
+  const data = escrows ? buildBalances(escrows, priceMap) : undefined
+
+  return { data, isLoading }
 }
 
-function buildBalances(escrows: HoldingEscrow[]): HoldingEscrowBalance[] {
+function resolvePrice(escrow: HoldingEscrow, priceMap: Map<string, Price>): Price {
+  if (isStablecoin(escrow.assetAddress)) return STABLECOIN_PRICE
+  return priceMap.get(escrow.assetAddress.toLowerCase()) ?? STABLECOIN_PRICE
+}
+
+function buildBalances(escrows: HoldingEscrow[], priceMap: Map<string, Price>): HoldingEscrowBalance[] {
   const balanceValues = escrows
     .filter((escrow) => !escrow.assetAmount.isZero())
-    .map((escrow) => ({
-      escrowAddress: escrow.escrowAddress,
-      assetSymbol: escrow.assetSymbol,
-      assetName: escrow.assetName,
-      centrifugeId: escrow.centrifugeId,
-      amount: escrow.assetAmount,
-      valueUsd: escrow.assetAmount.toDecimal().mul(escrow.assetPrice.toDecimal()),
-      percentage: 0,
-    }))
+    .map((escrow) => {
+      const price = resolvePrice(escrow, priceMap)
+      return {
+        escrowAddress: escrow.escrowAddress,
+        assetSymbol: escrow.assetSymbol,
+        assetName: escrow.assetName,
+        centrifugeId: escrow.centrifugeId,
+        amount: escrow.assetAmount,
+        valueUsd: escrow.assetAmount.toDecimal().mul(price.toDecimal()),
+        percentage: 0,
+      }
+    })
 
   const totalValue = balanceValues.reduce((sum, balance) => sum.add(balance.valueUsd), new Decimal(0))
 
