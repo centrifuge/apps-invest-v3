@@ -32,7 +32,7 @@ export type DebugFlagConfig =
       alwaysShow?: boolean
     }
 
-export type Key = 'address' | 'persistDebugFlags' | 'showMainnet'
+export type Key = 'address' | 'persistDebugFlags' | 'showMainnet' | 'showPoolReserves'
 
 export const flagsConfig = {
   address: {
@@ -46,6 +46,10 @@ export const flagsConfig = {
   },
   showMainnet: {
     alwaysShow: true,
+    default: false,
+    type: 'checkbox',
+  },
+  showPoolReserves: {
     default: false,
     type: 'checkbox',
   },
