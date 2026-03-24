@@ -68,7 +68,7 @@ const Panel = ({
   onChange: (key: Key, val: string | boolean) => void
   customFlags?: string[]
 }) => {
-  const flags = ['address', 'persistDebugFlags', 'showMainnet', ...customFlags]
+  const flags = ['address', 'persistDebugFlags', 'showMainnet', 'showPoolReserves', ...customFlags]
 
   return (
     <Drawer.Root>
