@@ -175,7 +175,7 @@ export function useGetPoolsByIds() {
   const getIsChroniclePool = (poolId?: string) => (poolId ? chroniclePoolIds.includes(poolId) : false)
   const getChroniclePoolIpfsUri = (poolId: string) => POOL_REGISTRY[poolId]?.chronicleIpfsUri
   const getIsTradingWidgetPool = (poolId?: string) =>
-    poolId ? (POOL_REGISTRY[poolId].hasTradingWidget ?? false) : false
+    poolId ? (POOL_REGISTRY[poolId]?.hasTradingWidget ?? false) : false
 
   return {
     chroniclePoolIds,
