@@ -89,8 +89,8 @@ export const PoolPerformanceChart = () => {
 
   const yDomain = useMemo(() => {
     if (!chartData || chartData.length === 0) return [0, 'dataMax']
-    const maxPrice = Number(Math.max(...chartData.map((d) => d.price)).toFixed(3))
-    const minPrice = Number(Math.min(...chartData.map((d) => d.price)).toFixed(3))
+    const maxPrice = Number(Math.max(...chartData.map((d) => d.price)).toFixed(2))
+    const minPrice = Number(Math.min(...chartData.map((d) => d.price)).toFixed(2))
     return [minPrice, maxPrice]
   }, [chartData])
 
@@ -130,9 +130,10 @@ export const PoolPerformanceChart = () => {
           height={260}
           data={chartData}
           yDomain={yDomain}
+          margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
           xAccessor={(r) => r.timestamp}
           xTickFormatter={xTickFormatter}
-          yTickFormatter={(v) => String(v.toFixed(3))}
+          yTickFormatter={(v) => String(v.toFixed(2))}
           tooltipYTickFormatter={(v) => String(v.toFixed(6))}
           series={[
             {
