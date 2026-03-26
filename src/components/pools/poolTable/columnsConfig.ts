@@ -35,12 +35,13 @@ export const VAULT_COLUMNS_ACCESS: VaultColumn[] = [
 ]
 
 export const POOL_COLUMNS_PRODUCTS: PoolTableColumns[] = [
-  { label: 'Token', field: 'name', width: '24%', align: 'left' },
-  { label: 'APY', field: 'apy', width: '10%', align: 'center' },
-  { label: 'TVL (USD)', field: 'tvl', width: '16%', align: 'right' },
-  { label: 'Asset type', width: '20%', align: 'left' },
-  { label: 'Investor type', width: '20%', align: 'left' },
+  { label: 'Token', field: 'name', width: '22%', align: 'left' },
+  { label: 'APY', field: 'apy', width: '8%', align: 'center' },
+  { label: 'TVL (USD)', field: 'tvl', width: '14%', align: 'right' },
+  { label: 'Asset type', width: '18%', align: 'left' },
+  { label: 'Investor type', width: '16%', align: 'left' },
   { label: 'Min. Investment', width: '10%', align: 'right' },
+  { label: 'Integrations', width: '12%', align: 'center' },
 ]
 
 export const VAULT_COLUMNS_PRODUCTS: VaultColumn[] = [
