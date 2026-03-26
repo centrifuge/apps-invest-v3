@@ -22,5 +22,6 @@ export function useInvestmentsPerVaultsQuery(vaults?: Vault[]) {
     enabled: !!address && !!vaults && vaults.length > 0,
     placeholderData: [] as Investment[],
     staleTime: 60000,
+    gcTime: Infinity,
   })
 }

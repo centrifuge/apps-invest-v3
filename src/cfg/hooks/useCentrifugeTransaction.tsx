@@ -1,4 +1,4 @@
-import { type OperationConfirmedStatus, type Transaction } from '@centrifuge/sdk'
+import { type OperationConfirmedStatus, type OperationStatus, type Transaction } from '@centrifuge/sdk'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { tap } from 'rxjs'
 import { waitForTransactionReceipt } from 'viem/actions'
@@ -12,15 +12,30 @@ import { useTransactions } from './TransactionProvider'
  */
 const TX_POLLING_INTERVAL = 2_000
 
+export interface ExecuteOptions {
+  /** Called with each SDK operation status event (signing, pending, confirmed). */
+  onStatusChange?: (status: OperationStatus) => void
+}
+
 export function useCentrifugeTransaction() {
   const centrifuge = useCentrifuge()
   const { updateTransaction, addOrUpdateTransaction, addTransaction } = useTransactions()
   const { data: client } = useConnectorClient()
   const publicClient = usePublicClient()
   const queryClient = useQueryClient()
-  const { mutateAsync, ...rest } = useMutation({
-    mutationFn: execute,
-  })
+
+  /**
+   * Set the wallet signer on the current Centrifuge context instance.
+   * Also call this on any SDK entity's `_root` if it may reference a stale
+   * Centrifuge instance (e.g. cached in React Query after an env switch).
+   */
+  function ensureSigner() {
+    if (!client) {
+      throw new Error('No wallet connected')
+    }
+    centrifuge.setSigner(client)
+    return client
+  }
 
   function invalidateTransactionQueries() {
     // Clear SDK's memoized observable cache so React Query refetches
@@ -35,11 +50,8 @@ export function useCentrifugeTransaction() {
     queryClient.invalidateQueries({ queryKey: ['investmentsPerVaults'] })
   }
 
-  function execute(observable: Transaction): Promise<OperationConfirmedStatus> {
-    if (!client) {
-      throw new Error('No wallet connected')
-    }
-    centrifuge.setSigner(client)
+  function executeWithOptions(observable: Transaction, options?: ExecuteOptions): Promise<OperationConfirmedStatus> {
+    ensureSigner()
 
     return new Promise<OperationConfirmedStatus>((resolve, reject) => {
       let lastId = ''
@@ -61,6 +73,8 @@ export function useCentrifugeTransaction() {
       const subscription = observable
         .pipe(
           tap((result) => {
+            options?.onStatusChange?.(result)
+
             switch (result.type) {
               case 'SigningTransaction':
                 lastId = result.id
@@ -141,8 +155,16 @@ export function useCentrifugeTransaction() {
     })
   }
 
+  // Keep backward compatibility: mutateAsync expects a single-argument mutationFn,
+  // so we use it for the simple case. For status tracking, use executeWithStatus directly.
+  const { mutateAsync, ...rest } = useMutation({
+    mutationFn: (observable: Transaction) => executeWithOptions(observable),
+  })
+
   return {
     execute: mutateAsync,
+    executeWithStatus: executeWithOptions,
+    ensureSigner,
     ...rest,
   }
 }
