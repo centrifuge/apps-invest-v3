@@ -1,6 +1,21 @@
 import { useMemo } from 'react'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useIsUserWhitelisted } from '@hooks/useIsUserWhitelisted'
+import aaveLogo from '@assets/logos/aave.svg'
+import aerodromeLogo from '@assets/logos/aerodrome.svg'
+import morphoLogo from '@assets/logos/morpho.svg'
+import { mainnet } from 'viem/chains'
+
+export type IntegrationType = 'DEX' | 'Collateral'
+
+export interface PoolIntegration {
+  name: string
+  icon: string
+  type: IntegrationType
+  url: string
+  chainIds: number[]
+}
+
 interface PoolConfig {
   name: string
   isProduction: boolean
@@ -9,6 +24,7 @@ interface PoolConfig {
   isRestricted: boolean
   chronicleIpfsUri?: string
   hasTradingWidget?: boolean
+  integrations?: PoolIntegration[]
 }
 
 const POOL_REGISTRY: Record<string, PoolConfig> = {
@@ -21,6 +37,15 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isRestricted: false,
     chronicleIpfsUri:
       'ipfs://QmPgCBS2mUzYoGd5Zx5DRRU8tyHqunEGVjHKvgDf29TnwK?checksum=0x39f63929f6e561825ddb6f8a1b84fdced7e30f879f40b03771d2119f9ee61d04',
+    integrations: [
+      {
+        name: 'Aave Horizon Market',
+        icon: aaveLogo,
+        type: 'Collateral',
+        url: 'https://app.aave.com/reserve-overview/?underlyingAsset=0x8c213ee79581ff4984583c6a801e5263418c4b86&marketName=proto_horizon_v3',
+        chainIds: [mainnet.id],
+      },
+    ],
   },
   '281474976710663': {
     name: 'JAAA',
@@ -28,6 +53,15 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isRwa: true,
     isDeRwa: false,
     isRestricted: false,
+    integrations: [
+      {
+        name: 'Aave Horizon Market',
+        icon: aaveLogo,
+        type: 'Collateral',
+        url: 'https://app.aave.com/reserve-overview/?underlyingAsset=0x5a0f93d040de44e78f251b03c43be9cf317dcf64&marketName=proto_horizon_v3',
+        chainIds: [mainnet.id],
+      },
+    ],
   },
   '281474976710664': {
     name: 'ACRDX',
@@ -35,6 +69,15 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isRwa: true,
     isDeRwa: false,
     isRestricted: false,
+    integrations: [
+      {
+        name: 'Morpho Market',
+        icon: morphoLogo,
+        type: 'Collateral',
+        url: 'https://app.morpho.org/ethereum/market/0x8d8ab648ffa225f0b6af1c7de5d6bc5f6711771eaa8d48ce6efd83d40281da73/acrdx-usdc',
+        chainIds: [mainnet.id],
+      },
+    ],
   },
   '281474976710665': {
     name: 'SPXA',
@@ -52,6 +95,15 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isDeRwa: true,
     isRestricted: false,
     hasTradingWidget: true,
+    integrations: [
+      {
+        name: 'Aerodrome Pool',
+        icon: aerodromeLogo,
+        type: 'DEX',
+        url: 'https://aerodrome.finance/swap?from=0xaaa0008c8cf3a7dca931adaf04336a5d808c82cc&to=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&chain0=8453&chain1=8453',
+        chainIds: [mainnet.id],
+      },
+    ],
   },
   '281474976710660': {
     name: 'deJTRSY',
@@ -176,6 +228,8 @@ export function useGetPoolsByIds() {
   const getChroniclePoolIpfsUri = (poolId: string) => POOL_REGISTRY[poolId]?.chronicleIpfsUri
   const getIsTradingWidgetPool = (poolId?: string) =>
     poolId ? (POOL_REGISTRY[poolId]?.hasTradingWidget ?? false) : false
+  const getPoolIntegrations = (poolId?: string): PoolIntegration[] =>
+    poolId ? (getPoolConfig(poolId)?.integrations ?? []) : []
 
   return {
     chroniclePoolIds,
@@ -192,5 +246,6 @@ export function useGetPoolsByIds() {
     getIsProductionPool,
     getIsRestrictedPool,
     getIsTradingWidgetPool,
+    getPoolIntegrations,
   }
 }
