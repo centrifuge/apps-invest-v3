@@ -112,7 +112,7 @@ export const PoolPerformanceChart = () => {
         borderColor="border.solid"
         shadow="xs"
       >
-        <Flex justifyContent="space-between" alignItems="center" mb={8}>
+        <Flex justifyContent="space-between" alignItems="center" mb={8} flexWrap="wrap" gap={4}>
           {/* // TODO: Add back datepickers once sdk accepts date filtering */}
           {/* <Flex gap={4} mr={4}>
             <DatePicker label="From" date={fromDate} onChange={setFromDate} />

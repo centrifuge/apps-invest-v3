@@ -17,10 +17,11 @@ export default function HomePage() {
     )
   }
 
-  const baseHeroHeight = '360px'
   const waveHeight = '120px'
-  const halfWaveHeight = `calc(${waveHeight} / 2)`
-  const totalHeroHeight = `calc(${baseHeroHeight} + ${halfWaveHeight} + 10px)` // add 10px padding to prevent color bleed
+  const totalHeroHeight = {
+    base: '290px',
+    md: `calc(360px + ${waveHeight} / 2 + 10px)`,
+  }
 
   return (
     <Box position="relative">
@@ -54,10 +55,11 @@ export default function HomePage() {
         <Box position="absolute" bg="fg.emphasized" width="8px" height="8px" top="162px" right="8%" />
       </Box>
 
-      {/* Wave separator - creates the curved boundary between dark hero and white content. */}
+      {/* Wave separator - creates the curved boundary between dark hero and white content. Hidden on mobile. */}
       <Box
+        display={{ base: 'none', md: 'block' }}
         position="absolute"
-        top={baseHeroHeight}
+        top="360px"
         left={0}
         right={0}
         height={waveHeight}
@@ -88,20 +90,26 @@ export default function HomePage() {
 
       <Box
         position="absolute"
-        top={`calc(${baseHeroHeight} + 1.5rem)`}
-        right={{ base: '2.5vw', xl: '12.5vw' }}
+        top={{ base: '240px', md: 'calc(360px + 1.5rem)' }}
+        right={{ base: 4, xl: '12.5vw', md: '2.5vw' }}
         zIndex={3}
       >
         <PoolsTvlCard poolIds={poolIds} />
       </Box>
 
       {/* Hero content */}
-      <Box position="relative" zIndex={3} pt={{ base: 32 }} px={{ base: 4, md: 16 }} height={baseHeroHeight}>
+      <Box
+        position="relative"
+        zIndex={3}
+        pt={{ base: 20, md: 32 }}
+        px={{ base: 4, md: 16 }}
+        height={{ base: '280px', md: '360px' }}
+      >
         <Box maxW={maxScreenSize} mx="auto">
           <Flex flexDirection="column" justifyContent="center" gap={6} py={{ base: 10, md: 12 }} maxW="558px">
             <Text
               as="h1"
-              fontSize="4rem"
+              fontSize={{ base: '2rem', md: '4rem' }}
               fontWeight={400}
               color="fg.inverted"
               lineHeight={{ base: '40px', md: '72px' }}
@@ -113,7 +121,7 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      <Box position="relative" px={{ base: 4, md: 16 }} pt="3.5rem">
+      <Box position="relative" px={{ base: 4, md: 16 }} pt={{ base: '1.5rem', md: '3.5rem' }}>
         <Box maxW={maxScreenSize} mx="auto">
           {!poolIds?.length ? (
             <Text as="h2" fontSize="2xl" mt={2}>

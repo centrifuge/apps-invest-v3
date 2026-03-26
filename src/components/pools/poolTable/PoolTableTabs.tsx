@@ -70,30 +70,34 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
       onValueChange={(e) => setActiveHomeTab(e.value as ActiveTab)}
     >
       {/* Tab triggers - z-3 so they render above the wave separator overlay (z-2) */}
-      <Tabs.List borderBottomColor="border.solid" width="fit-content" gap={8} position="relative" zIndex={3}>
+      <Tabs.List borderBottom="none" width="fit-content" gap={{ base: 4, md: 8 }} position="relative" zIndex={3}>
         <Tabs.Trigger
           value={POOL_TABLE_TABS.access}
-          height="44px"
+          height={{ base: '36px', md: '44px' }}
           alignItems="flex-end"
-          pb={4}
+          pb={{ base: 1, md: 2 }}
           px={2}
-          fontSize="2xl"
+          fontSize={{ base: 'lg', md: '2xl' }}
           fontWeight={400}
           color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
+          _before={{ display: 'none' }}
+          _after={{ display: 'none' }}
         >
           My Portfolio
         </Tabs.Trigger>
         <Tabs.Trigger
           value={POOL_TABLE_TABS.products}
-          height="44px"
+          height={{ base: '36px', md: '44px' }}
           alignItems="flex-end"
-          pb={4}
+          pb={{ base: 1, md: 2 }}
           px={2}
-          fontSize="2xl"
+          fontSize={{ base: 'lg', md: '2xl' }}
           fontWeight={400}
           color="fg.muted"
           _selected={{ fontWeight: 500, color: 'fg.solid' }}
+          _before={{ display: 'none' }}
+          _after={{ display: 'none' }}
         >
           Products
         </Tabs.Trigger>
@@ -107,7 +111,7 @@ export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
         left="50%"
         marginLeft="-50vw"
         pb={16}
-        pt={8}
+        pt={{ base: 0, md: 8 }}
         px={{ base: 4, md: 16 }}
       >
         <Box maxW={maxScreenSize} mx="auto" mt={8}>

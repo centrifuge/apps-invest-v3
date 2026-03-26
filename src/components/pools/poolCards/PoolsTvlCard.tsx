@@ -1,6 +1,6 @@
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatDate, useAllPoolDetails } from '@cfg'
-import { Flex, Skeleton, Text } from '@chakra-ui/react'
+import { Box, Flex, Skeleton, Text } from '@chakra-ui/react'
 import { MdOutlineInsertChart } from 'react-icons/md'
 
 export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
@@ -24,13 +24,29 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   }
 
   return (
-    <Flex alignItems="center" gap={3}>
-      <MdOutlineInsertChart size="3rem" color="#FFC012" style={{ marginTop: '1.3rem' }} />
+    <Flex alignItems="center" gap={{ base: 2, md: 3 }}>
+      <Box display={{ base: 'none', md: 'block' }}>
+        <MdOutlineInsertChart size="3rem" color="#FFC012" style={{ marginTop: '1.3rem' }} />
+      </Box>
+      <Box display={{ base: 'block', md: 'none' }}>
+        <MdOutlineInsertChart size="1.5rem" color="#FFC012" style={{ marginTop: '0.5rem' }} />
+      </Box>
       <Flex flexDirection="column" alignItems="flex-end">
-        <Text color="fg.subtle" fontSize="sm" fontWeight={500} lineHeight="20px">
+        <Text
+          color="fg.subtle"
+          fontSize={{ base: 'xs', md: 'sm' }}
+          fontWeight={500}
+          lineHeight={{ base: '16px', md: '20px' }}
+        >
           TVL on {formatDate(new Date(), 'short')}
         </Text>
-        <Text color="fg.inverted" fontSize="4xl" fontWeight={600} lineHeight="44px" letterSpacing="-0.72px">
+        <Text
+          color="fg.inverted"
+          fontSize={{ base: 'xl', md: '4xl' }}
+          fontWeight={600}
+          lineHeight={{ base: '28px', md: '44px' }}
+          letterSpacing="-0.72px"
+        >
           $ {formattedTotalTVL}
         </Text>
       </Flex>
