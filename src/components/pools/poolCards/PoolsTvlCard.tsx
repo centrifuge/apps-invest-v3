@@ -32,7 +32,12 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
         <MdOutlineInsertChart size="1.5rem" color="#FFC012" style={{ marginTop: '0.5rem' }} />
       </Box>
       <Flex flexDirection="column" alignItems="flex-end">
-        <Text color="fg.subtle" fontSize={{ base: 'xs', md: 'sm' }} fontWeight={500} lineHeight={{ base: '16px', md: '20px' }}>
+        <Text
+          color="fg.subtle"
+          fontSize={{ base: 'xs', md: 'sm' }}
+          fontWeight={500}
+          lineHeight={{ base: '16px', md: '20px' }}
+        >
           TVL on {formatDate(new Date(), 'short')}
         </Text>
         <Text
