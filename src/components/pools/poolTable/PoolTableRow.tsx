@@ -1,9 +1,10 @@
 import { MdBrokenImage } from 'react-icons/md'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 import { formatBalance, ipfsToHttp, type FormattableBalance } from '@cfg'
-import { Flex, Icon, Image, Table, Text } from '@chakra-ui/react'
+import { Flex, Icon, Image, Link, Table, Text } from '@chakra-ui/react'
 import { InvestorsOnlyValueBlock } from '@components/elements/InvestorsOnlyValueBlock'
 import { POOL_COLUMNS_ACCESS, POOL_COLUMNS_PRODUCTS } from '@components/pools/poolTable/columnsConfig'
+import { useGetPoolsByIds, type PoolIntegration } from '@hooks/useGetPoolsByIds'
 import { Tooltip } from '@ui'
 import type { ActiveTab, PoolInvestmentTotals, PoolRow } from './types'
 import { POOL_TABLE_TABS } from './types'
@@ -94,6 +95,8 @@ const numericTextProps = { fontSize: 'xs' as const, fontVariantNumeric: 'tabular
 
 function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
   const cols = POOL_COLUMNS_PRODUCTS
+  const { getPoolIntegrations } = useGetPoolsByIds()
+  const integrations = getPoolIntegrations(poolRow.poolId)
 
   return (
     <>
@@ -140,7 +143,34 @@ function FundsPoolCells({ poolRow }: { poolRow: PoolRow }) {
           {poolRow.minInvestment}
         </Text>
       </Table.Cell>
+
+      <Table.Cell textAlign={cols[6].align}>
+        <IntegrationIcons integrations={integrations} />
+      </Table.Cell>
     </>
+  )
+}
+
+function IntegrationIcons({ integrations }: { integrations: PoolIntegration[] }) {
+  if (integrations.length === 0) return null
+
+  return (
+    <Flex gap={1} justifyContent="center">
+      {integrations.map((integration) => (
+        <Tooltip key={integration.url} content={integration.name}>
+          <Link href={integration.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={integration.icon}
+              alt={integration.name}
+              height="20px"
+              width="20px"
+              borderRadius="4px"
+              flexShrink={0}
+            />
+          </Link>
+        </Tooltip>
+      ))}
+    </Flex>
   )
 }
 
