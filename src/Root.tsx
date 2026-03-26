@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
 import {
   CentrifugeProvider,
@@ -16,14 +16,14 @@ import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
 
-const queryClient = new QueryClient({
+const QUERY_CLIENT_OPTIONS = {
   defaultOptions: {
     queries: {
       staleTime: 600000,
       gcTime: 600000,
     },
   },
-})
+}
 
 function RootProviders() {
   const { showMainnet } = useDebugFlags()
@@ -48,15 +48,10 @@ function RootProviders() {
     })
   }, [isMainnet])
 
-  // Clear all React Query cache when the environment switches so stale
-  // data from the previous environment is never served.
-  const prevIsMainnetRef = useRef(isMainnet)
-  useEffect(() => {
-    if (prevIsMainnetRef.current !== isMainnet) {
-      queryClient.clear()
-      prevIsMainnetRef.current = isMainnet
-    }
-  }, [isMainnet])
+  // Create a new QueryClient when the environment switches. This causes
+  // QueryClientProvider to remount the entire tree, guaranteeing that no
+  // SDK entities from the previous environment survive in cache.
+  const queryClient = useMemo(() => new QueryClient(QUERY_CLIENT_OPTIONS), [isMainnet])
 
   /**
    * For WalletProvider networks, we include ALL possible networks (mainnet + testnet)
@@ -69,7 +64,7 @@ function RootProviders() {
    */
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider key={String(isMainnet)} client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
         <WalletProvider
           projectId={import.meta.env.VITE_REOWN_APP_ID!}
@@ -104,6 +99,7 @@ const USER_QUERY_KEYS = [
 
 function WalletInvalidator() {
   const { address } = useAddress()
+  const queryClient = useQueryClient()
   const prevAddressRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
@@ -113,7 +109,7 @@ function WalletInvalidator() {
       })
     }
     prevAddressRef.current = address
-  }, [address])
+  }, [address, queryClient])
 
   return null
 }

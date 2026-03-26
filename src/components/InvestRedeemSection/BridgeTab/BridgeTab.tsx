@@ -35,7 +35,7 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
   const { vaultDetails, isVaultDetailsLoading } = useVaultsContext()
   const { shareClass } = usePoolContext()
   const { address } = useAddress()
-  const { executeWithStatus, ensureSigner, isPending } = useCentrifugeTransaction()
+  const { executeWithStatus, isPending } = useCentrifugeTransaction()
   const { data: blockchainsMap } = useBlockchainsMapByCentrifugeId()
   const [actionType, setActionType] = useState<BridgeActionType>(BridgeAction.BRIDGE_FORM)
   const [bridgeProgress, setBridgeProgress] = useState<BridgeProgress | undefined>()
@@ -89,13 +89,6 @@ export function BridgeTab({ isLoading: isTabLoading }: TabProps) {
       const fromChainName = blockchainsMap?.get(fromId)?.name ?? 'Source'
       const toChainName = blockchainsMap?.get(toId)?.name ?? 'Destination'
       const fromExplorer = blockchainsMap?.get(fromId)?.explorer
-
-      // Set signer on the entity's own Centrifuge instance — it may differ from
-      // the context instance if the SDK was recreated (e.g. environment switch)
-      // while React Query still holds entities from the previous instance.
-      const signer = ensureSigner()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(shareClass.shareClass as any)._root?.setSigner?.(signer)
 
       const tx = shareClass.shareClass.crosschainTransferShares(fromId, toId, receiver, values.amount.toBigInt())
 
