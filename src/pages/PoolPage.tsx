@@ -64,7 +64,7 @@ export default function PoolPage() {
   return (
     <PoolPageLayout>
       <Box p="1.5rem" bg="bg.inverted" borderRadius="2xl">
-        <Flex justifyContent="space-between" alignItems="flex-end" justifyItems="center">
+        <Flex justifyContent="space-between" alignItems="flex-end" justifyItems="center" gap={4} flexWrap="wrap">
           <BackLink heading={poolName ?? 'Back to pools'} />
           <Box>
             <Text fontSize=".75rem" color="fg.subtle" width="auto" textAlign="right">
@@ -82,14 +82,14 @@ export default function PoolPage() {
       </Box>
 
       <Box bg="white" borderRadius="2xl" minH="75vh" maxW={maxScreenSize} mx="auto" my="2rem">
-        <Box maxW={maxScreenSize} mx="auto" px={{ base: 4, md: 8 }} py={8}>
+        <Box maxW="100%" mx="auto" px={{ base: 4, md: 8 }} py={8}>
           <Grid templateColumns={{ base: '1fr', sm: '1fr', md: '1fr', lg: '6fr 4fr' }} gap={6}>
             <Box minW={0}>
               <PoolMainStats />
               {isRwaPool ? <PoolDetailsRwa /> : <PoolDetailsDeRwa />}
             </Box>
 
-            <Box height="fit-content" position="sticky" top={8}>
+            <Box minW={0} height="fit-content" position="sticky" top={8}>
               {isSwapPool ? (
                 <SwapPoolSection pool={poolDetails} poolId={poolId!} />
               ) : (

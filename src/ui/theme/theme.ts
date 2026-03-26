@@ -17,6 +17,7 @@ const theme = defineConfig({
       color: charcoalScale[500],
       backgroundColor: grayScale[300],
       fontWeight: 400,
+      overflowX: 'hidden',
     },
   },
   theme: {
