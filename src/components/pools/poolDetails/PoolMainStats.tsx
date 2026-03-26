@@ -36,30 +36,25 @@ export function PoolMainStats() {
   ]
 
   return (
-    <Box bg="bg.subtle" padding={6} borderRadius={10} border="1px solid" borderColor="border.solid" shadow="xs">
-      <Grid templateColumns={{ base: 'repeat(3, 1fr)' }} gap={4}>
+    <Box bg="bg.subtle" padding={{ base: 4, md: 6 }} borderRadius={10} border="1px solid" borderColor="border.solid" shadow="xs">
+      <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={{ base: 2, md: 4 }}>
         {items.map((item, index) => (
           <GridItem minW={0} overflow="hidden" position="relative" key={item.label}>
             <Box
-              padding={{ base: '1rem 0 0 0', md: '0 1rem' }}
+              padding={{ base: 0, md: '0 1rem' }}
               borderLeft={index > 0 ? { base: 'none', md: '1px solid #E7E7E7' } : 'none'}
-              textAlign={{ base: 'center', md: 'left' }}
+              borderTop={index > 0 ? { base: '1px solid #E7E7E7', md: 'none' } : 'none'}
+              pt={index > 0 ? { base: 2, md: 0 } : 0}
             >
-              <Flex alignItems="center" justifyContent="left">
+              <Flex alignItems="center" gap={1}>
                 {item.icon}
-                <Text
-                  fontSize="0.75rem"
-                  color="fg.muted"
-                  fontWeight={500}
-                  width="auto"
-                  textAlign={{ base: 'center', md: 'left' }}
-                >
+                <Text fontSize="0.75rem" color="fg.muted" fontWeight={500}>
                   {item.label}
                 </Text>
               </Flex>
               {typeof item.value === 'string' ? (
                 <Text
-                  fontSize="clamp(1rem, 1.25rem, 1.5rem)"
+                  fontSize={{ base: 'md', md: 'clamp(1rem, 1.25rem, 1.5rem)' }}
                   whiteSpace="nowrap"
                   overflow="hidden"
                   textOverflow="ellipsis"
