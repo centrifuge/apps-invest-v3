@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { HexString, ShareClass } from '@centrifuge/sdk'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 
 /**

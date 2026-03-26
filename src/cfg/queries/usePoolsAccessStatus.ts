@@ -1,5 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { catchError, combineLatest, EMPTY, map, of, switchMap, timeout, type Observable } from 'rxjs'
 import type { Centrifuge, HexString, PoolId } from '@centrifuge/sdk'
+import { useCentrifuge } from './CentrifugeContext'
+import { queryKeys } from './queryKeys'
+import { useAddress } from './useAddress'
+import { firstValueWithTimeout } from './utils'
 
 export interface PoolAccessStatus {
   hasAccess: boolean
@@ -12,7 +17,24 @@ export interface UsePoolsAccessStatusResult {
   isLoading: boolean
 }
 
-export function createPoolsAccessStatus$(
+export function usePoolsAccessStatus(poolIds: PoolId[]) {
+  const centrifuge = useCentrifuge()
+  const { address } = useAddress()
+  const poolIdsKey =
+    poolIds
+      ?.map((id) => id.toString())
+      .sort()
+      .join(',') ?? ''
+
+  return useQuery({
+    queryKey: queryKeys.poolsAccessStatus(poolIdsKey, address),
+    queryFn: () => firstValueWithTimeout(createPoolsAccessStatus$(centrifuge, address!, poolIds)),
+    enabled: !!address && poolIds.length > 0,
+    staleTime: Infinity,
+  })
+}
+
+function createPoolsAccessStatus$(
   centrifuge: Centrifuge,
   address: HexString,
   poolIds: PoolId[]

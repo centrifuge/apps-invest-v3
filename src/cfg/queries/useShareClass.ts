@@ -1,6 +1,6 @@
 import { ShareClass } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 
 const HOLDINGS_REFETCH_INTERVAL = 60_000

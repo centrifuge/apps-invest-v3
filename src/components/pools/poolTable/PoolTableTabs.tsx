@@ -1,13 +1,7 @@
 import { useMemo } from 'react'
 import { Box, Tabs, Text } from '@chakra-ui/react'
 import { PoolId } from '@centrifuge/sdk'
-import {
-  type PoolAccessStatus,
-  useAddress,
-  useAllPoolsVaultsQuery,
-  useDebugFlags,
-  usePoolsAccessStatusQuery,
-} from '@cfg'
+import { type PoolAccessStatus, useAddress, useAllPoolsVaults, useDebugFlags, usePoolsAccessStatus } from '@cfg'
 import { PoolTableSection } from '@components/pools/poolTable/PoolTableSection'
 import { type ActiveTab, type PoolRow, POOL_TABLE_TABS } from '@components/pools/poolTable//types'
 import { usePoolContext } from '@contexts/PoolContext'
@@ -22,10 +16,10 @@ interface PoolTableTabsProps {
 export function PoolTableTabs({ poolIds }: PoolTableTabsProps) {
   const { activeHomeTab, setActiveHomeTab } = usePoolContext()
   const { showMainnet } = useDebugFlags()
-  const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaultsQuery(poolIds)
+  const { data: allVaults, isLoading: isPoolsVaultsLoading } = useAllPoolsVaults(poolIds)
   const { getIsProductionPool, getIsRestrictedPool, getIsRwaPool, getIsDeRwaPool } = useGetPoolsByIds()
   const { address } = useAddress()
-  const { data: accessData, isLoading: isAccessLoading } = usePoolsAccessStatusQuery(poolIds)
+  const { data: accessData, isLoading: isAccessLoading } = usePoolsAccessStatus(poolIds)
 
   const isMainnet = showMainnet || import.meta.env.VITE_CENTRIFUGE_ENV === 'mainnet'
 

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { LuArrowDown, LuArrowUp, LuArrowUpDown } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
-import { type Investment, useInvestmentsPerVaultsQuery } from '@cfg'
+import { type Investment, useInvestmentsPerVaults } from '@cfg'
 import { Box, Icon, Table, Text } from '@chakra-ui/react'
 import {
   POOL_COLUMNS_ACCESS,
@@ -66,7 +66,7 @@ export function PoolTable({ poolRows, isLoading, activeTab }: PoolTableProps) {
     () => (!showSkeleton ? poolRows.flatMap((row) => row.vaults.map((v) => v.vault)) : undefined),
     [poolRows, showSkeleton]
   )
-  const { data: allInvestments } = useInvestmentsPerVaultsQuery(allVaults)
+  const { data: allInvestments } = useInvestmentsPerVaults(allVaults)
 
   const investmentTotalsMap = useMemo(() => {
     const map = new Map<string, PoolInvestmentTotals>()

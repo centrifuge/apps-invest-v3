@@ -1,5 +1,6 @@
 import { Pool } from '@centrifuge/sdk'
 import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from './queryKeys'
 
 type GroupBy = 'day' | 'month' | 'quarter' | 'year'
 type DateLike = Date | string | number
@@ -26,7 +27,7 @@ export function useTokenPrices(pool: Pool | undefined, filters: TokenPriceFilter
 
   return useQuery({
     enabled: !!pool && Number.isFinite(fromNum) && Number.isFinite(toNum),
-    queryKey: ['sharePrices', pool?.id.toString(), fromNum, toNum, filters.groupBy, unit],
+    queryKey: queryKeys.sharePrices(pool?.id.toString(), fromNum, toNum, filters.groupBy, unit),
     queryFn: async () => {
       return pool!.reports.sharePrices({
         from: fromNum,

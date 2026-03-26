@@ -7,8 +7,8 @@ import {
   useBlockchainsMapByCentrifugeId,
   useAllowedBridgeDestinations,
   useShareClassDeployments,
-  useAllPoolsVaultsQuery,
-  useInvestmentsPerVaultsQuery,
+  useAllPoolsVaults,
+  useInvestmentsPerVaults,
   type Investment,
   type PoolNetworkVaultData,
 } from '@cfg'
@@ -63,7 +63,7 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
   )
 
   const poolIds = useMemo(() => pools?.map((p) => p.id) ?? [], [pools])
-  const { data: allPoolVaults } = useAllPoolsVaultsQuery(poolIds)
+  const { data: allPoolVaults } = useAllPoolsVaults(poolIds)
 
   // Filter to current pool and pick one vault per network
   const vaultsForPool = useMemo(() => {
@@ -79,7 +79,7 @@ export function BridgeForm({ isDisabled }: BridgeFormProps) {
   }, [allPoolVaults, selectedPoolId])
 
   const vaultObjects = useMemo(() => vaultsForPool.map((v) => v.vault), [vaultsForPool])
-  const { data: investments } = useInvestmentsPerVaultsQuery(vaultObjects)
+  const { data: investments } = useInvestmentsPerVaults(vaultObjects)
 
   const { shareBalanceByChain, investmentByChain } = useMemo(() => {
     const balanceMap = new Map<number, string>()

@@ -1,6 +1,6 @@
 import { useCentrifuge } from './CentrifugeContext'
 import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from './queries/queryKeys'
+import { queryKeys } from './queryKeys'
 import { firstValueWithTimeout } from './utils'
 import { HexString, Price } from '@centrifuge/sdk'
 
