@@ -5,29 +5,30 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@eslint/plugin-kit': 0.3.4
   '@isaacs/brace-expansion': 5.0.1
   '@metamask/sdk': 0.33.1
   '@metamask/sdk-communication-layer': 0.33.1
+  ajv@<7: 6.14.0
+  bn.js@<5: 4.12.3
+  bn.js@>=5: 5.2.3
   debug: 4.4.3
-  '@eslint/plugin-kit': 0.3.4
+  flatted: '>=3.4.2'
   glob: '>=11.1.0'
+  h3: '>=1.15.9'
   js-yaml: 4.1.1
-  qs: 6.14.2
-  viem: 2.40.2
   minimatch@<4: 3.1.4
   minimatch@>=5: 5.1.8
   minimatch@>=9: 9.0.7
   minimatch@>=10: 10.2.3
-  rollup@>=4: 4.59.0
-  ajv@<7: 6.14.0
-  bn.js@>=5: 5.2.3
-  bn.js@<5: 4.12.3
-  flatted: '>=3.4.2'
-  undici: '>=7.24.0'
-  postcss@<8.4.31: '>=8.4.31'
-  h3: '>=1.15.9'
   picomatch@<2.3.2: 2.3.2
   picomatch@>=4.0.0: 4.0.4
+  postcss@<8.4.31: '>=8.4.31'
+  qs: 6.14.2
+  rollup@>=4: 4.59.0
+  undici: '>=7.24.0'
+  viem: 2.40.2
+  brace-expansion: '>=5.0.5'
   yaml@<2: 1.10.3
 
 importers:
@@ -2922,9 +2923,6 @@ packages:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
     engines: {node: '>=10', npm: '>=6'}
 
-  balanced-match@1.0.2:
-    resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
-
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
@@ -2963,14 +2961,8 @@ packages:
   borsh@0.7.0:
     resolution: {integrity: sha512-CLCsZGIBCFnPtkNnieW/a8wmreDmfUtjU2m9yHrzPXIlNbqVs0AQrSatSG6vdNYUqdc83tkQi2eHfF98ubzQLA==}
 
-  brace-expansion@1.1.12:
-    resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
-
-  brace-expansion@2.0.2:
-    resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
-
-  brace-expansion@5.0.4:
-    resolution: {integrity: sha512-h+DEnpVvxmfVefa4jFbCf5HdH5YMDXRsmKflpf1pILZWRFlTbJpxeU55nJl4Smt5HQaGzg1o6RHFPJaOqnmBDg==}
+  brace-expansion@5.0.5:
+    resolution: {integrity: sha512-VZznLgtwhn+Mact9tfiwx64fA9erHH/MCXEUfB/0bX/6Fz6ny5EGTXYltMocqg4xFAQZtnO3DHWWXi8RiuN7cQ==}
     engines: {node: 18 || 20 || >=22}
 
   braces@3.0.3:
@@ -3174,9 +3166,6 @@ packages:
   commander@8.3.0:
     resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
     engines: {node: '>= 12'}
-
-  concat-map@0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   concurrently@8.2.2:
     resolution: {integrity: sha512-1dP4gpXFhei8IOtlXRE/T/4H88ElHgTiUzh71YUmtjTEHMSRS2Z/fgOxHSxxusGHogsRfxNq1vyAwxSC+EVyDg==}
@@ -9739,8 +9728,6 @@ snapshots:
       cosmiconfig: 7.1.0
       resolve: 1.22.11
 
-  balanced-match@1.0.2: {}
-
   balanced-match@4.0.4: {}
 
   base-x@3.0.11:
@@ -9773,16 +9760,7 @@ snapshots:
       text-encoding-utf-8: 1.0.2
     optional: true
 
-  brace-expansion@1.1.12:
-    dependencies:
-      balanced-match: 1.0.2
-      concat-map: 0.0.1
-
-  brace-expansion@2.0.2:
-    dependencies:
-      balanced-match: 1.0.2
-
-  brace-expansion@5.0.4:
+  brace-expansion@5.0.5:
     dependencies:
       balanced-match: 4.0.4
 
@@ -10003,8 +9981,6 @@ snapshots:
   commander@4.1.1: {}
 
   commander@8.3.0: {}
-
-  concat-map@0.0.1: {}
 
   concurrently@8.2.2:
     dependencies:
@@ -11130,19 +11106,19 @@ snapshots:
 
   minimatch@10.2.3:
     dependencies:
-      brace-expansion: 5.0.4
+      brace-expansion: 5.0.5
 
   minimatch@3.1.4:
     dependencies:
-      brace-expansion: 1.1.12
+      brace-expansion: 5.0.5
 
   minimatch@5.1.8:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 5.0.5
 
   minimatch@9.0.7:
     dependencies:
-      brace-expansion: 5.0.4
+      brace-expansion: 5.0.5
 
   minimist@1.2.8: {}
 
