@@ -1,4 +1,5 @@
 import { useDebugFlags } from '@cfg'
+import { TermsAndConditions } from '@components/elements/TermsAndConditions'
 import { PoolIntegrations } from '@components/pools/poolDetails/PoolIntegrations'
 import { PoolPerformanceChart } from '@components/pools/poolDetails/PoolPerformanceChart'
 import { PoolReserves } from './PoolReserves'
@@ -12,6 +13,7 @@ export function PoolDetailsDeRwa() {
       <PoolIntegrations />
       <PoolUnderlyingAssets />
       {showPoolReserves && <PoolReserves />}
+      <TermsAndConditions />
     </>
   )
 }
