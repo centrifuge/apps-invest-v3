@@ -4,7 +4,7 @@ import { useIsUserWhitelisted } from '@hooks/useIsUserWhitelisted'
 import aaveLogo from '@assets/logos/aave.svg'
 import aerodromeLogo from '@assets/logos/aerodrome.svg'
 import morphoLogo from '@assets/logos/morpho.svg'
-import { mainnet } from 'viem/chains'
+import { base, mainnet } from 'viem/chains'
 
 export type IntegrationType = 'DEX' | 'Collateral'
 
@@ -101,7 +101,7 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
         icon: aerodromeLogo,
         type: 'DEX',
         url: 'https://aerodrome.finance/swap?from=0xaaa0008c8cf3a7dca931adaf04336a5d808c82cc&to=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&chain0=8453&chain1=8453',
-        chainIds: [mainnet.id],
+        chainIds: [base.id],
       },
     ],
   },
@@ -126,6 +126,15 @@ const POOL_REGISTRY: Record<string, PoolConfig> = {
     isDeRwa: true,
     isRestricted: false,
     hasTradingWidget: true,
+    integrations: [
+      {
+        name: 'Aerodrome Pool',
+        icon: aerodromeLogo,
+        type: 'DEX',
+        url: 'https://aerodrome.finance/swap?from=0x9c5c365e764829876243d0b289733b9d2b729685&to=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&chain0=8453&chain1=8453',
+        chainIds: [base.id],
+      },
+    ],
   },
 
   // ===== Test RWA Pools =====
