@@ -9,6 +9,7 @@ import { checkboxRecipe } from './recipes/checkboxRecipe'
 import { headingRecipe } from './recipes/headingRecipe'
 import { inputRecipe } from './recipes/inputRecipe'
 import { paginationRecipe } from './recipes/paginationRecipe'
+import { switchRecipe } from './recipes/switchRecipe'
 import { textRecipe } from './recipes/textRecipe'
 
 const theme = defineConfig({
@@ -40,6 +41,7 @@ const theme = defineConfig({
       card: cardRecipe,
       checkbox: checkboxRecipe,
       pagination: paginationRecipe,
+      switch: switchRecipe,
     },
   },
 })
