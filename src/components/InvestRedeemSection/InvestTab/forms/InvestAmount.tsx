@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { Balance, PoolNetwork } from '@centrifuge/sdk'
-import { Badge, Box, Flex, Text } from '@chakra-ui/react'
+import { Badge, Box, Flex, Switch, Text } from '@chakra-ui/react'
 import { debounce } from '@cfg'
 import { balanceToString, divideBalanceByPrice } from '@utils/balance'
 import { BalanceInput, SubmitButton, useFormContext } from '@forms'
@@ -11,6 +11,7 @@ import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
 import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
+import { usePermitToggle } from '@hooks/usePermitToggle'
 import { infoText } from '@utils/infoText'
 
 interface InvestAmountProps {
@@ -60,6 +61,8 @@ export function InvestAmount({
     const receiveBalance = divideBalanceByPrice(portfolioBalance, pricePerShare)
     setValue('receiveAmount', balanceToString(receiveBalance))
   }, [portfolioBalance, maxInvestAmount, pricePerShare, setValue])
+
+  const { permitDisabled, setPermitDisabled } = usePermitToggle()
 
   const isDepositDisabled =
     !hasInvestmentCurrency || !portfolioBalance || portfolioBalance?.isZero() || !isDepositAllowed || isDisabled
@@ -125,6 +128,21 @@ export function InvestAmount({
           <SubmitButton colorPalette="yellow" width="100%" disabled={isDisabled || !isDepositAllowed} mt={6}>
             Invest
           </SubmitButton>
+          <Flex mt={3} align="center" justify="space-between">
+            <Text fontSize="sm" color="fg.muted">
+              Approve with permit signature
+            </Text>
+            <Switch.Root
+              size="sm"
+              checked={!permitDisabled}
+              onCheckedChange={({ checked }) => setPermitDisabled(!checked)}
+            >
+              <Switch.HiddenInput />
+              <Switch.Control>
+                <Switch.Thumb />
+              </Switch.Control>
+            </Switch.Root>
+          </Flex>
           {!hasInvestmentCurrency && (
             <InfoWrapper
               text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
