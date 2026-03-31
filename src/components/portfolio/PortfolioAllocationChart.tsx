@@ -1,7 +1,19 @@
 import { Box, Flex, Text } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 import { formatBalanceAbbreviated } from '@cfg'
 import { DonutChart, type DonutChartDatum } from '@ui'
 import { POOL_COLORS } from './colors'
+
+const slideInRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`
 
 interface PoolAllocation {
   poolName: string
@@ -30,6 +42,7 @@ export function PortfolioAllocationChart({ pools }: PortfolioAllocationChartProp
       justifyContent="space-between"
       height="100%"
       minH="398px"
+      css={{ animation: `${slideInRight} 0.5s ease-out 0.15s both` }}
       width={{ base: '100%', md: '390px' }}
       flexShrink={0}
     >

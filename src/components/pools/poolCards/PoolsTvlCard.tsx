@@ -1,7 +1,19 @@
 import { Balance, PoolId } from '@centrifuge/sdk'
 import { formatBalance, formatDate, useAllPoolDetails } from '@cfg'
 import { Box, Flex, Skeleton, Text } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 import { MdOutlineInsertChart } from 'react-icons/md'
+
+const slideInRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`
 
 export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   const { data: poolsDetails, isLoading } = useAllPoolDetails(poolIds, { enabled: poolIds.length > 0 })
@@ -24,7 +36,7 @@ export function PoolsTvlCard({ poolIds }: { poolIds: PoolId[] }) {
   }
 
   return (
-    <Flex alignItems="center" gap={{ base: 2, md: 3 }}>
+    <Flex alignItems="center" gap={{ base: 2, md: 3 }} css={{ animation: `${slideInRight} 0.5s ease-out both` }}>
       <Box display={{ base: 'none', md: 'block' }}>
         <MdOutlineInsertChart size="3rem" color="#FFC012" style={{ marginTop: '1.3rem' }} />
       </Box>

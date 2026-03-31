@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Box, Flex, Spinner, Text, useBreakpointValue } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 import { useAddress } from '@cfg'
 import { PoolTableTabs } from '@components/pools/poolTable/PoolTableTabs'
 import { PoolsTvlCard } from '@components/pools/poolCards/PoolsTvlCard'
@@ -210,9 +211,27 @@ export default function HomePage() {
   )
 }
 
+const slideInLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`
+
 function HeroText() {
   return (
-    <Flex flexDirection="column" justifyContent="center" gap={6} py={{ base: 10, md: 12 }} maxW="558px">
+    <Flex
+      flexDirection="column"
+      justifyContent="center"
+      gap={6}
+      py={{ base: 10, md: 12 }}
+      maxW="558px"
+      css={{ animation: `${slideInLeft} 0.5s ease-out both` }}
+    >
       <Text
         as="h1"
         fontSize={{ base: '2rem', md: '4rem' }}

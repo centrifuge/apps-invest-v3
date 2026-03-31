@@ -1,5 +1,17 @@
 import { useMemo } from 'react'
 import { Box, Center, Flex, Heading, Spinner, Text } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
+
+const slideInLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`
 import { Pool } from '@centrifuge/sdk'
 import { formatBalanceAbbreviated, useMultiPoolTokenPrices } from '@cfg'
 import { LineChart } from '@ui'
@@ -107,7 +119,7 @@ export function PortfolioAumChart({ pools, totalInvested }: PortfolioAumChartPro
     new Date(ts).toLocaleString('en-US', { month: 'short', day: '2-digit', timeZone: 'UTC' })
 
   return (
-    <Box flex="1" minW={0} position="relative">
+    <Box flex="1" minW={0} position="relative" css={{ animation: `${slideInLeft} 0.5s ease-out both` }}>
       {isLoading && (
         <Box pos="absolute" inset="0" zIndex={1}>
           <Center h="full">
