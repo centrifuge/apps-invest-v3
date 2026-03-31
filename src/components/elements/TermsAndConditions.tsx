@@ -4,7 +4,6 @@ import { usePoolContext } from '@contexts/PoolContext'
 export function TermsAndConditions() {
   const { poolDetails } = usePoolContext()
   const details = poolDetails?.metadata?.pool.details
-  console.log('details', poolDetails)
 
   if (!details?.length) {
     return null
