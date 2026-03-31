@@ -12,6 +12,8 @@ type SeriesConfig<T> = {
   colorToken?: string
   strokeWidth?: number
   barSize?: number
+  yAxisId?: 'left' | 'right'
+  tooltipFormatter?: (y: number) => string
 }
 
 type LineChartProps<T> = {
@@ -24,6 +26,8 @@ type LineChartProps<T> = {
   yTickFormatter?: (y: number) => string
   tooltipYTickFormatter?: (y: number) => string
   yDomain?: (string | number)[]
+  rightYDomain?: (string | number)[]
+  rightYTickFormatter?: (y: number) => string
   showGrid?: boolean
   showTooltip?: boolean
 }
@@ -38,6 +42,8 @@ export function LineChart<T>({
   yTickFormatter = (v) => String(v),
   tooltipYTickFormatter = (v) => String(v),
   yDomain = [0, 100],
+  rightYDomain,
+  rightYTickFormatter,
   showGrid = true,
   showTooltip = true,
 }: LineChartProps<T>) {
@@ -50,6 +56,16 @@ export function LineChart<T>({
   ])
 
   const defaultFormatMonth = (x: string) => new Date(x).toLocaleString('en-US', { month: 'short', year: 'numeric' })
+
+  const hasRightAxis = series.some((s) => s.yAxisId === 'right')
+
+  const tooltipFormatters = useMemo(() => {
+    const map: Record<string, (y: number) => string> = {}
+    for (const s of series) {
+      if (s.tooltipFormatter) map[s.id] = s.tooltipFormatter
+    }
+    return map
+  }, [series])
 
   // Normalize raw rows into { timestamp, [series.id]: number }
   const normalized = useMemo(() => {
@@ -76,12 +92,24 @@ export function LineChart<T>({
             style={{ fontSize: '10px', fill: textSecondary }}
           />
           <YAxis
+            yAxisId="left"
             domain={yDomain as any}
             tickFormatter={yTickFormatter}
             axisLine={false}
             tickLine={false}
             style={{ fontSize: '10px', fill: textSecondary }}
           />
+          {hasRightAxis && (
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={(rightYDomain ?? [0, 'auto']) as any}
+              tickFormatter={rightYTickFormatter ?? yTickFormatter}
+              axisLine={false}
+              tickLine={false}
+              style={{ fontSize: '10px', fill: textSecondary }}
+            />
+          )}
           {showTooltip && (
             <Tooltip
               content={
@@ -98,6 +126,7 @@ export function LineChart<T>({
                       .toUpperCase()
                   }
                   yFormatter={tooltipYTickFormatter}
+                  yFormatters={tooltipFormatters}
                 />
               }
               wrapperStyle={{ width: '298px', boxShadow: '1px 3px 6px rgba(0, 0, 0, 0.15)', borderRadius: '8px' }}
@@ -110,6 +139,7 @@ export function LineChart<T>({
               <Bar
                 key={s.id}
                 dataKey={s.id}
+                yAxisId={s.yAxisId ?? 'left'}
                 barSize={s.barSize ?? 20}
                 fill={seriesColors[i]}
                 fillOpacity={1}
@@ -120,6 +150,7 @@ export function LineChart<T>({
                 key={s.id}
                 type="monotone"
                 dataKey={s.id}
+                yAxisId={s.yAxisId ?? 'left'}
                 stroke={seriesColors[i]}
                 strokeWidth={s.strokeWidth ?? 2}
                 dot={false}
