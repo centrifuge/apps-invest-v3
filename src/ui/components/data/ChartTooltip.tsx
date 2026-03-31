@@ -4,11 +4,13 @@ export const ChartTooltip = ({
   borderColor,
   xFormatter,
   yFormatter,
+  yFormatters,
   ...props
 }: {
   borderColor: string
   xFormatter: (x: string) => string
   yFormatter: (y: number) => string
+  yFormatters?: Record<string, (y: number) => string>
 }) => {
   const { payload, label } = props as { payload: any; label: string }
   if (!payload?.length) return null
@@ -30,13 +32,16 @@ export const ChartTooltip = ({
         {formattedDate}
       </Heading>
 
-      {payload.map((entry: any) => (
-        <Text key={entry.dataKey} fontSize="xs" fontWeight="normal">
-          {`${entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}: ${
-            yFormatter ? yFormatter(entry.value) : entry.value
-          }`}
-        </Text>
-      ))}
+      {payload.map((entry: any) => {
+        const formatter = yFormatters?.[entry.dataKey] ?? yFormatter
+        return (
+          <Text key={entry.dataKey} fontSize="xs" fontWeight="normal">
+            {`${entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}: ${
+              formatter ? formatter(entry.value) : entry.value
+            }`}
+          </Text>
+        )
+      })}
     </Box>
   )
 }
