@@ -73,9 +73,8 @@ export function PortfolioAumChart({ pools, totalInvested }: PortfolioAumChartPro
 
         // Scale current assetBalance by price change ratio so the latest point matches the pie chart
         const historicalPrice = sc.price.toDecimal().toNumber()
-        const userValue = poolInfo.currentPrice > 0
-          ? poolInfo.investedValue * (historicalPrice / poolInfo.currentPrice)
-          : 0
+        const userValue =
+          poolInfo.currentPrice > 0 ? poolInfo.investedValue * (historicalPrice / poolInfo.currentPrice) : 0
 
         const existing = timestampMap.get(entry.timestamp)
         if (existing) {

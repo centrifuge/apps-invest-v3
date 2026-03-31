@@ -47,8 +47,7 @@ export function useMultiPoolTokenPrices(pools: Pool[], filters: TokenPriceFilter
   return useQueries({
     queries: pools.map((pool) => ({
       queryKey: queryKeys.sharePrices(pool.id.toString(), fromNum, toNum, groupBy, unit),
-      queryFn: async (): Promise<SharePricesReport> =>
-        pool.reports.sharePrices({ from: fromNum, to: toNum, groupBy }),
+      queryFn: async (): Promise<SharePricesReport> => pool.reports.sharePrices({ from: fromNum, to: toNum, groupBy }),
       staleTime: 5 * 60 * 1000,
       enabled: Number.isFinite(fromNum) && Number.isFinite(toNum),
     })),
