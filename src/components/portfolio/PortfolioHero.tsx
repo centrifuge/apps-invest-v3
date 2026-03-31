@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { Flex } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 import { Pool, PoolId } from '@centrifuge/sdk'
 import {
   type PoolAccessStatus,
@@ -18,10 +18,11 @@ import { PortfolioAllocationChart } from './PortfolioAllocationChart'
 interface PortfolioHeroProps {
   poolIds: PoolId[]
   fallback: React.ReactNode
+  isMobile: boolean
   onDataChange: (hasData: boolean) => void
 }
 
-export function PortfolioHero({ poolIds, fallback, onDataChange }: PortfolioHeroProps) {
+export function PortfolioHero({ poolIds, fallback, isMobile, onDataChange }: PortfolioHeroProps) {
   const { data: pools } = usePools()
   const { showMainnet } = useDebugFlags()
   const { data: allVaults } = useAllPoolsVaults(poolIds)
@@ -101,10 +102,15 @@ export function PortfolioHero({ poolIds, fallback, onDataChange }: PortfolioHero
   if (!hasData) return <>{fallback}</>
 
   return (
-    <Flex gap={8} alignItems="stretch" flexDirection={{ base: 'column', md: 'row' }} px={2}>
-      <PortfolioAumChart pools={investedPools} totalInvested={totalInvested} />
-      <PortfolioAllocationChart pools={investedPools.map((p) => ({ poolName: p.poolName, aum: p.investedValue }))} />
-    </Flex>
+    <>
+      <Flex gap={8} alignItems="stretch" flexDirection={{ base: 'column', md: 'row' }} px={2} pb={isMobile ? 8 : 2}>
+        {!isMobile ? <PortfolioAumChart pools={investedPools} totalInvested={totalInvested} /> : null}
+        <PortfolioAllocationChart pools={investedPools.map((p) => ({ poolName: p.poolName, aum: p.investedValue }))} />
+      </Flex>
+      {!isMobile && (
+        <Box position="absolute" bottom="-70px" height="70px" width="100vw" background="#07090A" zIndex={1} />
+      )}
+    </>
   )
 }
 
