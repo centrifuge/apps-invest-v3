@@ -28,6 +28,7 @@ type LineChartProps<T> = {
   yDomain?: (string | number)[]
   rightYDomain?: (string | number)[]
   rightYTickFormatter?: (y: number) => string
+  axisFontSize?: string
   showGrid?: boolean
   showTooltip?: boolean
 }
@@ -44,6 +45,7 @@ export function LineChart<T>({
   yDomain = [0, 100],
   rightYDomain,
   rightYTickFormatter,
+  axisFontSize = '10px',
   showGrid = true,
   showTooltip = true,
 }: LineChartProps<T>) {
@@ -89,7 +91,7 @@ export function LineChart<T>({
             tickFormatter={xTickFormatter ?? defaultFormatMonth}
             axisLine={false}
             tickLine={false}
-            style={{ fontSize: '10px', fill: textSecondary }}
+            style={{ fontSize: axisFontSize, fill: textSecondary }}
           />
           <YAxis
             yAxisId="left"
@@ -97,7 +99,7 @@ export function LineChart<T>({
             tickFormatter={yTickFormatter}
             axisLine={false}
             tickLine={false}
-            style={{ fontSize: '10px', fill: textSecondary }}
+            style={{ fontSize: axisFontSize, fill: textSecondary }}
           />
           {hasRightAxis && (
             <YAxis
