@@ -19,19 +19,19 @@ runs:
   using: 'composite'
   steps:
     - name: '🟢 Setup Node.js'
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with:
         node-version: '24'
 
     - name: '📦 Download Build Artifact'
       if: inputs.environment != 'prod'
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
       with:
         name: invest-v3-build-${{ github.sha }}
         path: ./dist
 
     - name: '📦 Setup pnpm (for Wrangler)'
-      uses: pnpm/action-setup@v3
+      uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3
       with:
         version: 10
 
@@ -87,7 +87,7 @@ runs:
         echo "wrangler-env=$WRANGLER_ENV" >> $GITHUB_OUTPUT
 
     - name: '🚀 Deploy to Cloudflare'
-      uses: cloudflare/wrangler-action@v3
+      uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3
       with:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
