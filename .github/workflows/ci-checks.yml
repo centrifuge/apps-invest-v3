@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: '📥 Checkout Code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
 
@@ -34,7 +34,7 @@ jobs:
         run: pnpm run lint
 
       - name: Run codespell
-        uses: codespell-project/actions-codespell@v2
+        uses: codespell-project/actions-codespell@406322ec52dd7b488e48c1c4b82e2a8b3a1bf630 # v2
         with:
           path: src
           skip: src/assets/**,src/ui/assets/**,.svg,.png,.jpg,.jpeg,.ico
@@ -51,7 +51,7 @@ jobs:
       contents: read
       security-events: write
       actions: read
-    uses: 'google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@v2.2.2'
+    uses: 'google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@90b209d0ea55cea1da9fc0c4e65782cc6acb6e2e' # v2.2.2
     with:
       fail-on-vuln: true
       upload-sarif: true
@@ -61,13 +61,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: $((${{ github.event.pull_request.commits }}+2))
           # Shallow clone to speed up the action
       - name: TruffleHog scan
-        uses: trufflesecurity/trufflehog@v3.90.4
+        uses: trufflesecurity/trufflehog@0c9fbff42893900f6cc15010c408d70d6013819c # v3.90.4
         with:
           extra_args: --exclude-globs "**/dist/**,**/build/**"
         # continue-on-error: true

@@ -19,11 +19,11 @@ jobs:
       url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
       - name: '📥 Checkout Code from Release Tag'
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.event.inputs.tag }}
       - name: '📦 Setup pnpm (for Wrangler)'
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d # v3
         with:
           version: 10
       - name: '📦 Install Wrangler'
@@ -43,7 +43,7 @@ jobs:
           echo "cmd=$CMD" >> $GITHUB_OUTPUT
 
       - name: '🚀 Deploy to Cloudflare'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
