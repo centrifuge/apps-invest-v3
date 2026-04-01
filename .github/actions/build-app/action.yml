@@ -53,7 +53,9 @@ runs:
       id: build
       shell: sh
       run: |
-        pnpm build ${{ inputs.build-args }}
+        pnpm build $BUILD_ARGS
+      env:
+        BUILD_ARGS: ${{ inputs.build-args }}
 
     - name: '📦 Upload Build Artifact'
       if: ${{ steps.build.outcome == 'success' }}

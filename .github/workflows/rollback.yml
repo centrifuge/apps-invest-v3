@@ -14,7 +14,7 @@ jobs:
       contents: read
     name: 'Rollback to ${{ github.event.inputs.tag }}'
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: production
       url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
@@ -29,16 +29,17 @@ jobs:
       - name: '📦 Install Wrangler'
         shell: sh
         run: |
-          npm install -g wrangler@4.33.1          
+          npm install -g wrangler@4.33.1
       - name: version id setup
         id: wrangler-command
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}        
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TAG: ${{ inputs.tag }}
         run: |
           WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
           WRANGLER_ENV="prod"
-          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ inputs.tag }}\") | .id" | head -1)
+          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"$TAG\") | .id" | head -1)
           CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
           echo "cmd=$CMD" >> $GITHUB_OUTPUT
 
@@ -49,5 +50,5 @@ jobs:
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           command: ${{ steps.wrangler-command.outputs.cmd }}
-          wranglerVersion: "4.45.0"
+          wranglerVersion: '4.45.0'
         id: deploy
