@@ -26,18 +26,20 @@ runs:
       if: github.event_name == 'release'
       id: check-artifact
       shell: sh
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        GH_REF_NAME: ${{ github.ref_name }}
+        GH_REPOSITORY: ${{ github.repository }}
       run: |
-        ARTIFACT_NAME="invest-bundle${{ github.ref_name }}.zip"
+        ARTIFACT_NAME="invest-bundle${GH_REF_NAME}.zip"
         echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
-        if [ -n "$(gh release view ${{ github.ref_name }} --repo ${{ github.repository }} --json assets --jq '.assets[] | select(.name == "'"$ARTIFACT_NAME"'")')" ]; then
+        if [ -n "$(gh release view "$GH_REF_NAME" --repo "$GH_REPOSITORY" --json assets --jq '.assets[] | select(.name == "'"$ARTIFACT_NAME"'")')" ]; then
           echo "::info::✅ Build artifact already exists, skipping build: $ARTIFACT_NAME"
           echo "skip_build=true" >> $GITHUB_OUTPUT
         else
           echo "::info::🔄 Build artifact not found, building $ARTIFACT_NAME"
           echo "skip_build=false" >> $GITHUB_OUTPUT
         fi
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: '📥 Install Dependencies'
       shell: sh
@@ -53,7 +55,9 @@ runs:
       id: build
       shell: sh
       run: |
-        pnpm build ${{ inputs.build-args }}
+        pnpm build $BUILD_ARGS
+      env:
+        BUILD_ARGS: ${{ inputs.build-args }}
 
     - name: '📦 Upload Build Artifact'
       if: ${{ steps.build.outcome == 'success' }}
@@ -65,13 +69,16 @@ runs:
     - name: '📦 Upload Build Artifact to Release'
       if: ${{ steps.build.outcome == 'success' &&  github.event.action == 'prereleased' }}
       shell: sh
-      run: |
-        # Create a zip file of the dist folder
-        cd dist && zip -r ../${{ steps.check-artifact.outputs.artifact-name }} . && cd ..
-
-        # Upload to release using GitHub CLI
-        gh release upload ${{ github.ref_name }} ${{ steps.check-artifact.outputs.artifact-name }} \
-          --repo ${{ github.repository }} \
-          --clobber
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        GH_REF_NAME: ${{ github.ref_name }}
+        GH_REPOSITORY: ${{ github.repository }}
+        ARTIFACT_NAME: ${{ steps.check-artifact.outputs.artifact-name }}
+      run: |
+        # Create a zip file of the dist folder
+        cd dist && zip -r "../$ARTIFACT_NAME" . && cd ..
+
+        # Upload to release using GitHub CLI
+        gh release upload "$GH_REF_NAME" "$ARTIFACT_NAME" \
+          --repo "$GH_REPOSITORY" \
+          --clobber

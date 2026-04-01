@@ -46,40 +46,44 @@ runs:
       env:
         CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
         CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        INPUT_ENVIRONMENT: ${{ inputs.environment }}
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
         # Map workflow environment names to wrangler environment names
-        if [ "${{ inputs.environment }}" = "demo" ]; then
+        if [ "$INPUT_ENVIRONMENT" = "demo" ]; then
           WRANGLER_ENV="dev"
-        elif [ "${{ inputs.environment }}" = "staging" ]; then
+        elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
           WRANGLER_ENV="prod"
         else
-          WRANGLER_ENV="${{ inputs.environment }}"
+          WRANGLER_ENV="$INPUT_ENVIRONMENT"
         fi
 
-        if [ "${{ inputs.environment }}" = "staging" ]; then
+        if [ "$INPUT_ENVIRONMENT" = "staging" ]; then
           # Staging: Upload with tag and preview-alias
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          CMD="versions upload --env $WRANGLER_ENV --tag ${{ github.ref_name }} --message \"Deployed commit: $SHORT_SHA\" --preview-alias staging"
-        elif [ "${{ inputs.environment }}" = "prod" ]; then
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          CMD="versions upload --env $WRANGLER_ENV --tag $GITHUB_REF_NAME --message \"Deployed commit: $SHORT_SHA\" --preview-alias staging"
+        elif [ "$INPUT_ENVIRONMENT" = "prod" ]; then
           # Production: Deploy existing version by tag
           # First, get the version ID for the tag using JSON output
           WORKER_NAME=$(grep -A1 "\[env.prod\]" wrangler.toml | grep "name" | cut -d'"' -f2)
-          VERSION_ID=$(wrangler versions list --name $WORKER_NAME --env $WRANGLER_ENV --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"${{ github.ref_name }}\") | .id" | head -1)
+          VERSION_ID=$(wrangler versions list --name "$WORKER_NAME" --env "$WRANGLER_ENV" --json | jq -r ".[] | select(.annotations.\"workers/tag\" == \"$GITHUB_REF_NAME\") | .id" | head -1)
           if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
             CMD="versions deploy $VERSION_ID@100% --env $WRANGLER_ENV --yes"
           else
-            echo "Error: No version found for tag ${{ github.ref_name }}"
+            echo "Error: No version found for tag $GITHUB_REF_NAME"
             exit 1
           fi
-        elif [ "${{ inputs.environment }}" = "dev" ]; then
+        elif [ "$INPUT_ENVIRONMENT" = "dev" ]; then
           # PR: Upload with PR info
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          CMD="versions upload --env $WRANGLER_ENV --tag $SHORT_SHA --message \"PR #${{ github.event.pull_request.number }} - $SHORT_SHA\""
-        elif [ "${{ inputs.environment }}" = "demo" ]; then
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          CMD="versions upload --env $WRANGLER_ENV --tag $SHORT_SHA --message \"PR #$PR_NUMBER - $SHORT_SHA\""
+        elif [ "$INPUT_ENVIRONMENT" = "demo" ]; then
           # Demo: Direct deploy
           CMD="deploy --env $WRANGLER_ENV"
         else
-          echo "Error: Environment '${{ inputs.environment }}' is not defined or supported."
+          echo "Error: Environment '$INPUT_ENVIRONMENT' is not defined or supported."
           exit 1
         fi
         echo "Wrangler command: $CMD"
@@ -99,8 +103,11 @@ runs:
     - name: '🔗 Handle Missing Preview URLs'
       if: steps.deploy.outputs.deployment-url == ''
       shell: sh
+      env:
+        WRANGLER_ENV: ${{ steps.wrangler-command.outputs.wrangler-env }}
+        CF_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
       run: |
-        echo "::warning::Preview URLs disabled for ${{ steps.wrangler-command.outputs.wrangler-env }}. %0A Please enable from https://dash.cloudflare.com/${{ inputs.cloudflare-account-id }}/workers-and-pages"
+        echo "::warning::Preview URLs disabled for $WRANGLER_ENV. %0A Please enable from https://dash.cloudflare.com/$CF_ACCOUNT_ID/workers-and-pages"
 
 outputs:
   deployment-url:
