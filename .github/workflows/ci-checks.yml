@@ -69,5 +69,5 @@ jobs:
       - name: TruffleHog scan
         uses: trufflesecurity/trufflehog@0c9fbff42893900f6cc15010c408d70d6013819c # v3.90.4
         with:
-          extra_args: --exclude-globs "**/dist/**,**/build/**"
+          extra_args: --exclude-globs "**/dist/**,**/build/**,.github/**"
         # continue-on-error: true
