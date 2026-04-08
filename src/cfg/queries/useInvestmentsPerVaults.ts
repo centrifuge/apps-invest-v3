@@ -19,9 +19,7 @@ export function useInvestmentsPerVaults(vaults?: Vault[]) {
     queryKey: queryKeys.investmentsPerVaults(vaultAddressesKey),
     queryFn: () =>
       firstValueWithTimeout(
-        combineLatest(
-          vaults!.map((v) => v.investment(address! as HexString).pipe(catchError(() => of(null))))
-        )
+        combineLatest(vaults!.map((v) => v.investment(address! as HexString).pipe(catchError(() => of(null)))))
       ),
     enabled: !!address && !!vaults && vaults.length > 0,
     placeholderData: [] as (Investment | null)[],

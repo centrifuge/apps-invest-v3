@@ -48,9 +48,7 @@ export const VaultsProvider = ({ children }: { children: ReactNode }) => {
       // Match by vault contract address (primary) or asset symbol (legacy fallback)
       const isAddress = assetFromUrl.startsWith('0x')
       if (isAddress) {
-        const matchingIndex = poolNetworkVaults.findIndex(
-          (v) => v.address.toLowerCase() === assetFromUrl.toLowerCase()
-        )
+        const matchingIndex = poolNetworkVaults.findIndex((v) => v.address.toLowerCase() === assetFromUrl.toLowerCase())
         if (matchingIndex !== -1) return poolNetworkVaults[matchingIndex]
       } else {
         const matchingIndex = vaultsDetails.findIndex(

@@ -144,10 +144,7 @@ export function InvestAmount({
             </Switch.Root>
           </Flex>
           {!hasInvestmentCurrency && (
-            <InfoWrapper
-              text={infoText(investment?.asset.symbol).portfolioMissingInvestmentCurrency}
-              type="error"
-            />
+            <InfoWrapper text={infoText(investment?.asset.symbol).portfolioMissingInvestmentCurrency} type="error" />
           )}
           {!isDepositAllowed && (
             <InfoWrapper
