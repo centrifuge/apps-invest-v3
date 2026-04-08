@@ -54,7 +54,7 @@ export function PoolTable({ poolRows, isLoading, activeTab }: PoolTableProps) {
     (poolRow: PoolRow) => {
       const vault = poolRow.vaults[0]
       if (!vault) return
-      const path = getVaultPath(poolRow.poolId, vault.networkName, vault.vaultDetails.asset.symbol)
+      const path = getVaultPath(poolRow.poolId, vault.networkName, vault.vault.address)
       navigate(path)
     },
     [navigate]
@@ -75,7 +75,7 @@ export function PoolTable({ poolRows, isLoading, activeTab }: PoolTableProps) {
     let offset = 0
     for (const row of poolRows) {
       const count = row.vaults.length
-      const investments = allInvestments.slice(offset, offset + count)
+      const investments = allInvestments.slice(offset, offset + count).filter((inv): inv is Investment => inv !== null)
       offset += count
       const totals = computeInvestmentTotals(investments)
       if (totals) map.set(row.poolId, totals)
@@ -89,7 +89,8 @@ export function PoolTable({ poolRows, isLoading, activeTab }: PoolTableProps) {
     if (!allInvestments) return map
     const allVaultsList = poolRows.flatMap((row) => row.vaults)
     allVaultsList.forEach((v, i) => {
-      if (allInvestments[i]) map.set(v.vault.address, allInvestments[i])
+      const inv = allInvestments[i]
+      if (inv) map.set(v.vault.address, inv)
     })
     return map
   }, [allInvestments, poolRows])

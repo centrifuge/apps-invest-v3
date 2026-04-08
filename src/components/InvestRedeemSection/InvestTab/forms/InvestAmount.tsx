@@ -10,7 +10,6 @@ import { PendingInvestmentBanner } from '@components/InvestRedeemSection/compone
 import { useGetPendingInvestments } from '@components/InvestRedeemSection/hooks/useGetPendingInvestments'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { usePoolContext } from '@contexts/PoolContext'
-import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { usePermitToggle } from '@hooks/usePermitToggle'
 import { infoText } from '@utils/infoText'
 
@@ -30,7 +29,8 @@ export function InvestAmount({
 }: InvestAmountProps) {
   const { poolDetails, network } = usePoolContext()
   const { investment, vaultDetails } = useVaultsContext()
-  const { portfolioInvestmentCurrency, portfolioBalance, hasInvestmentCurrency } = useGetPortfolioDetails(vaultDetails)
+  const assetBalance = investment?.assetBalance
+  const hasInvestmentCurrency = !assetBalance?.isZero()
   const { hasPendingInvestments, asset, pendingDepositAssets } = useGetPendingInvestments()
   const { setValue } = useFormContext()
   const isDepositAllowed = investment?.isAllowedToDeposit ?? false
@@ -56,16 +56,16 @@ export function InvestAmount({
   const debouncedCalculateReceiveAmount = useMemo(() => debounce(calculateReceiveAmount, 250), [calculateReceiveAmount])
 
   const setMaxInvestAmount = useCallback(() => {
-    if (!portfolioBalance || !maxInvestAmount || !pricePerShare) return
+    if (!assetBalance || !maxInvestAmount || !pricePerShare) return
     setValue('investAmount', maxInvestAmount, { shouldValidate: true })
-    const receiveBalance = divideBalanceByPrice(portfolioBalance, pricePerShare)
+    const receiveBalance = divideBalanceByPrice(assetBalance, pricePerShare)
     setValue('receiveAmount', balanceToString(receiveBalance))
-  }, [portfolioBalance, maxInvestAmount, pricePerShare, setValue])
+  }, [assetBalance, maxInvestAmount, pricePerShare, setValue])
 
   const { permitDisabled, setPermitDisabled } = usePermitToggle()
 
   const isDepositDisabled =
-    !hasInvestmentCurrency || !portfolioBalance || portfolioBalance?.isZero() || !isDepositAllowed || isDisabled
+    !hasInvestmentCurrency || !assetBalance || assetBalance?.isZero() || !isDepositAllowed || isDisabled
 
   return (
     <Box height="100%">
@@ -144,10 +144,7 @@ export function InvestAmount({
             </Switch.Root>
           </Flex>
           {!hasInvestmentCurrency && (
-            <InfoWrapper
-              text={infoText(portfolioInvestmentCurrency?.symbol).portfolioMissingInvestmentCurrency}
-              type="error"
-            />
+            <InfoWrapper text={infoText(investment?.asset.symbol).portfolioMissingInvestmentCurrency} type="error" />
           )}
           {!isDepositAllowed && (
             <InfoWrapper

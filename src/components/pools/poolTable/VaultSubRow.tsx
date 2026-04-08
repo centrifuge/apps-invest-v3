@@ -21,7 +21,7 @@ export function VaultSubRow({ vaultRow, poolId, activeTab, investment, isLast, i
   const assetSymbol = vaultRow.vaultDetails.asset.symbol
 
   const handleClick = () => {
-    const path = getVaultPath(poolId, vaultRow.networkName, assetSymbol)
+    const path = getVaultPath(poolId, vaultRow.networkName, vaultRow.vault.address)
     navigate(path)
   }
 

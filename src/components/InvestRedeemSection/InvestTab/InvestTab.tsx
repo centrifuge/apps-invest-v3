@@ -11,25 +11,25 @@ import {
 } from '@components/InvestRedeemSection/components/defaults'
 import { InvestTabForm } from '@components/InvestRedeemSection/InvestTab/forms/InvestTabForm'
 import { TabProps } from '@components/InvestRedeemSection'
-import { useGetPortfolioDetails } from '@hooks/useGetPortfolioDetails'
 import { useVaultsContext } from '@contexts/VaultsContext'
 import { balanceToString } from '@utils/balance'
 
 export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
   const { vaultDetails, investment, isVaultDetailsLoading, isInvestmentLoading } = useVaultsContext()
-  const { portfolioBalance, isPortfolioLoading } = useGetPortfolioDetails(vaultDetails)
   const { execute, isPending } = useCentrifugeTransaction()
   const [actionType, setActionType] = useState<InvestActionType>(InvestAction.INVEST_AMOUNT)
 
+  const assetBalance = investment?.assetBalance
+
   const maxInvestAmount = useMemo(() => {
-    if (!portfolioBalance) return '0'
-    return balanceToString(portfolioBalance)
-  }, [portfolioBalance])
+    if (!assetBalance) return '0'
+    return balanceToString(assetBalance)
+  }, [assetBalance])
 
   const formattedMaxInvestAmount = useMemo(() => {
-    if (!portfolioBalance) return '0'
-    return formatBalance(portfolioBalance, { currency: investment?.asset.symbol, precision: 0 })
-  }, [portfolioBalance])
+    if (!assetBalance) return '0'
+    return formatBalance(assetBalance, { currency: investment?.asset.symbol, precision: 0 })
+  }, [assetBalance, investment?.asset.symbol])
 
   function invest(amount: Balance) {
     const tx = investment?.isSyncDeposit ? vault.syncDeposit(amount) : vault.asyncDeposit(amount)
@@ -68,7 +68,7 @@ export function InvestTab({ isLoading: isTabLoading, vault }: TabProps) {
     [receiveAmount, schema.shape.receiveAmount]
   )
 
-  const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading || isPortfolioLoading
+  const isLoading = isTabLoading || isVaultDetailsLoading || isInvestmentLoading
   const isDisabled = isPending || !investment || !vaultDetails
 
   if (isLoading) {
