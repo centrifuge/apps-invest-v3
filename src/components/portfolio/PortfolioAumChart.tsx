@@ -134,7 +134,7 @@ export function PortfolioAumChart({ pools, totalInvested }: PortfolioAumChartPro
           </Text>
           <Flex gap={4} alignItems="center" mt={2}>
             <Heading size="2xl" color="fg.inverted">
-              {formatBalanceAbbreviated(totalInvested, 1, 'USD')}
+              {formatBalanceAbbreviated(totalInvested, 2, 'USD')}
             </Heading>
           </Flex>
         </Box>

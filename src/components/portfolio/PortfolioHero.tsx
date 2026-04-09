@@ -66,23 +66,25 @@ export function PortfolioHero({ poolIds, fallback, isMobile, onDataChange }: Por
     if (!pools) return result
 
     for (const row of accessPoolRows) {
-      let totalAssetBalance = 0
+      const pricePerShare = row.poolDetails.shareClasses?.[0]?.details?.pricePerShare
+      const price = pricePerShare?.toDecimal().toNumber() ?? 0
+      let totalInvestedValue = 0
+
       for (const vaultRow of row.vaults) {
         const inv = investmentMap.get(vaultRow.vault.address)
         if (inv) {
-          totalAssetBalance += inv.assetBalance.toDecimal().toNumber()
+          totalInvestedValue += inv.shareBalance.toDecimal().toNumber() * price
         }
       }
 
-      if (totalAssetBalance > 0) {
+      if (totalInvestedValue > 0) {
         const pool = pools.find((p) => p.id.toString() === row.poolId)
-        const pricePerShare = row.poolDetails.shareClasses?.[0]?.details?.pricePerShare
         if (pool && pricePerShare) {
           result.push({
             pool,
             poolName: row.poolName,
-            investedValue: totalAssetBalance,
-            currentPrice: pricePerShare.toDecimal().toNumber(),
+            investedValue: totalInvestedValue,
+            currentPrice: price,
           })
         }
       }
