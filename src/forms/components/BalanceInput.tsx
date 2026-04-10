@@ -175,6 +175,19 @@ export function BalanceInput<TFieldValues extends FieldValues = FieldValues>(pro
       const limitedValue = limitDecimals(numericValue, currentDisplayDecimals)
       field.onChange(limitedValue)
       setDisplayValue(formatWithThousandSeparators(limitedValue))
+      if (onChange) {
+        if (limitedValue !== '' && limitedValue !== '.') {
+          try {
+            const numValue = new Decimal(limitedValue)
+            const balance = decimalToBalance(numValue, decimals)
+            onChange(limitedValue, balance)
+          } catch {
+            onChange(limitedValue)
+          }
+        } else {
+          onChange(limitedValue)
+        }
+      }
     }
   }
 
