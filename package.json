@@ -22,8 +22,10 @@
       "@metamask/sdk": "0.33.1",
       "@metamask/sdk-communication-layer": "0.33.1",
       "ajv@<7": "6.14.0",
+      "axios": ">=1.15.0",
       "bn.js@<5": "4.12.3",
       "bn.js@>=5": "5.2.3",
+      "brace-expansion": ">=5.0.5",
       "debug": "4.4.3",
       "flatted": ">=3.4.2",
       "glob": ">=11.1.0",
@@ -40,7 +42,6 @@
       "rollup@>=4": "4.59.0",
       "undici": ">=7.24.0",
       "viem": "2.40.2",
-      "brace-expansion": ">=5.0.5",
       "yaml@<2": "1.10.3"
     }
   },
