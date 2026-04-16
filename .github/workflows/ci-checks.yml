@@ -44,7 +44,11 @@ jobs:
       - name: Audit dependencies with pnpm
         if: always()
         shell: sh
-        run: pnpm audit --audit-level moderate
+        # pnpm <11 hits HTTP 410 from the retired npm audit endpoint.
+        # Use pnpm v11 rc via dlx for the fixed bulk advisory API.
+        # Revert to plain `pnpm audit` once project upgrades to pnpm >=11.
+        # See: https://github.com/pnpm/pnpm/issues/11265
+        run: pnpm --config.minimumReleaseAge=0 dlx pnpm@11.0.0-rc.1 --config.manage-package-manager-versions=false audit --audit-level moderate
 
   osv-dependency-sec-check:
     permissions:
