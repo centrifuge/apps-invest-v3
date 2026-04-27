@@ -22,6 +22,7 @@ import {
 } from 'viem/chains'
 import ArbitrumLogo from '../assets/logos/arbitrum.svg'
 import BnbLogo from '../assets/logos/bnb.svg'
+import PharosLogo from '../assets/logos/pharos.png'
 import PlumeLogo from '../assets/logos/plume.svg'
 
 export interface WalletProviderProps {
@@ -94,6 +95,7 @@ function getOrCreateAdapter(
         [plumeMainnet.id]: PlumeLogo,
         [hyperEvm.id]: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg',
         [hyperliquidEvmTestnet.id]: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg',
+        1672: PharosLogo,
       },
       featuredWalletIds: [
         'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
