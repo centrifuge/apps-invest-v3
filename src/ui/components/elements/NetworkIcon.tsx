@@ -1,6 +1,7 @@
 import React from 'react'
 import { Image, type ImageProps, Flex, Box, Text } from '@chakra-ui/react'
 import { useBlockchainByCentrifugeId } from '@cfg'
+import PharosLogo from '@assets/logos/pharos.png'
 
 // Fallback data for chains where the SDK doesn't provide data
 const CHAIN_FALLBACKS: Record<number, { icon: string; name: string }> = {
@@ -12,6 +13,11 @@ const CHAIN_FALLBACKS: Record<number, { icon: string; name: string }> = {
     icon: 'https://coin-images.coingecko.com/coins/images/50882/large/hyperliquid.jpg',
     name: 'Hyperliquid EVM Testnet',
   },
+}
+
+// Fallback data keyed by Centrifuge ID for chains the indexer hasn't populated yet.
+const CENTRIFUGE_ID_FALLBACKS: Record<number, { icon: string; name: string }> = {
+  12: { icon: PharosLogo, name: 'Pharos Mainnet' },
 }
 
 interface NetworkIconProps extends Omit<ImageProps, 'src'> {
@@ -35,10 +41,11 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({
 }) => {
   const { data: blockchain } = useBlockchainByCentrifugeId(centrifugeId)
 
-  const fallback = chainId ? CHAIN_FALLBACKS[chainId] : undefined
-  const networkName = blockchain?.name || fallback?.name
+  const chainFallback = chainId ? CHAIN_FALLBACKS[chainId] : undefined
+  const centrifugeFallback = centrifugeId !== undefined ? CENTRIFUGE_ID_FALLBACKS[centrifugeId] : undefined
+  const networkName = blockchain?.name || chainFallback?.name || centrifugeFallback?.name
   const networkIcon = blockchain?.icon
-  const src = srcOverride || networkIcon || fallback?.icon || undefined
+  const src = srcOverride || networkIcon || chainFallback?.icon || centrifugeFallback?.icon || undefined
 
   if (!withLabel) {
     return src ? (
@@ -126,5 +133,6 @@ interface NetworkNameProps {
 
 export const NetworkName: React.FC<NetworkNameProps> = ({ centrifugeId }) => {
   const { data: blockchain } = useBlockchainByCentrifugeId(centrifugeId)
-  return <>{blockchain?.name ?? '-'}</>
+  const fallback = centrifugeId !== undefined ? CENTRIFUGE_ID_FALLBACKS[centrifugeId] : undefined
+  return <>{blockchain?.name ?? fallback?.name ?? '-'}</>
 }
