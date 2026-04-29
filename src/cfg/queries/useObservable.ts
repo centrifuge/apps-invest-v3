@@ -1,6 +1,7 @@
 import { useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 import { catchError, of, share, timer, type Observable, type ObservedValueOf } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
+import { reportDeploymentError } from '@contexts/DeploymentErrorContext'
 
 export type ObservableOptions = never
 
@@ -66,7 +67,10 @@ function useObservableInner<ObservableType extends Observable<any>>(observable?:
       } as CacheRecord<ObservedValueOf<ObservableType>>
       entry.observable = observable.pipe(
         map((value) => ({ data: value, error: undefined, hasData: true })),
-        catchError((error) => of({ data: entry.snapshot.data, error, hasData: entry.didEmitData })),
+        catchError((error) => {
+          reportDeploymentError(error)
+          return of({ data: entry.snapshot.data, error, hasData: entry.didEmitData })
+        }),
         tap((result) => {
           entry.didEmitData = result.hasData
           entry.snapshot = {
