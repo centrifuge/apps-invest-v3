@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
-import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query'
+import { QueryCache, QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import Centrifuge from '@centrifuge/sdk'
+import { DeploymentErrorProvider, reportDeploymentError } from '@contexts/DeploymentErrorContext'
+import { DeploymentHealthGate } from '@contexts/DeploymentHealthGate'
 import {
   CentrifugeProvider,
   DebugFlags,
@@ -16,13 +18,27 @@ import { LoadingProvider } from '@ui'
 import { WalletProvider } from '@wallet/WalletProvider'
 import { PoolProvider } from '@contexts/PoolContext'
 
-const QUERY_CLIENT_OPTIONS = {
-  defaultOptions: {
-    queries: {
-      staleTime: 600000,
-      gcTime: 600000,
-    },
+const QUERY_CLIENT_DEFAULTS = {
+  queries: {
+    staleTime: 600000,
+    gcTime: 600000,
   },
+}
+
+// Builds a fresh QueryClient + QueryCache pair. Must be called per environment
+// switch — sharing a QueryCache across QueryClients in v5 leads to queries
+// staying bound to the old client and never resolving in the new one. The
+// QueryCache hooks deployment-verification errors so they surface as a
+// blocking gate (most invest-app SDK calls go through React Query, not direct
+// observable subscription).
+function makeQueryClient(): QueryClient {
+  const queryCache = new QueryCache({
+    onError: (error) => reportDeploymentError(error),
+  })
+  return new QueryClient({
+    queryCache,
+    defaultOptions: QUERY_CLIENT_DEFAULTS,
+  })
 }
 
 function RootProviders() {
@@ -51,7 +67,7 @@ function RootProviders() {
   // Create a new QueryClient when the environment switches. This causes
   // QueryClientProvider to remount the entire tree, guaranteeing that no
   // SDK entities from the previous environment survive in cache.
-  const queryClient = useMemo(() => new QueryClient(QUERY_CLIENT_OPTIONS), [isMainnet])
+  const queryClient = useMemo(() => makeQueryClient(), [isMainnet])
 
   /**
    * For WalletProvider networks, we include ALL possible networks (mainnet + testnet)
@@ -66,20 +82,24 @@ function RootProviders() {
   return (
     <QueryClientProvider key={String(isMainnet)} client={queryClient}>
       <CentrifugeProvider client={centrifuge}>
-        <WalletProvider
-          projectId={import.meta.env.VITE_REOWN_APP_ID!}
-          networks={ALL_CHAINS}
-          rpcUrls={{ ...MAINNET_RPC_URLS, ...TESTNET_RPC_URLS }}
-        >
-          <WalletInvalidator />
-          <TransactionProvider>
-            <PoolProvider>
-              <LoadingProvider>
-                <Outlet />
-              </LoadingProvider>
-            </PoolProvider>
-          </TransactionProvider>
-        </WalletProvider>
+        <DeploymentErrorProvider>
+          <DeploymentHealthGate>
+            <WalletProvider
+              projectId={import.meta.env.VITE_REOWN_APP_ID!}
+              networks={ALL_CHAINS}
+              rpcUrls={{ ...MAINNET_RPC_URLS, ...TESTNET_RPC_URLS }}
+            >
+              <WalletInvalidator />
+              <TransactionProvider>
+                <PoolProvider>
+                  <LoadingProvider>
+                    <Outlet />
+                  </LoadingProvider>
+                </PoolProvider>
+              </TransactionProvider>
+            </WalletProvider>
+          </DeploymentHealthGate>
+        </DeploymentErrorProvider>
       </CentrifugeProvider>
     </QueryClientProvider>
   )
