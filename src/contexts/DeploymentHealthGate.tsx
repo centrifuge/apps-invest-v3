@@ -1,5 +1,17 @@
 import { useEffect } from 'react'
-import { Alert, AlertDescription, AlertTitle, Box, Button, Code, Flex, HStack, Stack, Text, VStack } from '@chakra-ui/react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Box,
+  Button,
+  Code,
+  Flex,
+  HStack,
+  Stack,
+  Text,
+  VStack,
+} from '@chakra-ui/react'
 import { DeploymentMismatchError, KNOWN_DEPLOYMENTS, UnknownDeploymentError } from '@centrifuge/sdk'
 import { useCentrifuge } from '@cfg'
 import { LogoCentrifugeText } from '@ui'
@@ -50,75 +62,69 @@ function BlockingMismatchScreen({ error }: { error: DeploymentMismatchError }) {
 
   return (
     <Box minH="100vh" bg="bg.subtle" display="flex" flexDirection="column">
-      <Flex
-        bg="linear-gradient(to top, #07090A 30%, #252B34 70%)"
-        color="white"
-        px={6}
-        py={3}
-        align="center"
-      >
+      <Flex bg="linear-gradient(to top, #07090A 30%, #252B34 70%)" color="white" px={6} py={3} align="center">
         <LogoCentrifugeText fill="white" size={28} />
       </Flex>
       <Box flex="1" display="flex" alignItems="center" justifyContent="center" p={6}>
-      <Alert.Root
-        status="error"
-        variant="subtle"
-        flexDirection="column"
-        alignItems="flex-start"
-        maxW="2xl"
-        borderRadius="md"
-        p={8}
-        role="alert"
-      >
-        <HStack gap={2} mb={2}>
-          <Alert.Indicator />
-          <AlertTitle fontSize="xl" fontWeight="bold">
-            Service unavailable — do not transact
-          </AlertTitle>
-        </HStack>
-        <Alert.Content>
-          <VStack align="flex-start" gap={4} w="full">
-            <AlertDescription>
-              The app detected a contract address mismatch on {chainName}. For your safety, the app is disabled until
-              this is resolved. <strong>Please do not attempt to transact.</strong> Try refreshing in a few minutes —
-              if the issue persists, contact support.
-            </AlertDescription>
+        <Alert.Root
+          status="error"
+          variant="subtle"
+          flexDirection="column"
+          alignItems="flex-start"
+          maxW="2xl"
+          borderRadius="md"
+          p={8}
+          role="alert"
+        >
+          <HStack gap={2} mb={2}>
+            <Alert.Indicator />
+            <AlertTitle fontSize="xl" fontWeight="bold">
+              Service unavailable — do not transact
+            </AlertTitle>
+          </HStack>
+          <Alert.Content>
+            <VStack align="flex-start" gap={4} w="full">
+              <AlertDescription>
+                The app detected a contract address mismatch on {chainName}. For your safety, the app is disabled until
+                this is resolved. <strong>Please do not attempt to transact.</strong> Try refreshing in a few minutes —
+                if the issue persists, contact support.
+              </AlertDescription>
 
-            <Stack gap={1} fontSize="sm" w="full">
-              <Text>
-                <strong>Chain Name:</strong> {chainName}
-              </Text>
-              <Text>
-                <strong>Chain (centrifugeId):</strong> {error.centrifugeId}
-              </Text>
-              <Text>
-                <strong>Contract:</strong> {error.field}{' '}
-                <Text as="span" color="fg.muted">
-                  (the protocol contract whose address didn't match)
+              <Stack gap={1} fontSize="sm" w="full">
+                <Text>
+                  <strong>Chain Name:</strong> {chainName}
                 </Text>
-              </Text>
-            </Stack>
+                <Text>
+                  <strong>Chain (centrifugeId):</strong> {error.centrifugeId}
+                </Text>
+                <Text>
+                  <strong>Contract:</strong> {error.field}{' '}
+                  <Text as="span" color="fg.muted">
+                    (the protocol contract whose address didn't match)
+                  </Text>
+                </Text>
+              </Stack>
 
-            <Code
-              display="block"
-              p={3}
-              w="full"
-              fontSize="xs"
-              whiteSpace="pre-wrap"
-              wordBreak="break-word"
-              bg="bg.muted"
-              borderRadius="md"
-            >
-              Expected: {error.expected}
-              {'\n'}Received: {error.actual}
-            </Code>
+              <Code
+                display="block"
+                p={3}
+                w="full"
+                fontSize="xs"
+                whiteSpace="pre-wrap"
+                wordBreak="break-word"
+                bg="bg.muted"
+                borderRadius="md"
+              >
+                Expected: {error.expected}
+                {'\n'}Received: {error.actual}
+              </Code>
 
-            <Button onClick={() => window.location.reload()} colorScheme="red" size="md" fontWeight="bold">
-              Refresh
-            </Button>
-          </VStack>
-        </Alert.Content>
-      </Alert.Root>
+              <Button onClick={() => window.location.reload()} colorScheme="red" size="md" fontWeight="bold">
+                Refresh
+              </Button>
+            </VStack>
+          </Alert.Content>
+        </Alert.Root>
       </Box>
     </Box>
   )
